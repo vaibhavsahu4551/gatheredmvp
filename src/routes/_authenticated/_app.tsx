@@ -34,13 +34,13 @@ function AppShell() {
 
 function BottomNav() {
   const { pathname } = useLocation();
-  const items = [
+  const items: { to: "/home" | "/events" | "/create" | "/chat" | "/profile"; label: string; icon: typeof Home; primary?: boolean }[] = [
     { to: "/home", label: "Home", icon: Home },
     { to: "/events", label: "Events", icon: Calendar },
     { to: "/create", label: "Create", icon: Plus, primary: true },
     { to: "/chat", label: "Chat", icon: MessageCircle },
     { to: "/profile", label: "Profile", icon: User },
-  ] as const;
+  ];
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 bg-background/95 backdrop-blur border-t border-border">
