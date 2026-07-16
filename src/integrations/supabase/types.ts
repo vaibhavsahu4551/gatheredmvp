@@ -14,7 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          bio: string | null
+          city: string | null
+          created_at: string
+          dob: string | null
+          full_name: string | null
+          gender: string | null
+          id: string
+          interests: string[]
+          onboarding_complete: boolean
+          photos: string[]
+          selfie_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          city?: string | null
+          created_at?: string
+          dob?: string | null
+          full_name?: string | null
+          gender?: string | null
+          id: string
+          interests?: string[]
+          onboarding_complete?: boolean
+          photos?: string[]
+          selfie_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          city?: string | null
+          created_at?: string
+          dob?: string | null
+          full_name?: string | null
+          gender?: string | null
+          id?: string
+          interests?: string[]
+          onboarding_complete?: boolean
+          photos?: string[]
+          selfie_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      verification_status: {
+        Row: {
+          notes: string | null
+          status: Database["public"]["Enums"]["verification_state"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          notes?: string | null
+          status?: Database["public"]["Enums"]["verification_state"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          notes?: string | null
+          status?: Database["public"]["Enums"]["verification_state"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +88,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      verification_state: "unverified" | "pending" | "verified"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +215,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      verification_state: ["unverified", "pending", "verified"],
+    },
   },
 } as const
