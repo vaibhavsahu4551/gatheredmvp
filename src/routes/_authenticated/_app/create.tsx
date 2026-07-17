@@ -1,25 +1,154 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Sparkles } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { CATEGORIES, looksResidential, type Category } from "@/lib/events";
+import { loadMe } from "@/lib/huddl";
+import { toast } from "sonner";
+import { AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/_app/create")({
   component: Create,
 });
 
 function Create() {
+  const navigate = useNavigate();
+  const [userId, setUserId] = useState("");
+  const [defaultCity, setDefaultCity] = useState("");
+  const [title, setTitle] = useState("");
+  const [desc, setDesc] = useState("");
+  const [category, setCategory] = useState<Category>("Coffee");
+  const [startsAt, setStartsAt] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [minSize, setMinSize] = useState(4);
+  const [maxSize, setMaxSize] = useState(8);
+  const [fee, setFee] = useState("");
+  const [minGirls, setMinGirls] = useState("");
+  const [minBoys, setMinBoys] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    loadMe().then((me) => {
+      if (!me) return;
+      setUserId(me.user.id);
+      setDefaultCity(me.profile?.city ?? "");
+      setCity(me.profile?.city ?? "");
+    });
+  }, []);
+
+  const residentialWarn = address.length > 4 && looksResidential(address);
+
+  const submit = async () => {
+    if (!title.trim()) return toast.error("Add a title");
+    if (!startsAt) return toast.error("Pick date and time");
+    if (new Date(startsAt).getTime() < Date.now()) return toast.error("Pick a future time");
+    if (!address.trim()) return toast.error("Add a location");
+    if (!city.trim()) return toast.error("Add city");
+    if (minSize < 4) return toast.error("Minimum group size is 4");
+    if (maxSize < minSize) return toast.error("Max must be ≥ min");
+
+    setSaving(true);
+    const { data, error } = await supabase.from("events").insert({
+      host_id: userId,
+      title: title.trim(),
+      description: desc.trim() || null,
+      category,
+      starts_at: new Date(startsAt).toISOString(),
+      location_address: address.trim(),
+      city: city.trim(),
+      min_size: minSize,
+      max_size: maxSize,
+      entry_fee: fee ? Number(fee) : null,
+      min_girls: minGirls ? Number(minGirls) : null,
+      min_boys: minBoys ? Number(minBoys) : null,
+    }).select("id").maybeSingle();
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Event created");
+    if (data) navigate({ to: "/events/$eventId", params: { eventId: data.id } });
+    else navigate({ to: "/events" });
+  };
+
   return (
-    <div>
+    <div className="pb-32">
       <header className="px-5 pt-8 pb-4">
         <h1 className="text-2xl font-semibold tracking-tight">Create a HUDDL</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Set the vibe and let people join.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Groups of 4 or more only. No solo hangs.</p>
       </header>
-      <div className="px-6 py-12 text-center">
-        <div className="mx-auto h-14 w-14 rounded-full bg-muted flex items-center justify-center">
-          <Sparkles className="h-6 w-6 text-muted-foreground" />
+
+      <div className="px-5 space-y-5 max-w-md mx-auto">
+        <Field label="Title">
+          <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls} placeholder="Sunday coffee run" />
+        </Field>
+
+        <Field label="Category">
+          <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className={inputCls}>
+            {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+          </select>
+        </Field>
+
+        <Field label="Date & time">
+          <input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} className={inputCls} />
+        </Field>
+
+        <Field label="Location (public place)">
+          <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputCls} placeholder="Third Wave Coffee, Indiranagar" />
+          {residentialWarn && (
+            <div className="mt-2 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5">
+              <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+              <span>This looks like a residential address. HUDDLs should meet at public places.</span>
+            </div>
+          )}
+        </Field>
+
+        <Field label="City">
+          <input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} placeholder={defaultCity || "Bengaluru"} />
+        </Field>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Min group size">
+            <input type="number" min={4} value={minSize} onChange={(e) => setMinSize(Number(e.target.value))} className={inputCls} />
+          </Field>
+          <Field label="Max group size">
+            <input type="number" min={minSize} value={maxSize} onChange={(e) => setMaxSize(Number(e.target.value))} className={inputCls} />
+          </Field>
         </div>
-        <p className="mt-4 text-sm text-muted-foreground max-w-xs mx-auto">
-          Event creation coming next. Phase 1 focuses on getting verified.
-        </p>
+
+        <Field label="Entry fee (optional)">
+          <input type="number" value={fee} onChange={(e) => setFee(e.target.value)} className={inputCls} placeholder="₹ 0" />
+        </Field>
+
+        <div className="rounded-2xl border border-border p-4">
+          <div className="text-sm font-medium">Gender balance (optional)</div>
+          <p className="mt-0.5 text-xs text-muted-foreground">Only confirm when at least this many join.</p>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <Field label="Min girls">
+              <input type="number" min={0} value={minGirls} onChange={(e) => setMinGirls(e.target.value)} className={inputCls} placeholder="0" />
+            </Field>
+            <Field label="Min boys">
+              <input type="number" min={0} value={minBoys} onChange={(e) => setMinBoys(e.target.value)} className={inputCls} placeholder="0" />
+            </Field>
+          </div>
+        </div>
       </div>
+
+      <div className="fixed inset-x-0 bottom-16 bg-background/95 backdrop-blur border-t border-border p-4">
+        <div className="max-w-md mx-auto">
+          <button onClick={submit} disabled={saving} className="w-full rounded-full bg-primary py-3.5 text-[15px] font-medium text-primary-foreground disabled:opacity-50">
+            {saving ? "Creating…" : "Create HUDDL"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const inputCls = "w-full rounded-2xl border border-input bg-background px-4 py-3 text-[15px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20";
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="mb-2 block text-sm font-medium">{label}</label>
+      {children}
     </div>
   );
 }
