@@ -14,6 +14,256 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_groups: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_groups_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_messages: {
+        Row: {
+          body: string
+          created_at: string
+          group_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          group_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          group_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "chat_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_participants: {
+        Row: {
+          created_at: string
+          event_id: string
+          gender: string | null
+          id: string
+          status: Database["public"]["Enums"]["participant_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          gender?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["participant_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          gender?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["participant_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_participants_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          auto_cancel_hours: number
+          category: Database["public"]["Enums"]["event_category"]
+          city: string
+          created_at: string
+          description: string | null
+          entry_fee: number | null
+          host_id: string
+          id: string
+          location_address: string
+          location_lat: number | null
+          location_lng: number | null
+          max_size: number
+          min_boys: number | null
+          min_girls: number | null
+          min_size: number
+          starts_at: string
+          status: Database["public"]["Enums"]["event_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          auto_cancel_hours?: number
+          category: Database["public"]["Enums"]["event_category"]
+          city: string
+          created_at?: string
+          description?: string | null
+          entry_fee?: number | null
+          host_id: string
+          id?: string
+          location_address: string
+          location_lat?: number | null
+          location_lng?: number | null
+          max_size: number
+          min_boys?: number | null
+          min_girls?: number | null
+          min_size: number
+          starts_at: string
+          status?: Database["public"]["Enums"]["event_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          auto_cancel_hours?: number
+          category?: Database["public"]["Enums"]["event_category"]
+          city?: string
+          created_at?: string
+          description?: string | null
+          entry_fee?: number | null
+          host_id?: string
+          id?: string
+          location_address?: string
+          location_lat?: number | null
+          location_lng?: number | null
+          max_size?: number
+          min_boys?: number | null
+          min_girls?: number | null
+          min_size?: number
+          starts_at?: string
+          status?: Database["public"]["Enums"]["event_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      post_comments: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_likes: {
+        Row: {
+          created_at: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          caption: string
+          city: string
+          created_at: string
+          id: string
+          photo_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          caption: string
+          city: string
+          created_at?: string
+          id?: string
+          photo_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          caption?: string
+          city?: string
+          created_at?: string
+          id?: string
+          photo_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           bio: string | null
@@ -85,9 +335,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_event_host: {
+        Args: { _event: string; _user: string }
+        Returns: boolean
+      }
+      is_event_member: {
+        Args: { _event: string; _user: string }
+        Returns: boolean
+      }
+      is_group_member: {
+        Args: { _group: string; _user: string }
+        Returns: boolean
+      }
+      is_verified: { Args: { _user: string }; Returns: boolean }
     }
     Enums: {
+      event_category:
+        | "Gaming"
+        | "Coffee"
+        | "Dinner"
+        | "Movie"
+        | "Hangout"
+        | "Sports"
+        | "Party"
+      event_status: "pending" | "confirmed" | "cancelled" | "completed"
+      participant_status: "pending" | "approved" | "rejected" | "cancelled"
       verification_state: "unverified" | "pending" | "verified"
     }
     CompositeTypes: {
@@ -216,6 +488,17 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      event_category: [
+        "Gaming",
+        "Coffee",
+        "Dinner",
+        "Movie",
+        "Hangout",
+        "Sports",
+        "Party",
+      ],
+      event_status: ["pending", "confirmed", "cancelled", "completed"],
+      participant_status: ["pending", "approved", "rejected", "cancelled"],
       verification_state: ["unverified", "pending", "verified"],
     },
   },
