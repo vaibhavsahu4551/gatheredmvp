@@ -1,66 +1,84 @@
-## HUDDL Phase 2 — Events, Feed & Chat
+# Firebase Phone Auth — Full Migration Plan
 
-Building on the existing verified-user gate, I'll add event creation, discovery, join workflow, a nearby feed, and realtime group chat.
+Replace Supabase Auth with Firebase Phone OTP. Firebase becomes the sole identity provider; Supabase remains the database but with a rewritten auth model.
 
-### 1. Database (single migration)
+## Important upfront warnings
 
-New tables (all with RLS + GRANTs, timestamps, update triggers):
+1. **All existing users and data will be orphaned.** Current rows key off Supabase `auth.users(id)` UUIDs. Firebase UIDs are 28-char strings, not UUIDs. There is no safe automatic mapping — existing profiles, events, chats, and posts will no longer be reachable by their original owners. Since the app is pre-launch, I'll wipe user data as part of the migration.
+2. **RLS model changes.** Supabase supports Firebase as a native third-party auth provider: Firebase-issued JWTs are validated by Supabase, and `auth.jwt() ->> 'sub'` returns the Firebase UID inside RLS. All policies will be rewritten to use the Firebase UID (text) instead of `auth.uid()` (uuid).
+3. **Phone auth in dev.** Firebase requires reCAPTCHA (invisible) and a verified sending domain. The Lovable preview domain must be added to Firebase Auth's "Authorized domains" list by the user in Firebase Console before OTP will send. I'll add test-number instructions in the plan.
 
-- **events** — `host_id`, `title`, `description`, `category` (enum), `starts_at`, `location_address`, `location_lat/lng` (nullable), `min_size` (>=4), `max_size`, `entry_fee` (nullable), `min_girls`, `min_boys` (nullable), `city`, `status` (enum: `pending`/`confirmed`/`cancelled`/`completed`), `auto_cancel_hours` (default 2).
-- **event_participants** — `event_id`, `user_id`, `status` (`pending`/`approved`/`rejected`), `gender` snapshot for ratio counting.
-- **posts** — `user_id`, `city`, `photo_url`, `caption`.
-- **post_likes** — `post_id`, `user_id` (unique).
-- **post_comments** — `post_id`, `user_id`, `body`.
-- **chat_groups** — `event_id` (unique, created when event confirmed).
-- **chat_messages** — `group_id`, `user_id`, `body`.
+## Approach
 
-Enums: `event_category`, `event_status`, `participant_status`.
+### 1. Environment
+- Move the 6 Firebase keys from server secrets into `.env` as `VITE_FIREBASE_*` (they are public web keys by design).
+- Install `firebase` npm package.
 
-**Enforcement**
-- CHECK: `min_size >= 4`, `max_size >= min_size`.
-- Trigger: when approved participants ≥ `min_size`, flip `events.status` to `confirmed` and insert `chat_groups` row.
-- Cron (pg_cron, hourly): if `starts_at - now() <= auto_cancel_hours` and status still `pending`, set `cancelled`.
-- `handle_new_event_participant` trigger blocks join if user not verified.
+### 2. Configure Supabase third-party auth for Firebase
+Register Firebase as a JWT auth provider in `supabase/config.toml` (via the Supabase config tool) so Supabase validates Firebase ID tokens and populates `auth.jwt()` for RLS.
 
-**RLS highlights**
-- events: SELECT for authenticated; INSERT only if `has_verified(auth.uid())`; UPDATE/DELETE only host.
-- event_participants: SELECT own + host of event; INSERT self (verified); UPDATE only host (approve/reject) or self (cancel).
-- posts: SELECT for authenticated (filtered client-side by city); INSERT only verified; UPDATE/DELETE own.
-- post_likes/comments: standard own-row rules, SELECT open to authenticated.
-- chat_groups/chat_messages: SELECT/INSERT only for approved participants of the event (security-definer helper `is_event_member`).
+### 3. Database migration (single migration)
+- Drop existing rows in: `chat_messages`, `chat_groups`, `event_participants`, `events`, `post_comments`, `post_likes`, `posts`, `verification_status`, `profiles`.
+- Change every `user_id`/`host_id`/`author_id`/`id` column that referenced `auth.users(id)` from `uuid` to `text`.
+- Drop FKs to `auth.users`. Firebase UID is the new identity — no local users table needed (profile row IS the user record, keyed by Firebase UID).
+- Drop the `handle_new_user` trigger on `auth.users` (Supabase Auth won't be creating users anymore). Profile creation happens client-side after OTP verify.
+- Rewrite every RLS policy: replace `auth.uid() = user_id` with `(auth.jwt() ->> 'sub') = user_id`. Rewrite the security-definer helpers (`is_event_host`, `is_event_member`, `is_group_member`, `is_verified`) to accept `text` and compare against the JWT sub.
+- Rewrite storage bucket policies (`profile-photos`, `selfies`, `feed-photos`) so the first path segment must equal `auth.jwt() ->> 'sub'`.
+- Re-run all GRANTs.
 
-Enable Realtime on `chat_messages`, `event_participants`.
+### 4. New Firebase client module
+- `src/integrations/firebase/client.ts` — initializes the SDK from `VITE_FIREBASE_*`.
+- `src/integrations/firebase/auth.ts` — helpers: `sendOtp(phone, recaptchaContainer)`, `verifyOtp(confirmationResult, code)`, `signOut()`, `onIdTokenChanged(cb)`.
 
-### 2. Frontend routes
+### 5. Bridge Firebase → Supabase client
+- Rewrite `src/integrations/supabase/client.ts` to attach the Firebase ID token as the `Authorization: Bearer <token>` header on every Supabase request (via a custom `fetch` wrapper), and refresh it on Firebase token changes. Publishable key stays as `apikey`.
+- Remove all `supabase.auth.*` calls throughout the codebase (getSession, getUser, signOut, onAuthStateChange, signInWithOtp, verifyOtp).
 
-Under `src/routes/_authenticated/_app/`:
+### 6. Rewrite auth screen
+- `src/routes/auth.tsx`: two-step phone → OTP flow using Firebase. Invisible reCAPTCHA container. On successful verify:
+  - Query `profiles` by Firebase UID.
+  - If none exists → insert stub row + redirect to `/onboarding`.
+  - If exists and `onboarding_complete` → `/home`. Otherwise `/onboarding`.
 
-- `create.tsx` — full form (rewrite the placeholder). Category select, datetime, address input, min/max sliders (min ≥ 4), optional entry fee, optional gender ratio, residential warning if address matches heuristic (contains "apartment"/"flat"/"villa"/"house"/"road no"/"block"), submit → insert event.
-- `home.tsx` — replace mock with live query: events in user's city, sorted by `starts_at`. Filters (category chips, date range popover, "girls preferred" toggle) and search input. Each card: title/date/location/category, "X boys, Y girls joined / max N", host name + verified badge, Join button.
-- `events/$eventId.tsx` — event detail: description, participants, Request to Join button, if host → pending requests list with approve/reject, status banner ("waiting for more people" / "confirmed").
-- `events.tsx` — split into "Hosting" and "Joined" tabs listing user's events.
-- `chat.tsx` — list of confirmed event group chats user belongs to.
-- `chat/$groupId.tsx` — realtime message thread; subscribe via `supabase.channel` inside `useEffect`.
-- `feed.tsx` (new bottom-nav tab replacing… actually keep 5 tabs — repurpose Home to include feed section OR add feed under Home). **Decision:** add a segmented toggle on Home between "Events" and "Feed" to preserve 5-tab nav.
+### 7. Update every reference to the old session
+- `src/routes/_authenticated/route.tsx` — gate on Firebase auth state, not Supabase session.
+- `src/lib/huddl.ts` `loadMe()` — get current user from Firebase, query profile by Firebase UID.
+- All lib files (`events.ts`, `feed.ts`, `chat.ts`) — replace `supabase.auth.getUser()` with Firebase UID getter.
+- Sign-out button in profile → Firebase `signOut()`.
 
-### 3. Helpers
+### 8. Age gate stays where it is (onboarding DOB check).
 
-`src/lib/events.ts` — typed fetchers (list events by city, get event with participants, join/approve/reject, participant counts by gender).
-`src/lib/feed.ts` — posts CRUD + likes/comments.
-`src/lib/chat.ts` — list groups, send message, subscribe.
+## Files touched
 
-### Technical notes
+**New**
+- `src/integrations/firebase/client.ts`
+- `src/integrations/firebase/auth.ts`
 
-- Realtime subscription tears down in effect cleanup.
-- Participant counts computed via SQL view `event_counts` (approved counts by gender) to avoid N+1.
-- Auto-confirm & auto-cancel handled in DB (trigger + pg_cron), so no server function needed.
-- Chat access enforced by RLS using `is_event_member(auth.uid(), group_id)` security-definer.
-- All new tables get `authenticated` GRANTs + `service_role` ALL; no `anon`.
+**Rewritten**
+- `.env` (add VITE_FIREBASE_*)
+- `src/integrations/supabase/client.ts` (token attacher)
+- `src/routes/auth.tsx` (phone + OTP)
+- `src/routes/_authenticated/route.tsx` (Firebase gate)
+- `src/lib/huddl.ts` (Firebase UID lookup)
+- `src/lib/events.ts`, `src/lib/feed.ts`, `src/lib/chat.ts` (remove supabase.auth calls)
+- `src/routes/_authenticated/_app/profile.tsx` (Firebase signOut)
+- `src/routes/_authenticated/_app.tsx` (loadMe still works)
 
-### Out of scope (Phase 2)
+**Migration**
+- One Supabase migration: wipe data, retype columns, rewrite policies + helpers, storage policies, drop `handle_new_user` trigger.
 
-- Real map picker (using address text + optional lat/lng manually; can add Mapbox later).
-- Push notifications for auto-cancel (DB flag only; users see status on next open).
-- Image upload for feed posts uses existing `profile-photos` bucket pattern with a new `feed-photos` private bucket + signed URLs.
+**Config**
+- Register Firebase as third-party auth provider via `supabase--configure_auth` (or config.toml edit if needed).
 
-Shall I proceed?
+## Manual steps you'll need to do
+
+1. In **Firebase Console → Authentication → Sign-in method**: enable **Phone**.
+2. In **Firebase Console → Authentication → Settings → Authorized domains**: add your Lovable preview domain (`id-preview--ce839c12-...lovable.app`) and published domain (`huddlmeet.lovable.app`).
+3. Optional: add test phone numbers under **Phone numbers for testing** to avoid burning SMS quota during development.
+
+## Risks
+
+- If Firebase third-party auth registration on the Supabase side fails or isn't supported on your plan, all authenticated Supabase queries will 401 and the app will be non-functional until reverted. I'll verify the config tool accepts Firebase before rewriting policies.
+- Realtime subscriptions (chat) rely on Supabase Auth session — with third-party JWT, the realtime client needs the Firebase token attached too. I'll wire that in the same client module.
+
+Approve to proceed, or tell me what to change.
