@@ -66,15 +66,15 @@ function AuthPage() {
     try {
       const cred = await confirmRef.current.confirm(value);
       const idToken = await cred.user.getIdToken();
-      const { email, tokenHash } = await bridgeFirebaseAuth({ data: { idToken } });
+      const { tokenHash } = await bridgeFirebaseAuth({ data: { idToken } });
       const { error } = await supabase.auth.verifyOtp({
-        email,
         token_hash: tokenHash,
         type: "magiclink",
       });
       if (error) throw error;
       navigate({ to: "/home" });
     } catch (e) {
+      console.error("[auth] verify failed", e);
       toast.error(e instanceof Error ? e.message : "Verification failed");
       setCode("");
     } finally {
