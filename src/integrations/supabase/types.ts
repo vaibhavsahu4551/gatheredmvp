@@ -270,11 +270,13 @@ export type Database = {
           city: string | null
           created_at: string
           dob: string | null
+          firebase_uid: string | null
           full_name: string | null
           gender: string | null
           id: string
           interests: string[]
           onboarding_complete: boolean
+          phone: string | null
           photos: string[]
           selfie_url: string | null
           updated_at: string
@@ -284,11 +286,13 @@ export type Database = {
           city?: string | null
           created_at?: string
           dob?: string | null
+          firebase_uid?: string | null
           full_name?: string | null
           gender?: string | null
           id: string
           interests?: string[]
           onboarding_complete?: boolean
+          phone?: string | null
           photos?: string[]
           selfie_url?: string | null
           updated_at?: string
@@ -298,11 +302,13 @@ export type Database = {
           city?: string | null
           created_at?: string
           dob?: string | null
+          firebase_uid?: string | null
           full_name?: string | null
           gender?: string | null
           id?: string
           interests?: string[]
           onboarding_complete?: boolean
+          phone?: string | null
           photos?: string[]
           selfie_url?: string | null
           updated_at?: string
