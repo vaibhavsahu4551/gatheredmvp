@@ -17,6 +17,7 @@ function EditProfile() {
   const [fullName, setFullName] = useState("");
   const [bio, setBio] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
+  const [originalInterests, setOriginalInterests] = useState<string[]>([]);
   const [photoPath, setPhotoPath] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
 
@@ -26,7 +27,9 @@ function EditProfile() {
       setUserId(me.user.id);
       setFullName(me.profile.full_name ?? "");
       setBio(me.profile.bio ?? "");
-      setInterests(me.profile.interests ?? []);
+      const loadedInterests = me.profile.interests ?? [];
+      setInterests(loadedInterests);
+      setOriginalInterests(loadedInterests);
       const existing = me.profile.photos?.[0];
       if (existing) {
         setPhotoPath(existing);
@@ -51,11 +54,22 @@ function EditProfile() {
   };
 
   const save = async () => {
+    const name = fullName.trim();
+    if (!name) {
+      toast.error("Name is required");
+      return;
+    }
+    if (bio.length > 150) {
+      toast.error("Bio must be 150 characters or less");
+      return;
+    }
+    const finalInterests = interests.length > 0 ? interests : originalInterests;
+
     setSaving(true);
     const { error } = await supabase.from("profiles").update({
-      full_name: fullName.trim() || null,
+      full_name: name || null,
       bio: bio.trim() || null,
-      interests,
+      interests: finalInterests,
       photos: photoPath ? [photoPath] : [],
     }).eq("id", userId);
     setSaving(false);
@@ -78,7 +92,7 @@ function EditProfile() {
         <button
           onClick={save}
           disabled={saving}
-          className="rounded-full bg-brand-gradient px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="rounded-full bg-gradient-brand px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
         >
           {saving ? "Saving…" : "Save"}
         </button>
@@ -141,7 +155,7 @@ function EditProfile() {
           <button
             onClick={save}
             disabled={saving}
-            className="flex-1 rounded-full bg-brand-gradient py-3 text-[15px] font-semibold text-white disabled:opacity-50"
+            className="flex-1 rounded-full bg-gradient-brand py-3 text-[15px] font-semibold text-white disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save changes"}
           </button>
@@ -153,7 +167,7 @@ function EditProfile() {
           <button
             onClick={save}
             disabled={saving}
-            className="w-full rounded-full bg-brand-gradient py-3.5 text-[15px] font-medium text-white disabled:opacity-50"
+            className="w-full rounded-full bg-gradient-brand py-3.5 text-[15px] font-medium text-white disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save changes"}
           </button>
