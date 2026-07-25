@@ -53,10 +53,10 @@ export function PostCard({
   return (
     <article className="rounded-2xl bg-card overflow-hidden shadow-card ring-1 ring-black/[0.04]">
       <div className="px-3 pt-2.5 pb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2 min-w-0">
+        <Link to="/u/$userId" params={{ userId: p.user_id }} className="flex items-center gap-2 min-w-0">
           <div className="h-7 w-7 rounded-full bg-gradient-brand shrink-0" />
-          <div className="text-[13px] font-semibold truncate">{name}</div>
-        </div>
+          <div className="text-[13px] font-semibold truncate hover:underline">{name}</div>
+        </Link>
         <div className="flex items-center gap-1">
           <span className="text-[10px] uppercase tracking-wide font-bold text-gradient-brand">Post</span>
           <SafetyMenu targetType="user" targetId={p.user_id} userId={p.user_id} />
