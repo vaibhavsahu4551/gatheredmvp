@@ -1,9 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { countByGender, getEvent, getParticipants, getProfilesLite, myParticipation, requestJoin, setParticipantStatus, type EventRow, type ParticipantRow } from "@/lib/events";
+import { countByGender, getEvent, getParticipants, getProfilesLite, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
 import { toast } from "sonner";
-import { ArrowLeft, ShieldCheck, MapPin, Clock, Users, MessageCircle } from "lucide-react";
+import { ArrowLeft, ShieldCheck, MapPin, Clock, Users, MessageCircle, Lock, Send } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/_app/events/$eventId")({
   component: EventDetail,
