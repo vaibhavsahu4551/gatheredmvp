@@ -25,6 +25,7 @@ import { toast } from "sonner";
 
 import { EventCard, type EventCounts } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
+import { Avatar } from "@/components/Avatar";
 
 export const Route = createFileRoute("/_authenticated/_app/profile/")({
   component: Profile,
@@ -39,6 +40,7 @@ function Profile() {
   const [tab, setTab] = useState<Tab>("posts");
   const [connIds, setConnIds] = useState<string[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
+  const [showConnections, setShowConnections] = useState(false);
 
   useEffect(() => {
     loadMe().then(async (data) => {
@@ -74,6 +76,7 @@ function Profile() {
               {p.full_name || "Add your name"}
               {p.dob && <span className="text-muted-foreground font-normal">, {ageFromDob(p.dob)}</span>}
             </h1>
+            {p.bio && <p className="mt-1 text-[15px] leading-relaxed">{p.bio}</p>}
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
               {p.city && (
                 <span className="inline-flex items-center gap-1">
@@ -105,13 +108,14 @@ function Profile() {
           </Link>
         </div>
 
-        <div className="mt-4 flex items-center gap-2 text-sm">
+        <button
+          onClick={() => setShowConnections(true)}
+          className="mt-4 flex items-center gap-2 text-sm hover:opacity-80 transition"
+        >
           <Users className="h-4 w-4 text-muted-foreground" />
           <span className="font-semibold">{connIds.length}</span>
           <span className="text-muted-foreground">Huddled with</span>
-        </div>
-
-        {p.bio && <p className="mt-4 text-[15px] leading-relaxed">{p.bio}</p>}
+        </button>
 
         {p.interests?.length > 0 && (
           <div className="mt-5">
@@ -122,6 +126,10 @@ function Profile() {
               ))}
             </div>
           </div>
+        )}
+
+        {showConnections && (
+          <ConnectionsModal ids={connIds} onClose={() => setShowConnections(false)} />
         )}
 
         <div className="mt-6 border-b border-border">
@@ -175,6 +183,8 @@ function PostsTab({ userId, onCreate }: { userId: string; onCreate: () => void }
   const [names, setNames] = useState<Record<string, { full_name: string | null }>>({});
   const [linked, setLinked] = useState<Record<string, { id: string; title: string; event_type: string | null }>>({});
   const [loading, setLoading] = useState(true);
+  const [openId, setOpenId] = useState<string | null>(null);
+
 
   const refresh = async () => {
     setLoading(true);
@@ -209,8 +219,8 @@ function PostsTab({ userId, onCreate }: { userId: string; onCreate: () => void }
       />
     );
 
-  const [openId, setOpenId] = useState<string | null>(null);
   const openPost = openId ? posts.find((p) => p.id === openId) : null;
+
 
   return (
     <>
@@ -318,6 +328,38 @@ function EmptyState({ icon, title, cta, onClick }: { icon: React.ReactNode; titl
       >
         {cta}
       </button>
+    </div>
+  );
+}
+
+function ConnectionsModal({ ids, onClose }: { ids: string[]; onClose: () => void }) {
+  const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
+  useEffect(() => {
+    if (ids.length) getProfilesLite(ids).then(setNames);
+  }, [ids]);
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-4" onClick={onClose}>
+      <div className="w-full max-w-md rounded-2xl bg-card p-4 shadow-elevated max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="text-base font-semibold mb-3">Huddled with</div>
+        {ids.length === 0 ? (
+          <div className="text-sm text-muted-foreground py-8 text-center">No connections yet.</div>
+        ) : (
+          <div className="space-y-1">
+            {ids.map((uid) => (
+              <Link
+                key={uid}
+                to="/u/$userId"
+                params={{ userId: uid }}
+                onClick={onClose}
+                className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted transition"
+              >
+                <Avatar photo={names[uid]?.photo} name={names[uid]?.full_name} size={40} />
+                <div className="text-sm font-medium truncate">{names[uid]?.full_name ?? "Member"}</div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
