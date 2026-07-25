@@ -1,4 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { eventTypeStyle } from "@/lib/event-style";
+
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { countByGender, getEvent, getParticipants, getProfilesLite, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
@@ -120,7 +122,11 @@ function EventDetail() {
       <div className="px-5 pt-4">
         <div className="flex items-center gap-2 flex-wrap">
           {event.event_type && (
-            <span className="rounded-full bg-primary/10 text-primary px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide">{event.event_type}</span>
+            <span
+              className="rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm"
+              style={{ backgroundImage: eventTypeStyle(event.event_type).gradient }}
+            >{event.event_type}</span>
+
           )}
           <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">{event.category}</span>
         </div>
