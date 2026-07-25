@@ -22,7 +22,7 @@ import {
 import { EventCard, type EventCounts } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
 
-export const Route = createFileRoute("/_authenticated/_app/profile")({
+export const Route = createFileRoute("/_authenticated/_app/profile/")({
   component: Profile,
 });
 
