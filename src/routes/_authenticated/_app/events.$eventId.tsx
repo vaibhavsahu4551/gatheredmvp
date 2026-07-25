@@ -3,9 +3,9 @@ import { eventTypeStyle } from "@/lib/event-style";
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { countByGender, getEvent, getParticipants, getProfilesLite, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
+import { countByGender, deleteEvent, getEvent, getParticipants, getProfilesLite, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
 import { toast } from "sonner";
-import { ArrowLeft, ShieldCheck, MapPin, Clock, Users, MessageCircle, Lock, Send } from "lucide-react";
+import { ArrowLeft, ShieldCheck, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2 } from "lucide-react";
 import { SafetyMenu } from "@/components/SafetyMenu";
 
 
