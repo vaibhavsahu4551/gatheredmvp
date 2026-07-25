@@ -20,7 +20,7 @@ export async function listEvents(_city?: string, opts?: { limit?: number; offset
   const to = from + (opts?.limit ?? 200) - 1;
   const { data, error } = await supabase
     .from("events")
-    .select("id, host_id, title, description, category, event_type, starts_at, location_address, city, min_size, max_size, entry_fee, min_girls, min_boys, status, created_at")
+    .select("*")
     .in("status", ["pending","confirmed"])
     .order("starts_at", { ascending: true })
     .range(from, to);
