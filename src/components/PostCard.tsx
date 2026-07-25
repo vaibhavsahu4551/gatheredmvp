@@ -23,6 +23,7 @@ export function PostCard({
   liked,
   likeCount,
   onLike,
+  onDelete,
 }: {
   p: PostItem;
   img?: string;
@@ -31,6 +32,7 @@ export function PostCard({
   liked: boolean;
   likeCount: number;
   onLike: () => void;
+  onDelete?: () => void;
 }) {
   const navigate = useNavigate();
   const [openC, setOpenC] = useState(false);
