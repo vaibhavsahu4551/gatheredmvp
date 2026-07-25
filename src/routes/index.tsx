@@ -28,7 +28,7 @@ function Landing() {
         </Link>
       </header>
 
-      <main className="flex-1 px-6 pt-10 pb-10 max-w-md mx-auto w-full">
+      <main className="px-6 pt-10 pb-10 max-w-md mx-auto w-full relative">
         <div className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur px-3 py-1 text-[11px] font-semibold text-white">
           <ShieldCheck className="h-3.5 w-3.5" /> Verified · 18+ only
         </div>
@@ -40,21 +40,25 @@ function Landing() {
           plan it together with people who actually show up.
         </p>
 
-        <Link
-          to="/auth"
-          className="mt-8 flex w-full items-center justify-center rounded-full bg-white px-6 py-4 text-[15px] font-bold text-gradient-brand shadow-glow active:scale-[0.99] transition"
-        >
-          Get started — it's free
-        </Link>
-        <p className="mt-3 text-center text-xs text-black font-medium">
-          By continuing you confirm you are 18 or older.
-        </p>
+        <div className="relative z-10 -mb-8 mt-8">
+          <Link
+            to="/auth"
+            className="flex w-full items-center justify-center rounded-2xl bg-white px-6 py-4 text-[15px] font-bold text-black shadow-elevated active:scale-[0.99] transition"
+          >
+            Get started — it's free
+          </Link>
+          <p className="mt-3 text-center text-xs text-black font-medium">
+            By continuing you confirm you are 18 or older.
+          </p>
+        </div>
+      </main>
 
-        <div className="mt-8 space-y-3">
+      <section className="px-6 pb-10 pt-14 max-w-md mx-auto w-full bg-background rounded-t-3xl relative z-0">
+        <div className="space-y-3">
           <Feature icon={<Users className="h-4 w-4" />} title="Groups, not 1:1s" body="Every event is a small group, so nobody's stuck alone." />
           <Feature icon={<Sparkles className="h-4 w-4" />} title="Interest-first" body="Match on what you want to do, not just who you are." />
         </div>
-      </main>
+      </section>
     </div>
   );
 }
