@@ -184,6 +184,7 @@ function HomeFeed() {
             onLike={async () => { await toggleLike(it.id); await refresh(); }} />
         ))}
       </div>
+      <CityPickerModal open={cityModal} onClose={() => setCityModal(false)} onSaved={(c) => { setCity(c); setLocState("idle"); }} />
     </div>
   );
 }
