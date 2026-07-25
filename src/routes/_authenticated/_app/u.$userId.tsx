@@ -22,7 +22,7 @@ function UserProfile() {
   const [status, setStatus] = useState<HuddleStatus>("none");
   const [reqId, setReqId] = useState<string | undefined>();
   const [connIds, setConnIds] = useState<string[]>([]);
-  const [connNames, setConnNames] = useState<Record<string, { full_name: string | null }>>({});
+  const [connNames, setConnNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [busy, setBusy] = useState(false);
 
   const load = async () => {
