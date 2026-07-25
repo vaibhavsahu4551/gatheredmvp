@@ -118,6 +118,7 @@ export type Database = {
           created_at: string
           description: string | null
           entry_fee: number | null
+          event_type: string | null
           host_id: string
           id: string
           location_address: string
@@ -139,6 +140,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           entry_fee?: number | null
+          event_type?: string | null
           host_id: string
           id?: string
           location_address: string
@@ -160,6 +162,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           entry_fee?: number | null
+          event_type?: string | null
           host_id?: string
           id?: string
           location_address?: string
