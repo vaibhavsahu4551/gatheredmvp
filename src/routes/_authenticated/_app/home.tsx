@@ -9,6 +9,7 @@ import { listFeed, getLikes, toggleLike, signedFeedUrl, getEventsLite } from "@/
 import { loadBlockedIds } from "@/lib/safety";
 import { EventCard } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
+import { CityPickerModal } from "@/components/CityPickerModal";
 
 
 export const Route = createFileRoute("/_authenticated/_app/home")({
@@ -38,6 +39,7 @@ function HomeFeed() {
   const [names, setNames] = useState<Record<string, { full_name: string | null }>>({});
   const [linkedEvents, setLinkedEvents] = useState<Record<string, { id: string; title: string; event_type: string | null }>>({});
 
+  const [cityModal, setCityModal] = useState(false);
   const [locState, setLocState] = useState<"idle" | "detecting" | "denied">("idle");
   useEffect(() => {
     loadMe().then((me) => {
