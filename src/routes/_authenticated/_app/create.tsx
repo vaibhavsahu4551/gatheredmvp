@@ -41,6 +41,8 @@ function Create() {
   const [eventType, setEventType] = useState<EventType | "">("");
   const [startsAt, setStartsAt] = useState("");
   const [address, setAddress] = useState("");
+  const [exactLocation, setExactLocation] = useState("");
+
   const [city, setCity] = useState("");
   const [minSize, setMinSize] = useState(4);
   const [maxSize, setMaxSize] = useState(8);
