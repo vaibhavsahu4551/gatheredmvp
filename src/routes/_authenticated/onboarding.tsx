@@ -47,12 +47,16 @@ function Onboarding() {
   const submit = async () => {
     if (!photoPath) return toast.error("Add a profile photo");
     setSaving(true);
-    const { error } = await supabase.from("profiles").update({
+    const { error } = await supabase.from("profiles").upsert({
+      id: userId,
       photos: [photoPath],
       onboarding_complete: true,
-    }).eq("id", userId);
+    }, { onConflict: "id" });
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      console.error("Onboarding save failed", error);
+      return toast.error(error.message);
+    }
     toast.success("Welcome to HUDDL");
     navigate({ to: "/home" });
   };
