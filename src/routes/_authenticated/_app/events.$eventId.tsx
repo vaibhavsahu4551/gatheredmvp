@@ -1,9 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { countByGender, getEvent, getParticipants, getProfilesLite, myParticipation, requestJoin, setParticipantStatus, type EventRow, type ParticipantRow } from "@/lib/events";
+import { countByGender, getEvent, getParticipants, getProfilesLite, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
 import { toast } from "sonner";
-import { ArrowLeft, ShieldCheck, MapPin, Clock, Users, MessageCircle } from "lucide-react";
+import { ArrowLeft, ShieldCheck, MapPin, Clock, Users, MessageCircle, Lock, Send } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/_app/events/$eventId")({
   component: EventDetail,
@@ -18,6 +18,10 @@ function EventDetail() {
   const [profiles, setProfiles] = useState<Record<string, { full_name: string | null; gender: string | null }>>({});
   const [my, setMy] = useState<ParticipantRow | null>(null);
   const [groupId, setGroupId] = useState<string | null>(null);
+  const [comments, setComments] = useState<EventComment[]>([]);
+  const [commentText, setCommentText] = useState("");
+  const [sending, setSending] = useState(false);
+  const commentsEndRef = useRef<HTMLDivElement>(null);
 
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -35,11 +39,54 @@ function EventDetail() {
   };
   useEffect(() => { load(); }, [eventId]);
 
+  const canDiscuss = !!event && (event.host_id === me || my?.status === "approved");
+
+  useEffect(() => {
+    if (!canDiscuss) { setComments([]); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await listEventComments(eventId);
+        if (cancelled) return;
+        setComments(list);
+        const ids = Array.from(new Set(list.map((c) => c.user_id)));
+        if (ids.length) {
+          const p = await getProfilesLite(ids);
+          setProfiles((prev) => ({ ...prev, ...p }));
+        }
+      } catch (e) { /* RLS may reject briefly during transitions */ }
+    })();
+    const channel = supabase.channel(`event-comments-${eventId}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "event_comments", filter: `event_id=eq.${eventId}` },
+        async (payload) => {
+          const c = payload.new as EventComment;
+          setComments((prev) => prev.some((x) => x.id === c.id) ? prev : [...prev, c]);
+          setProfiles((prev) => {
+            if (prev[c.user_id]) return prev;
+            getProfilesLite([c.user_id]).then((p) => setProfiles((s) => ({ ...s, ...p })));
+            return prev;
+          });
+        }).subscribe();
+    return () => { cancelled = true; supabase.removeChannel(channel); };
+  }, [eventId, canDiscuss]);
+
+  useEffect(() => { commentsEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [comments.length]);
+
   if (!event) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
   const isHost = event.host_id === me;
   const counts = countByGender(parts);
   const approved = parts.filter((p) => p.status === "approved");
   const pending = parts.filter((p) => p.status === "pending");
+
+  const sendComment = async () => {
+    const body = commentText.trim();
+    if (!body || sending) return;
+    setSending(true);
+    setCommentText("");
+    try { await postEventComment(eventId, body); }
+    catch (e: any) { toast.error(e.message ?? "Failed to send"); setCommentText(body); }
+    finally { setSending(false); }
+  };
 
   const doJoin = async () => {
     try { await requestJoin(eventId); toast.success("Request sent"); await load(); }
@@ -129,6 +176,61 @@ function EventDetail() {
             </div>
           </div>
         )}
+
+        <div className="mt-8">
+          <h3 className="text-sm font-semibold flex items-center gap-1.5">
+            <MessageCircle className="h-4 w-4" /> Discussion
+          </h3>
+          {!canDiscuss ? (
+            <div className="mt-2 rounded-2xl border border-dashed border-border p-4 flex items-center gap-2 text-sm text-muted-foreground">
+              <Lock className="h-4 w-4" /> Join this event to see the discussion
+            </div>
+          ) : (
+            <div className="mt-2 rounded-2xl border border-border bg-card">
+              <div className="max-h-80 overflow-y-auto p-3 space-y-3">
+                {comments.length === 0 && (
+                  <div className="text-xs text-muted-foreground text-center py-4">No messages yet. Say hi 👋</div>
+                )}
+                {comments.map((c) => {
+                  const name = profiles[c.user_id]?.full_name ?? "Someone";
+                  const initial = (name?.[0] ?? "?").toUpperCase();
+                  const mine = c.user_id === me;
+                  return (
+                    <div key={c.id} className="flex items-start gap-2">
+                      <div className="h-8 w-8 shrink-0 rounded-full bg-muted flex items-center justify-center text-[11px] font-semibold text-foreground/70">
+                        {initial}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-[13px] font-medium truncate">{mine ? "You" : name}</span>
+                          <span className="text-[10px] text-muted-foreground">{new Date(c.created_at).toLocaleString([], { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })}</span>
+                        </div>
+                        <div className="text-sm text-foreground/90 whitespace-pre-wrap break-words">{c.body}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={commentsEndRef} />
+              </div>
+              <div className="border-t border-border p-2 flex gap-2">
+                <input
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); sendComment(); } }}
+                  placeholder="Write a message…"
+                  className="flex-1 rounded-full bg-background border border-border px-4 py-2 text-sm outline-none"
+                />
+                <button
+                  onClick={sendComment}
+                  disabled={sending || !commentText.trim()}
+                  className="h-9 w-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-50"
+                >
+                  <Send className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
