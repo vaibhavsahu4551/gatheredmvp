@@ -6,6 +6,7 @@ import { LogOut, ShieldCheck, MapPin, Plus, CalendarPlus } from "lucide-react";
 import {
   countByGender,
   getParticipants,
+  getProfilesLite,
   listHostedEvents,
   listJoinedEvents,
   type EventRow,
@@ -13,11 +14,11 @@ import {
 import {
   getEventsLite,
   getLikes,
-  getProfilesLite,
   listUserPosts,
   signedFeedUrl,
   toggleLike,
 } from "@/lib/feed";
+
 import { EventCard, type EventCounts } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
 
