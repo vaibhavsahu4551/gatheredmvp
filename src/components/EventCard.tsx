@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Users, ShieldCheck } from "lucide-react";
 import type { EventRow } from "@/lib/events";
 import { SafetyMenu } from "@/components/SafetyMenu";
+import { ShareButton } from "@/components/ShareToConnection";
 import { eventTypeStyle } from "@/lib/event-style";
 
 export type EventCounts = { boys: number; girls: number; total: number };
@@ -51,6 +52,7 @@ export function EventCard({
             <span className="text-[11px] text-muted-foreground">
               {new Date(e.starts_at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}
             </span>
+            <ShareButton kind="event" id={e.id} />
             <SafetyMenu targetType="event" targetId={e.id} userId={e.host_id} />
           </div>
         </div>

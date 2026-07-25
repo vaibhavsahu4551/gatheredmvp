@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { Bell } from "lucide-react";
+import { unreadCount } from "@/lib/notifications";
 import { loadMe } from "@/lib/huddl";
 import { CATEGORIES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipants } from "@/lib/events";
 import { listFeed, getLikes, toggleLike, signedFeedUrl, getEventsLite } from "@/lib/feed";
@@ -23,6 +24,8 @@ function HomeFeed() {
   const [cat, setCat] = useState<string>("All");
   const [girlsOnly, setGirlsOnly] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [unread, setUnread] = useState(0);
+  useEffect(() => { unreadCount().then(setUnread).catch(() => {}); }, []);
 
   const [events, setEvents] = useState<EventRow[]>([]);
   const [counts, setCounts] = useState<Record<string, { boys: number; girls: number; total: number }>>({});
@@ -104,9 +107,10 @@ function HomeFeed() {
           <div className="text-xs font-medium text-muted-foreground">{city || "—"}</div>
           <h1 className="text-2xl font-semibold tracking-tight">Happening near you</h1>
         </div>
-        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-          <Search className="h-5 w-5" />
-        </div>
+        <Link to="/notifications" className="relative h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+          <Bell className="h-5 w-5" />
+          {unread > 0 && <span className="absolute -top-0.5 -right-0.5 h-5 min-w-5 px-1 rounded-full bg-gradient-brand text-white text-[10px] font-bold flex items-center justify-center">{unread}</span>}
+        </Link>
       </header>
 
       <div className="px-5">

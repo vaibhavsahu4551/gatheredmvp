@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Heart, MessageSquare, Link2 } from "lucide-react";
 import { SafetyMenu } from "@/components/SafetyMenu";
+import { ShareButton } from "@/components/ShareToConnection";
 import { eventTypeStyle } from "@/lib/event-style";
 
 export type PostItem = {
@@ -85,6 +86,7 @@ export function PostCard({
         <button onClick={() => { setOpenC((v) => !v); if (!openC) load(); }} className="flex items-center gap-1.5">
           <MessageSquare className="h-4 w-4" /> Comments
         </button>
+        <ShareButton kind="post" id={p.id} />
         <span className="ml-auto text-[11px] text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</span>
       </div>
       {openC && (

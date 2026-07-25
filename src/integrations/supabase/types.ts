@@ -93,6 +93,68 @@ export type Database = {
           },
         ]
       }
+      dm_messages: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          sender_id: string
+          share_id: string | null
+          share_kind: string | null
+          thread_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          sender_id: string
+          share_id?: string | null
+          share_kind?: string | null
+          thread_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          sender_id?: string
+          share_id?: string | null
+          share_kind?: string | null
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dm_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "dm_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dm_threads: {
+        Row: {
+          created_at: string
+          id: string
+          updated_at: string
+          user_a: string
+          user_b: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_a: string
+          user_b: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_a?: string
+          user_b?: string
+        }
+        Relationships: []
+      }
       event_comments: {
         Row: {
           body: string
@@ -232,6 +294,66 @@ export type Database = {
           status?: Database["public"]["Enums"]["event_status"]
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      huddle_requests: {
+        Row: {
+          created_at: string
+          from_id: string
+          id: string
+          status: string
+          to_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          from_id: string
+          id?: string
+          status?: string
+          to_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          from_id?: string
+          id?: string
+          status?: string
+          to_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          data: Json | null
+          id: string
+          kind: string
+          read_at: string | null
+          target_id: string | null
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          kind: string
+          read_at?: string | null
+          target_id?: string | null
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          kind?: string
+          read_at?: string | null
+          target_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -441,7 +563,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      are_huddled: { Args: { _a: string; _b: string }; Returns: boolean }
       is_blocked: { Args: { _a: string; _b: string }; Returns: boolean }
+      is_dm_member: {
+        Args: { _thread: string; _user: string }
+        Returns: boolean
+      }
       is_event_host: {
         Args: { _event: string; _user: string }
         Returns: boolean
