@@ -39,11 +39,54 @@ function EventDetail() {
   };
   useEffect(() => { load(); }, [eventId]);
 
+  const canDiscuss = !!event && (event.host_id === me || my?.status === "approved");
+
+  useEffect(() => {
+    if (!canDiscuss) { setComments([]); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await listEventComments(eventId);
+        if (cancelled) return;
+        setComments(list);
+        const ids = Array.from(new Set(list.map((c) => c.user_id)));
+        if (ids.length) {
+          const p = await getProfilesLite(ids);
+          setProfiles((prev) => ({ ...prev, ...p }));
+        }
+      } catch (e) { /* RLS may reject briefly during transitions */ }
+    })();
+    const channel = supabase.channel(`event-comments-${eventId}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "event_comments", filter: `event_id=eq.${eventId}` },
+        async (payload) => {
+          const c = payload.new as EventComment;
+          setComments((prev) => prev.some((x) => x.id === c.id) ? prev : [...prev, c]);
+          setProfiles((prev) => {
+            if (prev[c.user_id]) return prev;
+            getProfilesLite([c.user_id]).then((p) => setProfiles((s) => ({ ...s, ...p })));
+            return prev;
+          });
+        }).subscribe();
+    return () => { cancelled = true; supabase.removeChannel(channel); };
+  }, [eventId, canDiscuss]);
+
+  useEffect(() => { commentsEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [comments.length]);
+
   if (!event) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
   const isHost = event.host_id === me;
   const counts = countByGender(parts);
   const approved = parts.filter((p) => p.status === "approved");
   const pending = parts.filter((p) => p.status === "pending");
+
+  const sendComment = async () => {
+    const body = commentText.trim();
+    if (!body || sending) return;
+    setSending(true);
+    setCommentText("");
+    try { await postEventComment(eventId, body); }
+    catch (e: any) { toast.error(e.message ?? "Failed to send"); setCommentText(body); }
+    finally { setSending(false); }
+  };
 
   const doJoin = async () => {
     try { await requestJoin(eventId); toast.success("Request sent"); await load(); }
