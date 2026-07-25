@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { listIncomingRequests, respondHuddleRequest } from "@/lib/huddle-connect";
 import { getProfilesLite } from "@/lib/events";
+import { Avatar } from "@/components/Avatar";
 import { ArrowLeft, Check, X, Users } from "lucide-react";
 import { toast } from "sonner";
 
@@ -12,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/_app/requests")({
 function Requests() {
   const navigate = useNavigate();
   const [rows, setRows] = useState<any[]>([]);
-  const [names, setNames] = useState<Record<string, { full_name: string | null }>>({});
+  const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
