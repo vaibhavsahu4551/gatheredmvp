@@ -239,33 +239,44 @@ export type Database = {
       }
       posts: {
         Row: {
-          caption: string
+          caption: string | null
           city: string
           created_at: string
+          event_id: string | null
           id: string
           photo_url: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
-          caption: string
+          caption?: string | null
           city: string
           created_at?: string
+          event_id?: string | null
           id?: string
           photo_url?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
-          caption?: string
+          caption?: string | null
           city?: string
           created_at?: string
+          event_id?: string | null
           id?: string
           photo_url?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
