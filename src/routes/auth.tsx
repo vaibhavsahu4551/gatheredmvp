@@ -1,25 +1,32 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getFirebaseAuth } from "@/integrations/firebase/client";
-import { bridgeFirebaseAuth } from "@/lib/firebase-auth.functions";
-import { RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from "firebase/auth";
 import { toast } from "sonner";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+type Mode = "phone" | "email";
+
+function normalizePhone(input: string): string {
+  return input.replace(/\D+/g, "");
+}
+
+function phoneToEmail(phone: string): string {
+  return `${phone}@huddl.local`;
+}
+
 function AuthPage() {
   const navigate = useNavigate();
-  const [step, setStep] = useState<"phone" | "otp">("phone");
+  const [mode, setMode] = useState<Mode>("phone");
+  const [isSignup, setIsSignup] = useState(false);
   const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const confirmRef = useRef<ConfirmationResult | null>(null);
-  const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
+  const [magicSent, setMagicSent] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -27,56 +34,41 @@ function AuthPage() {
     });
   }, [navigate]);
 
-  const ensureRecaptcha = async () => {
-    if (recaptchaRef.current) return recaptchaRef.current;
-    const auth = await getFirebaseAuth();
-    const verifier = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
-    await verifier.render();
-    recaptchaRef.current = verifier;
-    return verifier;
-  };
-
-  const sendOtp = async () => {
-    const trimmed = phone.trim();
-    if (!/^\+[1-9]\d{6,14}$/.test(trimmed)) {
-      toast.error("Enter phone in international format, e.g. +14155552671");
-      return;
-    }
+  const submitPhone = async () => {
+    const digits = normalizePhone(phone);
+    if (digits.length < 6) return toast.error("Enter a valid phone number");
+    if (password.length < 6) return toast.error("Password must be 6+ characters");
     setLoading(true);
     try {
-      const auth = await getFirebaseAuth();
-      const verifier = await ensureRecaptcha();
-      const result = await signInWithPhoneNumber(auth, trimmed, verifier);
-      confirmRef.current = result;
-      toast.success("Code sent");
-      setStep("otp");
+      const fakeEmail = phoneToEmail(digits);
+      if (isSignup) {
+        const { error } = await supabase.auth.signUp({ email: fakeEmail, password });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email: fakeEmail, password });
+        if (error) throw error;
+      }
+      navigate({ to: "/home" });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to send code");
-      // Reset reCAPTCHA on failure so the next attempt works
-      recaptchaRef.current?.clear();
-      recaptchaRef.current = null;
+      toast.error(e instanceof Error ? e.message : "Login failed");
     } finally {
       setLoading(false);
     }
   };
 
-  const verify = async (value: string) => {
-    if (!confirmRef.current) return;
+  const submitEmail = async () => {
+    if (!/^\S+@\S+\.\S+$/.test(email)) return toast.error("Enter a valid email");
     setLoading(true);
     try {
-      const cred = await confirmRef.current.confirm(value);
-      const idToken = await cred.user.getIdToken();
-      const { tokenHash } = await bridgeFirebaseAuth({ data: { idToken } });
-      const { error } = await supabase.auth.verifyOtp({
-        token_hash: tokenHash,
-        type: "magiclink",
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: window.location.origin + "/home" },
       });
       if (error) throw error;
-      navigate({ to: "/home" });
+      setMagicSent(true);
+      toast.success("Check your email for the login link");
     } catch (e) {
-      console.error("[auth] verify failed", e);
-      toast.error(e instanceof Error ? e.message : "Verification failed");
-      setCode("");
+      toast.error(e instanceof Error ? e.message : "Failed to send link");
     } finally {
       setLoading(false);
     }
@@ -85,78 +77,100 @@ function AuthPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <div className="px-4 pt-4">
-        {step === "phone" ? (
-          <Link to="/" className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-        ) : (
-          <button
-            onClick={() => { setStep("phone"); setCode(""); confirmRef.current = null; }}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-        )}
+        <Link to="/" className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted">
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
       </div>
 
       <main className="flex-1 px-6 pt-8 max-w-md mx-auto w-full">
-        {step === "phone" ? (
-          <>
-            <h1 className="text-3xl font-semibold tracking-tight">What's your phone number?</h1>
-            <p className="mt-2 text-sm text-muted-foreground">We'll text you a 6-digit code.</p>
+        <h1 className="text-3xl font-semibold tracking-tight">
+          {mode === "phone" ? (isSignup ? "Create account" : "Welcome back") : "Sign in with email"}
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {mode === "phone"
+            ? "Use your phone number and a password."
+            : "We'll email you a one-tap login link."}
+        </p>
+
+        <div className="mt-6 inline-flex rounded-full bg-muted p-1 text-sm">
+          <button
+            onClick={() => setMode("phone")}
+            className={`px-4 py-1.5 rounded-full transition ${mode === "phone" ? "bg-background shadow-sm font-medium" : "text-muted-foreground"}`}
+          >
+            Phone
+          </button>
+          <button
+            onClick={() => setMode("email")}
+            className={`px-4 py-1.5 rounded-full transition ${mode === "email" ? "bg-background shadow-sm font-medium" : "text-muted-foreground"}`}
+          >
+            Email link
+          </button>
+        </div>
+
+        {mode === "phone" ? (
+          <div className="mt-6 space-y-3">
             <input
               type="tel"
-              autoFocus
-              inputMode="tel"
+              inputMode="numeric"
               autoComplete="tel"
-              placeholder="+14155552671"
+              placeholder="Phone number"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && sendOtp()}
-              className="mt-8 w-full rounded-2xl border border-input bg-background px-4 py-3.5 text-[15px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-2xl border border-input bg-background px-4 py-3.5 text-[15px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            />
+            <input
+              type="password"
+              autoComplete={isSignup ? "new-password" : "current-password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && submitPhone()}
+              className="w-full rounded-2xl border border-input bg-background px-4 py-3.5 text-[15px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
             <button
-              onClick={sendOtp}
+              onClick={submitPhone}
               disabled={loading}
-              className="mt-4 w-full rounded-full bg-primary px-6 py-3.5 text-[15px] font-medium text-primary-foreground disabled:opacity-50"
+              className="w-full rounded-full bg-primary px-6 py-3.5 text-[15px] font-medium text-primary-foreground disabled:opacity-50"
             >
-              {loading ? "Sending…" : "Send code"}
+              {loading ? "Please wait…" : isSignup ? "Create account" : "Sign in"}
             </button>
-            <p className="mt-6 text-center text-xs text-muted-foreground">
-              By continuing you confirm you're 18+ and agree to our Terms.
-            </p>
-          </>
-        ) : (
-          <>
-            <h1 className="text-3xl font-semibold tracking-tight">Enter the code</h1>
-            <p className="mt-2 text-sm text-muted-foreground">Sent to {phone}</p>
-            <div className="mt-8 flex justify-center">
-              <InputOTP
-                maxLength={6}
-                value={code}
-                onChange={(v) => {
-                  setCode(v);
-                  if (v.length === 6) verify(v);
-                }}
-              >
-                <InputOTPGroup>
-                  {[0, 1, 2, 3, 4, 5].map((i) => <InputOTPSlot key={i} index={i} />)}
-                </InputOTPGroup>
-              </InputOTP>
-            </div>
             <button
-              onClick={() => { setStep("phone"); setCode(""); confirmRef.current = null; }}
-              disabled={loading}
-              className="mt-8 w-full text-sm text-muted-foreground hover:text-foreground"
+              onClick={() => setIsSignup((v) => !v)}
+              className="w-full text-sm text-muted-foreground hover:text-foreground"
             >
-              Didn't get it? Try again
+              {isSignup ? "Have an account? Sign in" : "New here? Create an account"}
             </button>
-          </>
+          </div>
+        ) : (
+          <div className="mt-6 space-y-3">
+            <input
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && submitEmail()}
+              className="w-full rounded-2xl border border-input bg-background px-4 py-3.5 text-[15px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            />
+            <button
+              onClick={submitEmail}
+              disabled={loading}
+              className="w-full rounded-full bg-primary px-6 py-3.5 text-[15px] font-medium text-primary-foreground disabled:opacity-50"
+            >
+              {loading ? "Sending…" : "Send login link"}
+            </button>
+            {magicSent && (
+              <p className="text-center text-xs text-muted-foreground">
+                Link sent. Open it on this device to sign in.
+              </p>
+            )}
+          </div>
         )}
-      </main>
 
-      {/* Invisible reCAPTCHA host */}
-      <div id="recaptcha-container" />
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          By continuing you confirm you're 18+ and agree to our Terms.
+        </p>
+      </main>
     </div>
   );
 }
