@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { unreadCount } from "@/lib/notifications";
 import { loadMe } from "@/lib/huddl";
-import { CATEGORIES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipants } from "@/lib/events";
+import { CATEGORIES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipantsForEvents } from "@/lib/events";
 import { listFeed, getLikes, toggleLike, signedFeedUrl, getEventsLite } from "@/lib/feed";
 import { loadBlockedIds } from "@/lib/safety";
 import { EventCard } from "@/components/EventCard";
@@ -19,6 +19,7 @@ export const Route = createFileRoute("/_authenticated/_app/home")({
 type EventItem = { kind: "event"; id: string; created_at: string; ev: EventRow };
 type FeedItem = PostItem | EventItem;
 
+const POSTS_PAGE = 10;
 
 function HomeFeed() {
   const [city, setCity] = useState("");
@@ -34,10 +35,16 @@ function HomeFeed() {
   const [hosts, setHosts] = useState<Record<string, { full_name: string | null; gender: string | null }>>({});
 
   const [posts, setPosts] = useState<PostItem[]>([]);
+  const [postsOffset, setPostsOffset] = useState(0);
+  const [postsDone, setPostsDone] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [imgs, setImgs] = useState<Record<string, string>>({});
   const [likes, setLikes] = useState<{ counts: Record<string, number>; mine: Set<string> }>({ counts: {}, mine: new Set() });
-  const [names, setNames] = useState<Record<string, { full_name: string | null }>>({});
+  const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [linkedEvents, setLinkedEvents] = useState<Record<string, { id: string; title: string; event_type: string | null }>>({});
+
+  const meIdRef = useRef<string>("");
+  const blockedRef = useRef<Set<string>>(new Set());
 
   const [cityModal, setCityModal] = useState(false);
   const [locState, setLocState] = useState<"idle" | "detecting" | "denied">("idle");
@@ -63,47 +70,123 @@ function HomeFeed() {
     });
   }, []);
 
+  // Hydrate a batch of posts (profiles, likes, linked events, signed image URLs) in parallel.
+  const hydratePosts = useCallback(async (batch: PostItem[]) => {
+    if (!batch.length) return;
+    const [l, n, evMap, imgPairs] = await Promise.all([
+      getLikes(batch.map((p) => p.id)),
+      getProfilesLite(batch.map((p) => p.user_id)),
+      getEventsLite(batch.map((p) => p.event_id ?? "").filter(Boolean)),
+      Promise.all(
+        batch.filter((p) => p.photo_url).map(async (p) => [p.id, await signedFeedUrl(p.photo_url!)] as const),
+      ),
+    ]);
+    setLikes((prev) => ({
+      counts: { ...prev.counts, ...l.counts },
+      mine: new Set([...prev.mine, ...l.mine]),
+    }));
+    setNames((prev) => ({ ...prev, ...n }));
+    setLinkedEvents((prev) => ({ ...prev, ...evMap }));
+    setImgs((prev) => {
+      const next = { ...prev };
+      for (const [id, url] of imgPairs) next[id] = url;
+      return next;
+    });
+  }, []);
 
   const [err, setErr] = useState<string | null>(null);
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     setLoading(true);
     setErr(null);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const [{ data: { user } }, ev, firstPosts, blocked] = await Promise.all([
+        supabase.auth.getUser(),
+        listEvents(),
+        listFeed({ limit: POSTS_PAGE, offset: 0 }),
+        loadBlockedIds(),
+      ]);
       const meId = user?.id ?? "";
-      const [ev, ps, blocked] = await Promise.all([listEvents(), listFeed(), loadBlockedIds()]);
+      meIdRef.current = meId;
+      blockedRef.current = blocked;
+
       const evFiltered = ev.filter((e) => !blocked.has(e.host_id) && e.host_id !== meId);
       setEvents(evFiltered);
-      const cts: typeof counts = {};
-      for (const e of evFiltered) {
-        const parts = await getParticipants(e.id);
-        cts[e.id] = countByGender(parts);
-      }
-      setCounts(cts);
-      setHosts(await getProfilesLite(evFiltered.map((e) => e.host_id)));
 
-      const pItems: PostItem[] = (ps as any[])
+      // Batched participants + hosts in parallel — was N+1 before.
+      const [partsMap, hostsMap] = await Promise.all([
+        getParticipantsForEvents(evFiltered.map((e) => e.id)),
+        getProfilesLite(evFiltered.map((e) => e.host_id)),
+      ]);
+      const cts: typeof counts = {};
+      for (const e of evFiltered) cts[e.id] = countByGender(partsMap[e.id] ?? []);
+      setCounts(cts);
+      setHosts(hostsMap);
+
+      const pItems: PostItem[] = (firstPosts as any[])
         .filter((p) => !blocked.has(p.user_id) && p.user_id !== meId)
         .map((p) => ({
           kind: "post", id: p.id, created_at: p.created_at, user_id: p.user_id,
           caption: p.caption, photo_url: p.photo_url, event_id: p.event_id ?? null,
         }));
       setPosts(pItems);
-      const [l, n, evMap] = await Promise.all([
-        getLikes(pItems.map((p) => p.id)),
-        getProfilesLite(pItems.map((p) => p.user_id)),
-        getEventsLite(pItems.map((p) => p.event_id ?? "")),
-      ]);
-      setLikes(l); setNames(n); setLinkedEvents(evMap);
-      const im: Record<string, string> = {};
-      for (const p of pItems) if (p.photo_url) im[p.id] = await signedFeedUrl(p.photo_url);
-      setImgs(im);
+      setPostsOffset(firstPosts.length);
+      setPostsDone(firstPosts.length < POSTS_PAGE);
+      await hydratePosts(pItems);
     } catch (e: any) {
       setErr(e?.message ?? "Failed to load feed");
     } finally { setLoading(false); }
-  };
-  useEffect(() => { refresh(); }, []);
+  }, [hydratePosts]);
+  useEffect(() => { refresh(); }, [refresh]);
 
+  const loadMore = useCallback(async () => {
+    if (loadingMore || postsDone) return;
+    setLoadingMore(true);
+    try {
+      const raw = await listFeed({ limit: POSTS_PAGE, offset: postsOffset });
+      const meId = meIdRef.current;
+      const blocked = blockedRef.current;
+      const batch: PostItem[] = (raw as any[])
+        .filter((p) => !blocked.has(p.user_id) && p.user_id !== meId)
+        .map((p) => ({
+          kind: "post", id: p.id, created_at: p.created_at, user_id: p.user_id,
+          caption: p.caption, photo_url: p.photo_url, event_id: p.event_id ?? null,
+        }));
+      setPosts((prev) => [...prev, ...batch]);
+      setPostsOffset((n) => n + raw.length);
+      if (raw.length < POSTS_PAGE) setPostsDone(true);
+      await hydratePosts(batch);
+    } finally { setLoadingMore(false); }
+  }, [loadingMore, postsDone, postsOffset, hydratePosts]);
+
+  // Infinite scroll sentinel.
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      if (entries[0]?.isIntersecting) loadMore();
+    }, { rootMargin: "600px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [loadMore]);
+
+  // Optimistic like — no full-feed refresh.
+  const onLike = useCallback(async (postId: string) => {
+    setLikes((prev) => {
+      const mine = new Set(prev.mine);
+      const counts = { ...prev.counts };
+      if (mine.has(postId)) { mine.delete(postId); counts[postId] = Math.max(0, (counts[postId] ?? 1) - 1); }
+      else { mine.add(postId); counts[postId] = (counts[postId] ?? 0) + 1; }
+      return { counts, mine };
+    });
+    try { await toggleLike(postId); } catch { /* re-fetch just this post's likes on failure */
+      const l = await getLikes([postId]);
+      setLikes((prev) => ({
+        counts: { ...prev.counts, [postId]: l.counts[postId] ?? 0 },
+        mine: (() => { const m = new Set(prev.mine); l.mine.has(postId) ? m.add(postId) : m.delete(postId); return m; })(),
+      }));
+    }
+  }, []);
 
   const filteredEvents = useMemo(() => events.filter((e) => {
     if (cat !== "All" && e.category !== cat) return false;
@@ -113,7 +196,7 @@ function HomeFeed() {
   }), [events, cat, girlsOnly, q]);
 
   const filteredPosts = useMemo(() => posts.filter((p) => {
-    if (cat !== "All") return false; // hide posts when filtering by event category
+    if (cat !== "All") return false;
     if (girlsOnly) return false;
     if (q && !(p.caption ?? "").toLowerCase().includes(q.toLowerCase())) return false;
     return true;
@@ -165,7 +248,7 @@ function HomeFeed() {
       </div>
 
       <div className="mt-3 px-5 space-y-3 pb-4">
-        {loading && <div className="text-sm text-muted-foreground text-center py-8">Loading…</div>}
+        {loading && <FeedSkeleton />}
         {!loading && err && (
           <div className="text-center py-8 space-y-3">
             <div className="text-sm text-destructive">{err}</div>
@@ -179,13 +262,37 @@ function HomeFeed() {
           <EventCard key={"e" + it.id} e={it.ev} c={counts[it.id] ?? { boys: 0, girls: 0, total: 0 }} host={hosts[it.ev.host_id]} />
         ) : (
           <PostCard key={"p" + it.id} p={it} img={imgs[it.id]} name={names[it.user_id]?.full_name ?? "Someone"}
-            avatarPhoto={(names[it.user_id] as any)?.photo ?? null}
+            avatarPhoto={names[it.user_id]?.photo ?? null}
             linked={it.event_id ? linkedEvents[it.event_id] : undefined}
             liked={likes.mine.has(it.id)} likeCount={likes.counts[it.id] ?? 0}
-            onLike={async () => { await toggleLike(it.id); await refresh(); }} />
+            onLike={() => onLike(it.id)} />
         ))}
+        {!loading && !err && (
+          <div ref={sentinelRef} className="py-4 text-center text-xs text-muted-foreground">
+            {loadingMore ? "Loading more…" : postsDone ? "" : ""}
+          </div>
+        )}
       </div>
       <CityPickerModal open={cityModal} onClose={() => setCityModal(false)} onSaved={(c) => { setCity(c); setLocState("idle"); }} />
+    </div>
+  );
+}
+
+function FeedSkeleton() {
+  return (
+    <div className="space-y-3">
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="rounded-2xl border border-border bg-card p-4 animate-pulse">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-muted" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 w-1/3 rounded bg-muted" />
+              <div className="h-3 w-1/2 rounded bg-muted" />
+            </div>
+          </div>
+          <div className="mt-4 h-40 rounded-xl bg-muted" />
+        </div>
+      ))}
     </div>
   );
 }

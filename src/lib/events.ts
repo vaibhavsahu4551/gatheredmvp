@@ -15,12 +15,15 @@ export function looksResidential(addr: string): boolean {
   return RESIDENTIAL_HINTS.some((h) => a.includes(h));
 }
 
-export async function listEvents(_city?: string) {
+export async function listEvents(_city?: string, opts?: { limit?: number; offset?: number }) {
+  const from = opts?.offset ?? 0;
+  const to = from + (opts?.limit ?? 200) - 1;
   const { data, error } = await supabase
     .from("events")
     .select("*")
     .in("status", ["pending","confirmed"])
-    .order("starts_at", { ascending: true });
+    .order("starts_at", { ascending: true })
+    .range(from, to);
   if (error) throw error;
   return data ?? [];
 }
@@ -58,6 +61,21 @@ export async function getParticipants(eventId: string) {
   const { data, error } = await supabase.from("event_participants").select("*").eq("event_id", eventId);
   if (error) throw error;
   return data ?? [];
+}
+
+// Batched: one query for many events, then group by event_id.
+export async function getParticipantsForEvents(eventIds: string[]) {
+  const map: Record<string, ParticipantRow[]> = {};
+  const uniq = Array.from(new Set(eventIds.filter(Boolean)));
+  if (!uniq.length) return map;
+  const { data, error } = await supabase
+    .from("event_participants")
+    .select("event_id, user_id, status, gender")
+    .in("event_id", uniq);
+  if (error) throw error;
+  for (const id of uniq) map[id] = [];
+  for (const p of (data ?? []) as any[]) (map[p.event_id] ??= []).push(p as ParticipantRow);
+  return map;
 }
 
 export async function getProfilesLite(ids: string[]) {

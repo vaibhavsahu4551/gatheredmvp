@@ -44,13 +44,14 @@ function EditProfile() {
   };
 
   const uploadPhoto = async (file: File) => {
-    const ext = file.name.split(".").pop() ?? "jpg";
-    const path = `${userId}/${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from("profile-photos").upload(path, file, { upsert: false });
+    const { compressImage } = await import("@/lib/image-compress");
+    const compressed = await compressImage(file, { maxDim: 720, quality: 0.85 });
+    const path = `${userId}/${crypto.randomUUID()}.jpg`;
+    const { error } = await supabase.storage.from("profile-photos").upload(path, compressed, { upsert: false, contentType: compressed.type });
     if (error) return toast.error(error.message);
     if (photoPath) await supabase.storage.from("profile-photos").remove([photoPath]);
     setPhotoPath(path);
-    setPhotoPreview(URL.createObjectURL(file));
+    setPhotoPreview(URL.createObjectURL(compressed));
   };
 
   const save = async () => {
