@@ -182,6 +182,8 @@ function PostsTab({ userId, onCreate }: { userId: string; onCreate: () => void }
   const [names, setNames] = useState<Record<string, { full_name: string | null }>>({});
   const [linked, setLinked] = useState<Record<string, { id: string; title: string; event_type: string | null }>>({});
   const [loading, setLoading] = useState(true);
+  const [openId, setOpenId] = useState<string | null>(null);
+
 
   const refresh = async () => {
     setLoading(true);
