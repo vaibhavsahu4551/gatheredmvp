@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { listDm, sendDm } from "@/lib/dm";
 import { getProfilesLite } from "@/lib/events";
+import { Avatar } from "@/components/Avatar";
 import { ArrowLeft, Send, Link2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/_app/messages/$threadId")({
@@ -15,7 +16,7 @@ function DmRoom() {
   const { threadId } = Route.useParams();
   const navigate = useNavigate();
   const [me, setMe] = useState("");
-  const [other, setOther] = useState<{ id: string; name: string } | null>(null);
+  const [other, setOther] = useState<{ id: string; name: string; photo: string | null } | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [text, setText] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -30,7 +31,8 @@ function DmRoom() {
       if (t) {
         const otherId = t.user_a === user.id ? t.user_b : t.user_a;
         const n = await getProfilesLite([otherId]);
-        setOther({ id: otherId, name: n[otherId]?.full_name ?? "Member" });
+        const info = (n as any)[otherId];
+        setOther({ id: otherId, name: info?.full_name ?? "Member", photo: info?.photo ?? null });
       }
       const msgs = await listDm(threadId);
       setMessages(msgs);
@@ -78,7 +80,7 @@ function DmRoom() {
         </button>
         {other ? (
           <Link to="/u/$userId" params={{ userId: other.id }} className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-gradient-brand" />
+            <Avatar photo={other.photo} name={other.name} size={32} />
             <div className="text-sm font-semibold">{other.name}</div>
           </Link>
         ) : <div className="text-sm">Chat</div>}

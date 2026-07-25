@@ -179,6 +179,7 @@ function HomeFeed() {
           <EventCard key={"e" + it.id} e={it.ev} c={counts[it.id] ?? { boys: 0, girls: 0, total: 0 }} host={hosts[it.ev.host_id]} />
         ) : (
           <PostCard key={"p" + it.id} p={it} img={imgs[it.id]} name={names[it.user_id]?.full_name ?? "Someone"}
+            avatarPhoto={(names[it.user_id] as any)?.photo ?? null}
             linked={it.event_id ? linkedEvents[it.event_id] : undefined}
             liked={likes.mine.has(it.id)} likeCount={likes.counts[it.id] ?? 0}
             onLike={async () => { await toggleLike(it.id); await refresh(); }} />

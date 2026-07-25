@@ -247,6 +247,7 @@ function PostsTab({ userId, onCreate }: { userId: string; onCreate: () => void }
               p={openPost}
               img={imgs[openPost.id]}
               name={names[openPost.user_id]?.full_name ?? "You"}
+              avatarPhoto={(names[openPost.user_id] as any)?.photo ?? null}
               linked={openPost.event_id ? linked[openPost.event_id] : undefined}
               liked={likes.mine.has(openPost.id)}
               likeCount={likes.counts[openPost.id] ?? 0}
