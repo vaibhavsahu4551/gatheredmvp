@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { loadMe, signedPhotoUrl, ageFromDob } from "@/lib/huddl";
-import { LogOut, ShieldCheck, MapPin, Plus, CalendarPlus } from "lucide-react";
+import { LogOut, ShieldCheck, MapPin, Plus, CalendarPlus, Pencil } from "lucide-react";
 import {
   countByGender,
   getParticipants,
@@ -31,7 +31,6 @@ type Tab = "posts" | "hosting" | "joined";
 function Profile() {
   const navigate = useNavigate();
   const [me, setMe] = useState<Awaited<ReturnType<typeof loadMe>>>(null);
-  const [hero, setHero] = useState<string>("");
   const [avatar, setAvatar] = useState<string>("");
   const [tab, setTab] = useState<Tab>("posts");
 
@@ -39,9 +38,7 @@ function Profile() {
     loadMe().then(async (data) => {
       setMe(data);
       const photos = data?.profile?.photos ?? [];
-      if (photos[0]) setHero(await signedPhotoUrl(photos[0]));
-      if (photos[1]) setAvatar(await signedPhotoUrl(photos[1]));
-      else if (photos[0]) setAvatar(await signedPhotoUrl(photos[0]));
+      if (photos[0]) setAvatar(await signedPhotoUrl(photos[0]));
     });
   }, []);
 
@@ -55,19 +52,14 @@ function Profile() {
 
   return (
     <div>
-      <div className="relative h-56 bg-muted">
-        {hero && <img src={hero} className="h-full w-full object-cover" alt="" />}
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" />
-      </div>
-
-      <div className="px-5 -mt-12 relative">
-        <div className="flex items-end gap-4">
-          <div className="h-24 w-24 rounded-full ring-4 ring-background bg-muted overflow-hidden shrink-0">
+      <div className="px-5 pt-8">
+        <div className="flex items-start gap-4">
+          <div className="h-24 w-24 rounded-full ring-4 ring-background bg-muted overflow-hidden shrink-0 shadow-elevated">
             {avatar && <img src={avatar} className="h-full w-full object-cover" alt="" />}
           </div>
-          <div className="pb-2 min-w-0">
+          <div className="pt-2 min-w-0 flex-1">
             <h1 className="text-2xl font-semibold tracking-tight truncate">
-              {p.full_name}
+              {p.full_name || "Add your name"}
               {p.dob && <span className="text-muted-foreground font-normal">, {ageFromDob(p.dob)}</span>}
             </h1>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
@@ -84,6 +76,13 @@ function Profile() {
             </div>
           </div>
         </div>
+
+        <button
+          onClick={() => navigate({ to: "/profile/edit" })}
+          className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-full border border-border bg-background py-2.5 text-sm font-medium hover:bg-muted transition"
+        >
+          <Pencil className="h-4 w-4" /> Edit profile
+        </button>
 
         {p.bio && <p className="mt-4 text-[15px] leading-relaxed">{p.bio}</p>}
 
