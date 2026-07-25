@@ -11,8 +11,8 @@ export const Route = createFileRoute("/_authenticated/_app/notifications")({
 
 function label(kind: string) {
   switch (kind) {
-    case "huddle_request": return "sent you a Huddle Up request";
-    case "huddle_accepted": return "accepted your Huddle Up request";
+    case "huddle_request": return "sent you a Linkup request";
+    case "huddle_accepted": return "accepted your Linkup request";
     case "post_like": return "liked your post";
     case "post_comment": return "commented on your post";
     case "join_request": return "requested to join your event";

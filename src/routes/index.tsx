@@ -5,9 +5,9 @@ export const Route = createFileRoute("/")({
   component: Landing,
   head: () => ({
     meta: [
-      { title: "HUDDL — 18+ verified group meetups near you" },
+      { title: "Gathr — 18+ verified group meetups near you" },
       { name: "description", content: "Coffee, dinner, drinks, gaming, treks — plan real hangouts with verified people who actually show up." },
-      { property: "og:title", content: "HUDDL — meet strangers, plan real hangouts" },
+      { property: "og:title", content: "Gathr — meet strangers, plan real hangouts" },
       { property: "og:description", content: "Group-only meetups for 18+ verified people. Coffee, dinner, drinks, gaming, treks and more." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -22,7 +22,7 @@ function Landing() {
       <div aria-hidden className="absolute inset-x-0 top-[60vh] h-40 -z-10 bg-gradient-to-b from-transparent to-background" />
 
       <header className="px-6 pt-8 flex items-center justify-between">
-        <div className="text-lg font-black tracking-tight text-white">[HUDDL]</div>
+        <div className="text-lg font-black tracking-tight text-white">[Gathr]</div>
         <Link to="/auth" className="text-sm font-semibold text-white/90 hover:text-white">
           Sign in
         </Link>
@@ -36,7 +36,7 @@ function Landing() {
           Meet strangers.<br />Plan real<br />hangouts.
         </h1>
         <p className="mt-4 text-[15px] text-white/90 leading-relaxed max-w-sm">
-          HUDDL is a group-only meetup app. Coffee, gaming, dinner, movies, treks —
+          Gathr is a group-only meetup app. Coffee, gaming, dinner, movies, treks —
           plan it together with people who actually show up.
         </p>
 

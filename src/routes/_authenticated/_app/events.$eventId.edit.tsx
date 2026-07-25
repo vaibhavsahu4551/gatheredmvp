@@ -108,7 +108,7 @@ function EditEvent() {
         <button onClick={() => navigate({ to: "/events/$eventId", params: { eventId } })} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <h1 className="text-2xl font-semibold tracking-tight">Edit HUDDL</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Edit Gathr</h1>
       </div>
 
       <div className="px-5 pt-6 space-y-5 max-w-md mx-auto">
@@ -139,7 +139,7 @@ function EditEvent() {
           {residentialWarn && (
             <div className="mt-2 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5">
               <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
-              <span>This looks like a residential address. HUDDLs should meet at public places.</span>
+              <span>This looks like a residential address. Gathrs should meet at public places.</span>
             </div>
           )}
         </Field>

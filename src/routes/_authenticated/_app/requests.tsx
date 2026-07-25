@@ -28,7 +28,7 @@ function Requests() {
   const act = async (id: string, accept: boolean) => {
     try {
       await respondHuddleRequest(id, accept);
-      toast.success(accept ? "Huddled up!" : "Declined");
+      toast.success(accept ? "Linked up!" : "Declined");
       await load();
     } catch (e: any) { toast.error(e.message ?? "Failed"); }
   };
@@ -39,7 +39,7 @@ function Requests() {
         <button onClick={() => navigate({ to: "/profile" })} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <h1 className="text-2xl font-semibold tracking-tight">Huddle Up requests</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Linkup requests</h1>
       </header>
       <div className="px-5 space-y-2">
         {loading && <div className="text-sm text-muted-foreground text-center py-8">Loading…</div>}
@@ -57,7 +57,7 @@ function Requests() {
               <Avatar photo={names[r.from_id]?.photo} name={names[r.from_id]?.full_name} size={44} />
               <div className="min-w-0">
                 <div className="text-sm font-semibold truncate">{names[r.from_id]?.full_name ?? "Member"}</div>
-                <div className="text-[11px] text-muted-foreground">wants to Huddle Up</div>
+                <div className="text-[11px] text-muted-foreground">wants to Linkup</div>
               </div>
             </Link>
             <button onClick={() => act(r.id, true)} className="h-9 w-9 rounded-full bg-gradient-brand text-white flex items-center justify-center">

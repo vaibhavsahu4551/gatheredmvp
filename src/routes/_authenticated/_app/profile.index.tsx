@@ -114,7 +114,7 @@ function Profile() {
         >
           <Users className="h-4 w-4 text-muted-foreground" />
           <span className="font-semibold">{connIds.length}</span>
-          <span className="text-muted-foreground">Huddled with</span>
+          <span className="text-muted-foreground">Linked with</span>
         </button>
 
         {p.interests?.length > 0 && (
@@ -340,7 +340,7 @@ function ConnectionsModal({ ids, onClose }: { ids: string[]; onClose: () => void
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-4" onClick={onClose}>
       <div className="w-full max-w-md rounded-2xl bg-card p-4 shadow-elevated max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="text-base font-semibold mb-3">Huddled with</div>
+        <div className="text-base font-semibold mb-3">Linked with</div>
         {ids.length === 0 ? (
           <div className="text-sm text-muted-foreground py-8 text-center">No connections yet.</div>
         ) : (

@@ -8,9 +8,9 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
   head: () => ({
     meta: [
-      { title: "Join HUDDL — meet verified people, plan real hangouts" },
-      { name: "description", content: "Sign up or log in to HUDDL. 18+ verified group meetups for coffee, dinner, drinks, gaming and more." },
-      { property: "og:title", content: "Join HUDDL" },
+      { title: "Join Gathr — meet verified people, plan real hangouts" },
+      { name: "description", content: "Sign up or log in to Gathr. 18+ verified group meetups for coffee, dinner, drinks, gaming and more." },
+      { property: "og:title", content: "Join Gathr" },
       { property: "og:description", content: "18+ verified group meetups. Sign up or log in to start." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -217,7 +217,7 @@ function AuthPage() {
                 <button onClick={() => setTab("login")} className="font-semibold text-gradient-brand">Log in</button>
               </>
             ) : (
-              <>New to HUDDL?{" "}
+              <>New to Gathr?{" "}
                 <button onClick={() => setTab("signup")} className="font-semibold text-gradient-brand">Create account</button>
               </>
             )}

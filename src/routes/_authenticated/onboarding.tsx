@@ -58,7 +58,7 @@ function Onboarding() {
       console.error("Onboarding save failed", error);
       return toast.error(error.message);
     }
-    toast.success("Welcome to HUDDL");
+    toast.success("Welcome to Gathr");
     navigate({ to: "/home" });
   };
 
