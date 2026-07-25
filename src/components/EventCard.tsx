@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Users, ShieldCheck } from "lucide-react";
+import { Users } from "lucide-react";
 import type { EventRow } from "@/lib/events";
 import { SafetyMenu } from "@/components/SafetyMenu";
 import { ShareButton } from "@/components/ShareToConnection";
