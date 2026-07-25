@@ -1,0 +1,155 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { INTERESTS, loadMe, signedPhotoUrl } from "@/lib/huddl";
+import { toast } from "sonner";
+import { ArrowLeft, Camera } from "lucide-react";
+
+export const Route = createFileRoute("/_authenticated/_app/profile/edit")({
+  component: EditProfile,
+});
+
+function EditProfile() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [bio, setBio] = useState("");
+  const [interests, setInterests] = useState<string[]>([]);
+  const [photoPath, setPhotoPath] = useState<string | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>("");
+
+  useEffect(() => {
+    loadMe().then(async (me) => {
+      if (!me?.profile) return;
+      setUserId(me.user.id);
+      setFullName(me.profile.full_name ?? "");
+      setBio(me.profile.bio ?? "");
+      setInterests(me.profile.interests ?? []);
+      const existing = me.profile.photos?.[0];
+      if (existing) {
+        setPhotoPath(existing);
+        setPhotoPreview(await signedPhotoUrl(existing));
+      }
+      setLoading(false);
+    });
+  }, []);
+
+  const toggleInterest = (i: string) => {
+    setInterests((s) => (s.includes(i) ? s.filter((x) => x !== i) : [...s, i]));
+  };
+
+  const uploadPhoto = async (file: File) => {
+    const ext = file.name.split(".").pop() ?? "jpg";
+    const path = `${userId}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("profile-photos").upload(path, file, { upsert: false });
+    if (error) return toast.error(error.message);
+    if (photoPath) await supabase.storage.from("profile-photos").remove([photoPath]);
+    setPhotoPath(path);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const save = async () => {
+    setSaving(true);
+    const { error } = await supabase.from("profiles").update({
+      full_name: fullName.trim() || null,
+      bio: bio.trim() || null,
+      interests,
+      photos: photoPath ? [photoPath] : [],
+    }).eq("id", userId);
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Profile updated");
+    navigate({ to: "/profile" });
+  };
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="h-6 w-6 rounded-full border-2 border-muted border-t-primary animate-spin" /></div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-background pb-32">
+      <header className="px-5 pt-6 flex items-center gap-3">
+        <button onClick={() => navigate({ to: "/profile" })} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <h1 className="text-xl font-semibold tracking-tight">Edit profile</h1>
+      </header>
+
+      <div className="mt-6 px-6 max-w-md mx-auto space-y-6">
+        <div className="flex flex-col items-center">
+          <label className="relative h-32 w-32 rounded-full bg-muted overflow-hidden cursor-pointer flex items-center justify-center shadow-elevated">
+            {photoPreview ? (
+              <img src={photoPreview} className="h-full w-full object-cover" alt="" />
+            ) : (
+              <div className="flex flex-col items-center text-muted-foreground">
+                <Camera className="h-6 w-6 mb-1" />
+                <span className="text-xs">Add</span>
+              </div>
+            )}
+            <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadPhoto(e.target.files[0])} />
+          </label>
+          <div className="mt-2 text-xs text-muted-foreground">Tap to change</div>
+        </div>
+
+        <Field label="Name">
+          <input value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputCls} placeholder="Alex Chen" />
+        </Field>
+
+        <Field label="Bio" hint={`${bio.length}/150`}>
+          <textarea
+            maxLength={150}
+            rows={3}
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            className={inputCls}
+            placeholder="Coffee snob. Weekend trekker."
+          />
+        </Field>
+
+        <Field label="Interests">
+          <div className="flex flex-wrap gap-2">
+            {INTERESTS.map((i) => {
+              const active = interests.includes(i);
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => toggleInterest(i)}
+                  className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium border transition ${active ? "bg-foreground text-background border-foreground" : "bg-background text-foreground border-border"}`}
+                >{i}</button>
+              );
+            })}
+          </div>
+        </Field>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 bg-background/95 backdrop-blur border-t border-border p-4">
+        <div className="max-w-md mx-auto">
+          <button
+            onClick={save}
+            disabled={saving}
+            className="w-full rounded-full bg-brand-gradient py-3.5 text-[15px] font-medium text-white disabled:opacity-50"
+          >
+            {saving ? "Saving…" : "Save changes"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const inputCls = "w-full rounded-2xl border border-input bg-background px-4 py-3 text-[15px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20";
+
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="mb-2 flex items-baseline justify-between">
+        <label className="text-sm font-medium">{label}</label>
+        {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
