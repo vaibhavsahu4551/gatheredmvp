@@ -43,7 +43,7 @@ function Landing() {
         <div className="relative z-10 -mb-8 mt-8">
           <Link
             to="/auth"
-            className="flex w-full items-center justify-center rounded-2xl bg-white px-6 py-4 text-[15px] font-bold text-gradient-brand shadow-elevated active:scale-[0.99] transition"
+            className="flex w-full items-center justify-center rounded-2xl bg-white px-6 py-4 text-[15px] font-bold text-black shadow-elevated active:scale-[0.99] transition"
           >
             Get started — it's free
           </Link>
