@@ -15,11 +15,10 @@ export function looksResidential(addr: string): boolean {
   return RESIDENTIAL_HINTS.some((h) => a.includes(h));
 }
 
-export async function listEvents(city: string) {
+export async function listEvents(_city?: string) {
   const { data, error } = await supabase
     .from("events")
     .select("*")
-    .eq("city", city)
     .in("status", ["pending","confirmed"])
     .order("starts_at", { ascending: true });
   if (error) throw error;
