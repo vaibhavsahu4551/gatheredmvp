@@ -17,7 +17,7 @@ function Messages() {
 
   useEffect(() => {
     (async () => {
-      const t = await listMyThreads();
+      const t = (await listMyThreads()) as Thread[];
       setThreads(t);
       if (t.length) setNames(await getProfilesLite(t.map((x) => x.other_id)));
       setLoading(false);
