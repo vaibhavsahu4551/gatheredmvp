@@ -14,12 +14,21 @@ function Chat() {
 
   return (
     <div>
-      <header className="px-5 pt-8 pb-4">
-        <h1 className="text-2xl font-semibold tracking-tight">Chat</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Group chats unlock when your HUDDL confirms.</p>
+      <header className="px-5 pt-8 pb-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Chat</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Group chats unlock when your HUDDL confirms.</p>
+        </div>
+        <Link to="/messages" className="rounded-full bg-gradient-brand text-white text-xs font-semibold px-3 py-2">
+          Messages
+        </Link>
       </header>
 
       <div className="px-5 space-y-2">
+        <Link to="/messages" className="block rounded-2xl border border-border p-3 bg-gradient-brand-soft">
+          <div className="text-sm font-semibold">Direct messages</div>
+          <div className="text-[11px] text-muted-foreground">1:1 chats with your Huddle Up connections</div>
+        </Link>
         {loading && <div className="text-sm text-muted-foreground text-center py-8">Loading…</div>}
         {!loading && groups.length === 0 && (
           <div className="px-6 py-16 text-center">
