@@ -107,9 +107,10 @@ function HomeFeed() {
           <div className="text-xs font-medium text-muted-foreground">{city || "—"}</div>
           <h1 className="text-2xl font-semibold tracking-tight">Happening near you</h1>
         </div>
-        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-          <Search className="h-5 w-5" />
-        </div>
+        <Link to="/notifications" className="relative h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+          <Bell className="h-5 w-5" />
+          {unread > 0 && <span className="absolute -top-0.5 -right-0.5 h-5 min-w-5 px-1 rounded-full bg-gradient-brand text-white text-[10px] font-bold flex items-center justify-center">{unread}</span>}
+        </Link>
       </header>
 
       <div className="px-5">
