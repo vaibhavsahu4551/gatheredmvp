@@ -89,7 +89,7 @@ function Onboarding() {
         <button
           onClick={submit}
           disabled={saving || !photoPath}
-          className="mt-8 w-full rounded-full bg-brand-gradient py-3.5 text-[15px] font-semibold text-white shadow-elevated disabled:opacity-50"
+          className="mt-8 w-full rounded-full bg-gradient-brand py-3.5 text-[15px] font-semibold text-white shadow-elevated disabled:opacity-50"
         >
           {saving ? "Saving…" : photoPath ? "Continue" : "Add a photo to continue"}
         </button>
@@ -100,7 +100,7 @@ function Onboarding() {
           <button
             onClick={submit}
             disabled={saving || !photoPath}
-            className="w-full rounded-full bg-brand-gradient py-3.5 text-[15px] font-medium text-white disabled:opacity-50"
+            className="w-full rounded-full bg-gradient-brand py-3.5 text-[15px] font-medium text-white disabled:opacity-50"
           >
             {saving ? "Saving…" : "Continue"}
           </button>
