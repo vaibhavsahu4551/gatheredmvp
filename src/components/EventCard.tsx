@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { Users, ShieldCheck } from "lucide-react";
 import type { EventRow } from "@/lib/events";
+import { SafetyMenu } from "@/components/SafetyMenu";
 
 export type EventCounts = { boys: number; girls: number; total: number };
+
 
 export function EventCard({
   e,
