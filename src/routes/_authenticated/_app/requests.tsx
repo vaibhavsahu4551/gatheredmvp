@@ -54,7 +54,7 @@ function Requests() {
         {rows.map((r) => (
           <div key={r.id} className="flex items-center gap-3 rounded-2xl border border-border p-3 bg-card">
             <Link to="/u/$userId" params={{ userId: r.from_id }} className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="h-11 w-11 rounded-full bg-gradient-brand shrink-0" />
+              <Avatar photo={names[r.from_id]?.photo} name={names[r.from_id]?.full_name} size={44} />
               <div className="min-w-0">
                 <div className="text-sm font-semibold truncate">{names[r.from_id]?.full_name ?? "Member"}</div>
                 <div className="text-[11px] text-muted-foreground">wants to Huddle Up</div>
