@@ -52,6 +52,7 @@ export function EventCard({
             <span className="text-[11px] text-muted-foreground">
               {new Date(e.starts_at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}
             </span>
+            <ShareButton kind="event" id={e.id} />
             <SafetyMenu targetType="event" targetId={e.id} userId={e.host_id} />
           </div>
         </div>
