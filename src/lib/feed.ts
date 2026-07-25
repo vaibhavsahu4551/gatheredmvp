@@ -16,9 +16,10 @@ export async function signedFeedUrl(path: string) {
   return data?.signedUrl ?? "";
 }
 
-export async function createPost(city: string, caption: string, file?: File) {
+export async function createPost(city: string, caption: string, file?: File, eventId?: string | null) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Sign in required");
+  if (!caption.trim() && !file) throw new Error("Add text or a photo");
   let photo_url: string | null = null;
   if (file) {
     const ext = file.name.split(".").pop() ?? "jpg";
@@ -27,8 +28,30 @@ export async function createPost(city: string, caption: string, file?: File) {
     if (error) throw error;
     photo_url = path;
   }
-  const { error } = await supabase.from("posts").insert({ user_id: user.id, city, caption, photo_url });
+  const { error } = await supabase.from("posts").insert({
+    user_id: user.id,
+    city,
+    caption: caption.trim() || null,
+    photo_url,
+    event_id: eventId ?? null,
+  } as any);
   if (error) throw error;
+}
+
+export async function listMyEvents() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data } = await supabase.from("events").select("id, title, starts_at").eq("host_id", user.id).order("starts_at", { ascending: false }).limit(30);
+  return data ?? [];
+}
+
+export async function getEventsLite(ids: string[]) {
+  const uniq = Array.from(new Set(ids.filter(Boolean)));
+  if (!uniq.length) return {} as Record<string, { id: string; title: string; event_type: string | null }>;
+  const { data } = await supabase.from("events").select("id, title, event_type").in("id", uniq);
+  const map: Record<string, { id: string; title: string; event_type: string | null }> = {};
+  for (const e of data ?? []) map[e.id] = e as any;
+  return map;
 }
 
 export async function toggleLike(postId: string) {
