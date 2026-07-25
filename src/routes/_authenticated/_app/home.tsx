@@ -131,7 +131,13 @@ function HomeFeed() {
 
       <div className="mt-3 px-5 space-y-3 pb-4">
         {loading && <div className="text-sm text-muted-foreground text-center py-8">Loading…</div>}
-        {!loading && items.length === 0 && (
+        {!loading && err && (
+          <div className="text-center py-8 space-y-3">
+            <div className="text-sm text-destructive">{err}</div>
+            <button onClick={refresh} className="rounded-full bg-gradient-brand text-white px-4 py-2 text-sm font-medium">Retry</button>
+          </div>
+        )}
+        {!loading && !err && items.length === 0 && (
           <div className="text-sm text-muted-foreground text-center py-12">Nothing here yet in {city || "your city"}. Create the first event or post.</div>
         )}
         {items.map((it) => it.kind === "event" ? (
