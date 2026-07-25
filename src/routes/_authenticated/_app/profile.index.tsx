@@ -218,8 +218,8 @@ function PostsTab({ userId, onCreate }: { userId: string; onCreate: () => void }
       />
     );
 
-  const [openId, setOpenId] = useState<string | null>(null);
   const openPost = openId ? posts.find((p) => p.id === openId) : null;
+
 
   return (
     <>
