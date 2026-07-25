@@ -94,7 +94,10 @@ function EventDetail() {
 
   const doJoin = async () => {
     try { await requestJoin(eventId); toast.success("Request sent"); await load(); }
-    catch (e: any) { toast.error(e.message); }
+    catch (e: any) {
+      console.error("Join failed", e);
+      toast.error(e?.message || e?.error_description || "Couldn't send request. Please try again.");
+    }
   };
   const decide = async (id: string, s: "approved" | "rejected") => {
     await setParticipantStatus(id, s); await load();
@@ -172,7 +175,7 @@ function EventDetail() {
           <h3 className="text-sm font-semibold">Going ({approved.length})</h3>
           <div className="mt-2 space-y-1.5">
             {approved.map((p) => (
-              <div key={p.id} className="text-sm text-muted-foreground">{profiles[p.user_id]?.full_name ?? "Someone"} · {profiles[p.user_id]?.gender ?? "—"}</div>
+              <Link key={p.id} to="/u/$userId" params={{ userId: p.user_id }} className="block text-sm text-muted-foreground hover:text-foreground">{profiles[p.user_id]?.full_name ?? "Someone"} · {profiles[p.user_id]?.gender ?? "—"}</Link>
             ))}
             {approved.length === 0 && <div className="text-sm text-muted-foreground">No one yet.</div>}
           </div>
@@ -184,10 +187,10 @@ function EventDetail() {
             <div className="mt-2 space-y-2">
               {pending.map((p) => (
                 <div key={p.id} className="flex items-center justify-between rounded-2xl border border-border p-3">
-                  <div className="text-sm">
-                    <div className="font-medium">{profiles[p.user_id]?.full_name ?? "Someone"}</div>
+                  <Link to="/u/$userId" params={{ userId: p.user_id }} className="text-sm min-w-0 flex-1">
+                    <div className="font-medium truncate">{profiles[p.user_id]?.full_name ?? "Someone"}</div>
                     <div className="text-xs text-muted-foreground">{profiles[p.user_id]?.gender ?? "—"}</div>
-                  </div>
+                  </Link>
                   <div className="flex gap-2">
                     <button onClick={() => decide(p.id, "rejected")} className="rounded-full border border-border px-3 py-1.5 text-xs">Reject</button>
                     <button onClick={() => decide(p.id, "approved")} className="rounded-full bg-primary text-primary-foreground px-3 py-1.5 text-xs">Approve</button>
@@ -218,12 +221,16 @@ function EventDetail() {
                   const mine = c.user_id === me;
                   return (
                     <div key={c.id} className="flex items-start gap-2">
-                      <div className="h-8 w-8 shrink-0 rounded-full bg-muted flex items-center justify-center text-[11px] font-semibold text-foreground/70">
+                      <Link to="/u/$userId" params={{ userId: c.user_id }} className="h-8 w-8 shrink-0 rounded-full bg-muted flex items-center justify-center text-[11px] font-semibold text-foreground/70">
                         {initial}
-                      </div>
+                      </Link>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-baseline gap-1.5">
-                          <span className="text-[13px] font-medium truncate">{mine ? "You" : name}</span>
+                          {mine ? (
+                            <span className="text-[13px] font-medium truncate">You</span>
+                          ) : (
+                            <Link to="/u/$userId" params={{ userId: c.user_id }} className="text-[13px] font-medium truncate hover:underline">{name}</Link>
+                          )}
                           <span className="text-[10px] text-muted-foreground">{new Date(c.created_at).toLocaleString([], { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })}</span>
                         </div>
                         <div className="text-sm text-foreground/90 whitespace-pre-wrap break-words">{c.body}</div>
