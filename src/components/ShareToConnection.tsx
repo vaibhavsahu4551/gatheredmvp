@@ -26,7 +26,7 @@ export function ShareButton({ kind, id }: { kind: "post" | "event"; id: string }
 
 function SharePicker({ kind, id, onClose }: { kind: "post" | "event"; id: string; onClose: () => void }) {
   const [connIds, setConnIds] = useState<string[]>([]);
-  const [names, setNames] = useState<Record<string, { full_name: string | null }>>({});
+  const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [note, setNote] = useState("");
   const [sending, setSending] = useState(false);
