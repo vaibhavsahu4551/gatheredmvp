@@ -171,7 +171,7 @@ function UserProfile() {
               {connIds.map((uid) => (
                 <Link key={uid} to="/u/$userId" params={{ userId: uid }}
                   className="flex items-center gap-2 rounded-full bg-muted px-3 py-1.5">
-                  <div className="h-6 w-6 rounded-full bg-gradient-brand" />
+                  <Avatar photo={connNames[uid]?.photo} name={connNames[uid]?.full_name} size={24} />
                   <span className="text-[13px] font-medium truncate max-w-[120px]">{connNames[uid]?.full_name ?? "Member"}</span>
                 </Link>
               ))}
