@@ -9,6 +9,7 @@ import { listFeed, getLikes, toggleLike, signedFeedUrl, getEventsLite } from "@/
 import { loadBlockedIds } from "@/lib/safety";
 import { EventCard } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
+import { CityPickerModal } from "@/components/CityPickerModal";
 
 
 export const Route = createFileRoute("/_authenticated/_app/home")({
@@ -38,6 +39,7 @@ function HomeFeed() {
   const [names, setNames] = useState<Record<string, { full_name: string | null }>>({});
   const [linkedEvents, setLinkedEvents] = useState<Record<string, { id: string; title: string; event_type: string | null }>>({});
 
+  const [cityModal, setCityModal] = useState(false);
   const [locState, setLocState] = useState<"idle" | "detecting" | "denied">("idle");
   useEffect(() => {
     loadMe().then((me) => {
@@ -132,11 +134,13 @@ function HomeFeed() {
         <div>
           <div className="text-xs font-medium text-muted-foreground flex items-center gap-1">
             {city ? (
-              <span>📍 Showing events near <span className="text-foreground font-semibold">{city}</span></span>
+              <button onClick={() => setCityModal(true)} className="text-left">
+                📍 Showing events near <span className="text-foreground font-semibold underline">{city}</span>
+              </button>
             ) : locState === "detecting" ? (
               <span>📍 Detecting your location…</span>
             ) : (
-              <Link to="/profile/edit" className="underline text-primary">📍 Set your location</Link>
+              <button onClick={() => setCityModal(true)} className="underline text-primary">📍 Set your location</button>
             )}
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">Happening near you</h1>
@@ -180,6 +184,7 @@ function HomeFeed() {
             onLike={async () => { await toggleLike(it.id); await refresh(); }} />
         ))}
       </div>
+      <CityPickerModal open={cityModal} onClose={() => setCityModal(false)} onSaved={(c) => { setCity(c); setLocState("idle"); }} />
     </div>
   );
 }
