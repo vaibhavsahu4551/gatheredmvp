@@ -3,9 +3,9 @@ import { eventTypeStyle } from "@/lib/event-style";
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { countByGender, getEvent, getParticipants, getProfilesLite, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
+import { countByGender, deleteEvent, getEvent, getParticipants, getProfilesLite, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
 import { toast } from "sonner";
-import { ArrowLeft, ShieldCheck, MapPin, Clock, Users, MessageCircle, Lock, Send } from "lucide-react";
+import { ArrowLeft, ShieldCheck, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2 } from "lucide-react";
 import { SafetyMenu } from "@/components/SafetyMenu";
 
 
@@ -115,11 +115,40 @@ function EventDetail() {
               <MessageCircle className="h-4 w-4" /> Group chat
             </Link>
           )}
-          {event.host_id !== me && (
+          {isHost && (
+            <>
+              <Link
+                to="/events/$eventId/edit"
+                params={{ eventId: event.id }}
+                className="h-9 w-9 rounded-full bg-muted flex items-center justify-center"
+                aria-label="Edit event"
+              >
+                <Pencil className="h-4 w-4" />
+              </Link>
+              <button
+                onClick={async () => {
+                  if (!confirm("Delete this event? All requests, attendees, comments, and the group chat will be removed.")) return;
+                  try {
+                    await deleteEvent(event.id);
+                    toast.success("Event deleted");
+                    navigate({ to: "/events" });
+                  } catch (e: any) {
+                    toast.error(e?.message ?? "Could not delete event");
+                  }
+                }}
+                className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-destructive"
+                aria-label="Delete event"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </>
+          )}
+          {!isHost && (
             <SafetyMenu targetType="event" targetId={event.id} userId={event.host_id} />
           )}
         </div>
       </div>
+
 
 
       <div className="px-5 pt-4">

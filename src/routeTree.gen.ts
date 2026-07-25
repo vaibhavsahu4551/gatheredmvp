@@ -28,6 +28,7 @@ import { Route as AuthenticatedAppProfileEditRouteImport } from './routes/_authe
 import { Route as AuthenticatedAppMessagesThreadIdRouteImport } from './routes/_authenticated/_app/messages.$threadId'
 import { Route as AuthenticatedAppEventsEventIdRouteImport } from './routes/_authenticated/_app/events.$eventId'
 import { Route as AuthenticatedAppChatGroupIdRouteImport } from './routes/_authenticated/_app/chat.$groupId'
+import { Route as AuthenticatedAppEventsEventIdEditRouteImport } from './routes/_authenticated/_app/events.$eventId.edit'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -130,6 +131,12 @@ const AuthenticatedAppChatGroupIdRoute =
     path: '/$groupId',
     getParentRoute: () => AuthenticatedAppChatRoute,
   } as any)
+const AuthenticatedAppEventsEventIdEditRoute =
+  AuthenticatedAppEventsEventIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedAppEventsEventIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -144,11 +151,12 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedAppNotificationsRoute
   '/requests': typeof AuthenticatedAppRequestsRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
-  '/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
+  '/events/$eventId': typeof AuthenticatedAppEventsEventIdRouteWithChildren
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/profile/': typeof AuthenticatedAppProfileIndexRoute
+  '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -163,11 +171,12 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedAppNotificationsRoute
   '/requests': typeof AuthenticatedAppRequestsRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
-  '/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
+  '/events/$eventId': typeof AuthenticatedAppEventsEventIdRouteWithChildren
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/profile': typeof AuthenticatedAppProfileIndexRoute
+  '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -185,11 +194,12 @@ export interface FileRoutesById {
   '/_authenticated/_app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/_authenticated/_app/requests': typeof AuthenticatedAppRequestsRoute
   '/_authenticated/_app/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
-  '/_authenticated/_app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
+  '/_authenticated/_app/events/$eventId': typeof AuthenticatedAppEventsEventIdRouteWithChildren
   '/_authenticated/_app/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/_authenticated/_app/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/_authenticated/_app/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/_authenticated/_app/profile/': typeof AuthenticatedAppProfileIndexRoute
+  '/_authenticated/_app/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/profile/edit'
     | '/u/$userId'
     | '/profile/'
+    | '/events/$eventId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/profile/edit'
     | '/u/$userId'
     | '/profile'
+    | '/events/$eventId/edit'
   id:
     | '__root__'
     | '/'
@@ -251,6 +263,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/profile/edit'
     | '/_authenticated/_app/u/$userId'
     | '/_authenticated/_app/profile/'
+    | '/_authenticated/_app/events/$eventId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -394,6 +407,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppChatGroupIdRouteImport
       parentRoute: typeof AuthenticatedAppChatRoute
     }
+    '/_authenticated/_app/events/$eventId/edit': {
+      id: '/_authenticated/_app/events/$eventId/edit'
+      path: '/edit'
+      fullPath: '/events/$eventId/edit'
+      preLoaderRoute: typeof AuthenticatedAppEventsEventIdEditRouteImport
+      parentRoute: typeof AuthenticatedAppEventsEventIdRoute
+    }
   }
 }
 
@@ -408,13 +428,29 @@ const AuthenticatedAppChatRouteChildren: AuthenticatedAppChatRouteChildren = {
 const AuthenticatedAppChatRouteWithChildren =
   AuthenticatedAppChatRoute._addFileChildren(AuthenticatedAppChatRouteChildren)
 
+interface AuthenticatedAppEventsEventIdRouteChildren {
+  AuthenticatedAppEventsEventIdEditRoute: typeof AuthenticatedAppEventsEventIdEditRoute
+}
+
+const AuthenticatedAppEventsEventIdRouteChildren: AuthenticatedAppEventsEventIdRouteChildren =
+  {
+    AuthenticatedAppEventsEventIdEditRoute:
+      AuthenticatedAppEventsEventIdEditRoute,
+  }
+
+const AuthenticatedAppEventsEventIdRouteWithChildren =
+  AuthenticatedAppEventsEventIdRoute._addFileChildren(
+    AuthenticatedAppEventsEventIdRouteChildren,
+  )
+
 interface AuthenticatedAppEventsRouteChildren {
-  AuthenticatedAppEventsEventIdRoute: typeof AuthenticatedAppEventsEventIdRoute
+  AuthenticatedAppEventsEventIdRoute: typeof AuthenticatedAppEventsEventIdRouteWithChildren
 }
 
 const AuthenticatedAppEventsRouteChildren: AuthenticatedAppEventsRouteChildren =
   {
-    AuthenticatedAppEventsEventIdRoute: AuthenticatedAppEventsEventIdRoute,
+    AuthenticatedAppEventsEventIdRoute:
+      AuthenticatedAppEventsEventIdRouteWithChildren,
   }
 
 const AuthenticatedAppEventsRouteWithChildren =

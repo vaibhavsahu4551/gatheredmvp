@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Bell } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { unreadCount } from "@/lib/notifications";
 import { loadMe } from "@/lib/huddl";
 import { CATEGORIES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipants } from "@/lib/events";
@@ -46,8 +47,10 @@ function HomeFeed() {
     setLoading(true);
     setErr(null);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const meId = user?.id ?? "";
       const [ev, ps, blocked] = await Promise.all([listEvents(), listFeed(), loadBlockedIds()]);
-      const evFiltered = ev.filter((e) => !blocked.has(e.host_id));
+      const evFiltered = ev.filter((e) => !blocked.has(e.host_id) && e.host_id !== meId);
       setEvents(evFiltered);
       const cts: typeof counts = {};
       for (const e of evFiltered) {
@@ -58,7 +61,7 @@ function HomeFeed() {
       setHosts(await getProfilesLite(evFiltered.map((e) => e.host_id)));
 
       const pItems: PostItem[] = (ps as any[])
-        .filter((p) => !blocked.has(p.user_id))
+        .filter((p) => !blocked.has(p.user_id) && p.user_id !== meId)
         .map((p) => ({
           kind: "post", id: p.id, created_at: p.created_at, user_id: p.user_id,
           caption: p.caption, photo_url: p.photo_url, event_id: p.event_id ?? null,

@@ -48,6 +48,11 @@ export async function createPost(city: string, caption: string, file?: File, eve
   if (error) throw error;
 }
 
+export async function deletePost(id: string) {
+  const { error } = await supabase.from("posts").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export async function listMyEvents() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];

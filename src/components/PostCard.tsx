@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "@tanstack/react-router";
-import { Heart, MessageSquare, Link2 } from "lucide-react";
+import { Heart, MessageSquare, Link2, Trash2 } from "lucide-react";
 import { SafetyMenu } from "@/components/SafetyMenu";
 import { ShareButton } from "@/components/ShareToConnection";
 import { eventTypeStyle } from "@/lib/event-style";
@@ -23,6 +23,7 @@ export function PostCard({
   liked,
   likeCount,
   onLike,
+  onDelete,
 }: {
   p: PostItem;
   img?: string;
@@ -31,6 +32,7 @@ export function PostCard({
   liked: boolean;
   likeCount: number;
   onLike: () => void;
+  onDelete?: () => void;
 }) {
   const navigate = useNavigate();
   const [openC, setOpenC] = useState(false);
@@ -59,7 +61,18 @@ export function PostCard({
         </Link>
         <div className="flex items-center gap-1">
           <span className="text-[10px] uppercase tracking-wide font-bold text-gradient-brand">Post</span>
-          <SafetyMenu targetType="user" targetId={p.user_id} userId={p.user_id} />
+          {onDelete ? (
+            <button
+              type="button"
+              onClick={() => { if (confirm("Delete this post? This will remove all its likes and comments.")) onDelete(); }}
+              className="h-7 w-7 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-destructive"
+              aria-label="Delete post"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          ) : (
+            <SafetyMenu targetType="user" targetId={p.user_id} userId={p.user_id} />
+          )}
         </div>
       </div>
 
