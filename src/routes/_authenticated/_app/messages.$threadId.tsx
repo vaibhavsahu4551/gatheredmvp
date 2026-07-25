@@ -58,8 +58,14 @@ function DmRoom() {
       for (const e of data ?? []) upd[`event:${e.id}`] = e;
     }
     if (postIds.length) {
-      const { data } = await sb.from("posts").select("id, caption").in("id", postIds);
-      for (const p of data ?? []) upd[`post:${p.id}`] = p;
+      const { data } = await sb.from("posts").select("id, caption, photo_url, user_id").in("id", postIds);
+      const authorIds = Array.from(new Set((data ?? []).map((p: any) => p.user_id).filter(Boolean))) as string[];
+      const authors = authorIds.length ? await getProfilesLite(authorIds) : {};
+      const { signedFeedUrl } = await import("@/lib/feed");
+      for (const p of data ?? []) {
+        const thumb = p.photo_url ? await signedFeedUrl(p.photo_url) : "";
+        upd[`post:${p.id}`] = { ...p, author: (authors as any)[p.user_id], thumb };
+      }
     }
     if (Object.keys(upd).length) setShared((s) => ({ ...s, ...upd }));
   };
@@ -101,10 +107,24 @@ function DmRoom() {
                   </Link>
                 )}
                 {sk && m.share_kind === "post" && (
-                  <div className={`mb-1 rounded-xl px-2 py-1.5 text-[12px] ${mine ? "bg-white/20" : "bg-background"}`}>
-                    <Link2 className="inline h-3 w-3 mr-1" />
-                    Post: {sk.caption?.slice(0, 60) ?? "Shared post"}
-                  </div>
+                  <Link to="/posts/$postId" params={{ postId: m.share_id }}
+                    className={`flex gap-2 mb-1 rounded-xl p-2 ${mine ? "bg-white/20" : "bg-background"}`}>
+                    {sk.thumb ? (
+                      <img src={sk.thumb} alt="" className="h-14 w-14 rounded-lg object-cover flex-shrink-0" />
+                    ) : (
+                      <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                        <Link2 className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[11px] opacity-80 font-semibold truncate">
+                        {sk.author?.full_name ?? "Post"}
+                      </div>
+                      <div className="text-[12px] line-clamp-2 opacity-90">
+                        {sk.caption?.slice(0, 80) ?? (sk.thumb ? "Photo" : "Shared post")}
+                      </div>
+                    </div>
+                  </Link>
                 )}
                 {m.body}
               </div>
