@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Calendar } from "lucide-react";
 import type { EventRow } from "@/lib/events";
 
-export const Route = createFileRoute("/_authenticated/_app/events")({
+export const Route = createFileRoute("/_authenticated/_app/events/")({
   component: Events,
 });
 
