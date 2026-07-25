@@ -31,42 +31,54 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-surface: var(--surface);
+  --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
+  --color-brand-3: var(--brand-3);
   --font-display: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --shadow-card: 0 1px 2px 0 oklch(0 0 0 / 0.04), 0 4px 16px -4px oklch(0 0 0 / 0.06);
+  --shadow-card: 0 1px 2px 0 oklch(0 0 0 / 0.04), 0 8px 24px -8px color-mix(in oklab, var(--brand) 22%, transparent);
+  --shadow-glow: 0 12px 40px -10px color-mix(in oklab, var(--brand-2) 45%, transparent);
   --shadow-nav: 0 -1px 0 0 var(--color-border);
 }
 
 :root {
-  --radius: 0.875rem;
-  /* Clean & Minimal: white + slate-900 ink + iOS-blue */
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.21 0.04 265);   /* #111827 */
-  --surface: oklch(0.972 0.005 260);    /* #F3F4F6 */
+  --radius: 1rem;
+
+  /* Vibrant HUDDL palette: coral → magenta → deep indigo */
+  --brand: oklch(0.68 0.20 22);        /* coral #FF5A5F-ish */
+  --brand-2: oklch(0.58 0.28 340);     /* hot pink/magenta */
+  --brand-3: oklch(0.45 0.22 290);     /* deep indigo/purple */
+
+  --gradient-brand: linear-gradient(135deg, #FF5A5F 0%, #FF2D95 50%, #6B46FF 100%);
+  --gradient-brand-soft: linear-gradient(135deg, #FFE4E1 0%, #FCE2F1 50%, #E9E3FF 100%);
+
+  --background: oklch(0.995 0.005 20);
+  --foreground: oklch(0.19 0.03 285);
+  --surface: oklch(0.97 0.012 20);
 
   --card: oklch(1 0 0);
   --card-foreground: var(--foreground);
   --popover: oklch(1 0 0);
   --popover-foreground: var(--foreground);
 
-  --primary: oklch(0.55 0.19 260);       /* iOS/tailwind blue-600 #2563EB */
+  --primary: var(--brand);
   --primary-foreground: oklch(1 0 0);
 
   --secondary: var(--surface);
   --secondary-foreground: var(--foreground);
 
   --muted: var(--surface);
-  --muted-foreground: oklch(0.5 0.02 260);
+  --muted-foreground: oklch(0.5 0.03 285);
 
-  --accent: var(--surface);
-  --accent-foreground: var(--foreground);
+  --accent: oklch(0.94 0.05 340);
+  --accent-foreground: oklch(0.28 0.14 300);
 
   --destructive: oklch(0.6 0.22 27);
   --destructive-foreground: oklch(1 0 0);
 
-  --border: oklch(0.92 0.005 260);
-  --input: oklch(0.92 0.005 260);
-  --ring: var(--primary);
+  --border: oklch(0.93 0.015 320);
+  --input: oklch(0.93 0.015 320);
+  --ring: var(--brand-2);
 }
 
 @layer base {
@@ -76,5 +88,22 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    background-image:
+      radial-gradient(1200px 500px at -10% -10%, color-mix(in oklab, #FF5A5F 12%, transparent), transparent 60%),
+      radial-gradient(900px 400px at 110% -5%, color-mix(in oklab, #6B46FF 12%, transparent), transparent 55%);
+    background-attachment: fixed;
   }
+}
+
+@utility bg-gradient-brand {
+  background-image: var(--gradient-brand);
+}
+@utility bg-gradient-brand-soft {
+  background-image: var(--gradient-brand-soft);
+}
+@utility text-gradient-brand {
+  background-image: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
