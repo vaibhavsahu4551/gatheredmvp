@@ -35,12 +35,20 @@ function Profile() {
   const [me, setMe] = useState<Awaited<ReturnType<typeof loadMe>>>(null);
   const [avatar, setAvatar] = useState<string>("");
   const [tab, setTab] = useState<Tab>("posts");
+  const [connIds, setConnIds] = useState<string[]>([]);
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     loadMe().then(async (data) => {
       setMe(data);
       const photos = data?.profile?.photos ?? [];
       if (photos[0]) setAvatar(await signedPhotoUrl(photos[0]));
+      if (data?.user) {
+        const ids = await listConnections(data.user.id);
+        setConnIds(ids);
+        const inc = await listIncomingRequests();
+        setPendingCount(inc.length);
+      }
     });
   }, []);
 
