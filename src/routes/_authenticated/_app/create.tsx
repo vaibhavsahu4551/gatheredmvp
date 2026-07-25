@@ -81,7 +81,9 @@ function Create() {
       event_type: eventType,
       starts_at: new Date(startsAt).toISOString(),
       location_address: address.trim(),
+      exact_location: exactLocation.trim() || null,
       city: city.trim(),
+
       min_size: minSize,
       max_size: maxSize,
       entry_fee: fee ? Number(fee) : null,
