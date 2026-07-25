@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/_app/messages")({
 type Thread = { id: string; other_id: string; updated_at: string };
 
 function Messages() {
-  const [threads, setThreads] = useState<Awaited<ReturnType<typeof listMyThreads>>>([]);
+  const [threads, setThreads] = useState<Thread[]>([]);
   const [names, setNames] = useState<Record<string, { full_name: string | null }>>({});
   const [loading, setLoading] = useState(true);
 
