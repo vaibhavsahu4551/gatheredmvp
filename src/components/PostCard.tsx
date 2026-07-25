@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Heart, MessageSquare, Link2 } from "lucide-react";
 import { SafetyMenu } from "@/components/SafetyMenu";
+import { ShareButton } from "@/components/ShareToConnection";
 import { eventTypeStyle } from "@/lib/event-style";
 
 export type PostItem = {
