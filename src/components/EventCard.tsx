@@ -33,10 +33,12 @@ export function EventCard({
             {e.category}
           </span>
         </div>
-        <span className="text-[11px] text-muted-foreground shrink-0">
+        <span className="text-[11px] text-muted-foreground shrink-0 flex items-center gap-0.5">
           {new Date(e.starts_at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}
+          <SafetyMenu targetType="event" targetId={e.id} userId={e.host_id} />
         </span>
       </div>
+
       <h3 className="mt-1.5 text-[17px] font-semibold leading-snug">{e.title}</h3>
       <div className="mt-1 text-[13px] text-muted-foreground">{e.location_address}</div>
       <div className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
