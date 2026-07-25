@@ -41,11 +41,12 @@ function HomeFeed() {
     loadMe().then((me) => setCity(me?.profile?.city ?? ""));
   }, []);
 
+  const [err, setErr] = useState<string | null>(null);
   const refresh = async () => {
-    if (!city) return;
     setLoading(true);
+    setErr(null);
     try {
-      const [ev, ps, blocked] = await Promise.all([listEvents(city), listFeed(city), loadBlockedIds()]);
+      const [ev, ps, blocked] = await Promise.all([listEvents(), listFeed(), loadBlockedIds()]);
       const evFiltered = ev.filter((e) => !blocked.has(e.host_id));
       setEvents(evFiltered);
       const cts: typeof counts = {};
@@ -72,9 +73,11 @@ function HomeFeed() {
       const im: Record<string, string> = {};
       for (const p of pItems) if (p.photo_url) im[p.id] = await signedFeedUrl(p.photo_url);
       setImgs(im);
+    } catch (e: any) {
+      setErr(e?.message ?? "Failed to load feed");
     } finally { setLoading(false); }
   };
-  useEffect(() => { refresh(); }, [city]);
+  useEffect(() => { refresh(); }, []);
 
 
   const filteredEvents = useMemo(() => events.filter((e) => {
@@ -128,7 +131,13 @@ function HomeFeed() {
 
       <div className="mt-3 px-5 space-y-3 pb-4">
         {loading && <div className="text-sm text-muted-foreground text-center py-8">Loading…</div>}
-        {!loading && items.length === 0 && (
+        {!loading && err && (
+          <div className="text-center py-8 space-y-3">
+            <div className="text-sm text-destructive">{err}</div>
+            <button onClick={refresh} className="rounded-full bg-gradient-brand text-white px-4 py-2 text-sm font-medium">Retry</button>
+          </div>
+        )}
+        {!loading && !err && items.length === 0 && (
           <div className="text-sm text-muted-foreground text-center py-12">Nothing here yet in {city || "your city"}. Create the first event or post.</div>
         )}
         {items.map((it) => it.kind === "event" ? (
