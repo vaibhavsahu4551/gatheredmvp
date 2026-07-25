@@ -225,6 +225,10 @@ function PostsTab({ userId, onCreate }: { userId: string; onCreate: () => void }
           liked={likes.mine.has(p.id)}
           likeCount={likes.counts[p.id] ?? 0}
           onLike={async () => { await toggleLike(p.id); await refresh(); }}
+          onDelete={async () => {
+            try { await deletePost(p.id); toast.success("Post deleted"); await refresh(); }
+            catch (e: any) { toast.error(e?.message ?? "Could not delete post"); }
+          }}
         />
       ))}
     </div>
