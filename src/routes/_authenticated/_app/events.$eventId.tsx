@@ -176,6 +176,61 @@ function EventDetail() {
             </div>
           </div>
         )}
+
+        <div className="mt-8">
+          <h3 className="text-sm font-semibold flex items-center gap-1.5">
+            <MessageCircle className="h-4 w-4" /> Discussion
+          </h3>
+          {!canDiscuss ? (
+            <div className="mt-2 rounded-2xl border border-dashed border-border p-4 flex items-center gap-2 text-sm text-muted-foreground">
+              <Lock className="h-4 w-4" /> Join this event to see the discussion
+            </div>
+          ) : (
+            <div className="mt-2 rounded-2xl border border-border bg-card">
+              <div className="max-h-80 overflow-y-auto p-3 space-y-3">
+                {comments.length === 0 && (
+                  <div className="text-xs text-muted-foreground text-center py-4">No messages yet. Say hi 👋</div>
+                )}
+                {comments.map((c) => {
+                  const name = profiles[c.user_id]?.full_name ?? "Someone";
+                  const initial = (name?.[0] ?? "?").toUpperCase();
+                  const mine = c.user_id === me;
+                  return (
+                    <div key={c.id} className="flex items-start gap-2">
+                      <div className="h-8 w-8 shrink-0 rounded-full bg-muted flex items-center justify-center text-[11px] font-semibold text-foreground/70">
+                        {initial}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-[13px] font-medium truncate">{mine ? "You" : name}</span>
+                          <span className="text-[10px] text-muted-foreground">{new Date(c.created_at).toLocaleString([], { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })}</span>
+                        </div>
+                        <div className="text-sm text-foreground/90 whitespace-pre-wrap break-words">{c.body}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={commentsEndRef} />
+              </div>
+              <div className="border-t border-border p-2 flex gap-2">
+                <input
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); sendComment(); } }}
+                  placeholder="Write a message…"
+                  className="flex-1 rounded-full bg-background border border-border px-4 py-2 text-sm outline-none"
+                />
+                <button
+                  onClick={sendComment}
+                  disabled={sending || !commentText.trim()}
+                  className="h-9 w-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-50"
+                >
+                  <Send className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
