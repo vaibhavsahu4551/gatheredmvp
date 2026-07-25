@@ -92,7 +92,7 @@ function EditProfile() {
         <button
           onClick={save}
           disabled={saving}
-          className="rounded-full bg-brand-gradient px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="rounded-full bg-gradient-brand px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
         >
           {saving ? "Saving…" : "Save"}
         </button>
@@ -155,7 +155,7 @@ function EditProfile() {
           <button
             onClick={save}
             disabled={saving}
-            className="flex-1 rounded-full bg-brand-gradient py-3 text-[15px] font-semibold text-white disabled:opacity-50"
+            className="flex-1 rounded-full bg-gradient-brand py-3 text-[15px] font-semibold text-white disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save changes"}
           </button>
@@ -167,7 +167,7 @@ function EditProfile() {
           <button
             onClick={save}
             disabled={saving}
-            className="w-full rounded-full bg-brand-gradient py-3.5 text-[15px] font-medium text-white disabled:opacity-50"
+            className="w-full rounded-full bg-gradient-brand py-3.5 text-[15px] font-medium text-white disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save changes"}
           </button>
