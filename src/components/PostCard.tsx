@@ -62,7 +62,7 @@ export function PostCard({
       <article className="bg-background px-4 py-3 border-b border-border">
         <div className="flex gap-3">
           <Link to="/u/$userId" params={{ userId: p.user_id }} className="shrink-0">
-            <div className="h-10 w-10 rounded-full bg-gradient-brand" />
+            <Avatar photo={avatarPhoto} name={name} size={40} />
           </Link>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
@@ -130,7 +130,7 @@ export function PostCard({
     <article className="rounded-2xl bg-card overflow-hidden shadow-card ring-1 ring-black/[0.04]">
       <div className="px-3 pt-2.5 pb-2 flex items-center justify-between">
         <Link to="/u/$userId" params={{ userId: p.user_id }} className="flex items-center gap-2 min-w-0">
-          <div className="h-7 w-7 rounded-full bg-gradient-brand shrink-0" />
+          <Avatar photo={avatarPhoto} name={name} size={28} />
           <div className="text-[13px] font-semibold truncate hover:underline">{name}</div>
         </Link>
         <div className="flex items-center gap-1">
