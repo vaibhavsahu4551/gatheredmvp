@@ -224,8 +224,8 @@ function PostsTab({ userId, onCreate }: { userId: string; onCreate: () => void }
             {p.photo_url && imgs[p.id] ? (
               <img src={imgs[p.id]} alt="" className="absolute inset-0 h-full w-full object-cover" />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center p-2 bg-gradient-brand-soft">
-                <div className="text-[11px] leading-snug text-foreground/80 line-clamp-6 text-center whitespace-pre-wrap">
+              <div className="absolute inset-0 flex items-center justify-center p-3 bg-background ring-1 ring-inset ring-border">
+                <div className="text-[12px] leading-snug text-foreground line-clamp-6 text-left whitespace-pre-wrap font-medium">
                   {p.caption ?? ""}
                 </div>
               </div>
