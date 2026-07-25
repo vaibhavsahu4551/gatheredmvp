@@ -17,6 +17,7 @@ function EditProfile() {
   const [fullName, setFullName] = useState("");
   const [bio, setBio] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
+  const [originalInterests, setOriginalInterests] = useState<string[]>([]);
   const [photoPath, setPhotoPath] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
 
