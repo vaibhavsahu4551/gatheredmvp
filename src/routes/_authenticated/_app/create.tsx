@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { CATEGORIES, looksResidential, type Category } from "@/lib/events";
+import { CATEGORIES, EVENT_TYPES, looksResidential, type Category, type EventType } from "@/lib/events";
 import { loadMe } from "@/lib/huddl";
 import { toast } from "sonner";
 import { AlertTriangle } from "lucide-react";
