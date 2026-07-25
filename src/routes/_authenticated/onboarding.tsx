@@ -37,8 +37,8 @@ function Onboarding() {
         setBio(me.profile.bio ?? "");
         setInterests(me.profile.interests ?? []);
         setSelfiePath(me.profile.selfie_url);
-        if (me.profile.onboarding_complete && me.verification?.status !== "unverified") {
-          navigate({ to: me.verification?.status === "verified" ? "/home" : "/pending" });
+        if (me.profile.onboarding_complete) {
+          navigate({ to: "/home" });
           return;
         }
       }
