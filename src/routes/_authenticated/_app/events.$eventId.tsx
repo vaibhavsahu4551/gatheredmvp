@@ -115,11 +115,40 @@ function EventDetail() {
               <MessageCircle className="h-4 w-4" /> Group chat
             </Link>
           )}
-          {event.host_id !== me && (
+          {isHost && (
+            <>
+              <Link
+                to="/events/$eventId/edit"
+                params={{ eventId: event.id }}
+                className="h-9 w-9 rounded-full bg-muted flex items-center justify-center"
+                aria-label="Edit event"
+              >
+                <Pencil className="h-4 w-4" />
+              </Link>
+              <button
+                onClick={async () => {
+                  if (!confirm("Delete this event? All requests, attendees, comments, and the group chat will be removed.")) return;
+                  try {
+                    await deleteEvent(event.id);
+                    toast.success("Event deleted");
+                    navigate({ to: "/events" });
+                  } catch (e: any) {
+                    toast.error(e?.message ?? "Could not delete event");
+                  }
+                }}
+                className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-destructive"
+                aria-label="Delete event"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </>
+          )}
+          {!isHost && (
             <SafetyMenu targetType="event" targetId={event.id} userId={event.host_id} />
           )}
         </div>
       </div>
+
 
 
       <div className="px-5 pt-4">
