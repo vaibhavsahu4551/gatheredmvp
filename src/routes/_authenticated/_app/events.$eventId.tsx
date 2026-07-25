@@ -138,9 +138,16 @@ function EventDetail() {
         <div className="mt-4 space-y-2 text-sm">
           <Row icon={<Clock className="h-4 w-4" />}>{new Date(event.starts_at).toLocaleString()}</Row>
           <Row icon={<MapPin className="h-4 w-4" />}>{event.location_address}</Row>
+          {(event as any).exact_location && (event.host_id === me || my?.status === "approved") && (
+            <div className="ml-6 rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-[13px] text-emerald-900">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700">Exact meeting point</div>
+              <div className="mt-0.5">{(event as any).exact_location}</div>
+            </div>
+          )}
           <Row icon={<Users className="h-4 w-4" />}>{counts.boys} boys, {counts.girls} girls joined / max {event.max_size}</Row>
           {(event.entry_fee ?? 0) > 0 && <Row icon={<span className="text-sm">₹</span>}>{event.entry_fee}</Row>}
         </div>
+
 
         {event.description && <p className="mt-4 text-[14px] text-foreground/90 whitespace-pre-wrap">{event.description}</p>}
 
