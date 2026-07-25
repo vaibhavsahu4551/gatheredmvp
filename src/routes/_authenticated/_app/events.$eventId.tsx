@@ -205,7 +205,10 @@ function EventDetail() {
           <h3 className="text-sm font-semibold">Going ({approved.length})</h3>
           <div className="mt-2 space-y-1.5">
             {approved.map((p) => (
-              <Link key={p.id} to="/u/$userId" params={{ userId: p.user_id }} className="block text-sm text-muted-foreground hover:text-foreground">{profiles[p.user_id]?.full_name ?? "Someone"} · {profiles[p.user_id]?.gender ?? "—"}</Link>
+              <Link key={p.id} to="/u/$userId" params={{ userId: p.user_id }} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+                <Avatar photo={profiles[p.user_id]?.photo} name={profiles[p.user_id]?.full_name} size={28} />
+                <span>{profiles[p.user_id]?.full_name ?? "Someone"} · {profiles[p.user_id]?.gender ?? "—"}</span>
+              </Link>
             ))}
             {approved.length === 0 && <div className="text-sm text-muted-foreground">No one yet.</div>}
           </div>
