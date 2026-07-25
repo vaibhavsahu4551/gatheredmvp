@@ -83,7 +83,7 @@ function SharePicker({ kind, id, onClose }: { kind: "post" | "event"; id: string
                   onClick={() => toggle(uid)}
                   className={`w-full flex items-center gap-3 p-2 rounded-xl text-left transition ${selected.has(uid) ? "bg-gradient-brand-soft" : "hover:bg-muted"}`}
                 >
-                  <div className="h-9 w-9 rounded-full bg-gradient-brand shrink-0" />
+                  <Avatar photo={names[uid]?.photo} name={names[uid]?.full_name} size={36} />
                   <div className="text-sm font-medium flex-1 truncate">{names[uid]?.full_name ?? "Member"}</div>
                   <div className={`h-5 w-5 rounded-full border-2 ${selected.has(uid) ? "border-primary bg-primary" : "border-border"}`} />
                 </button>
