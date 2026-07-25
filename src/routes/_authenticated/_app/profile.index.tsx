@@ -25,6 +25,7 @@ import { toast } from "sonner";
 
 import { EventCard, type EventCounts } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
+import { Avatar } from "@/components/Avatar";
 
 export const Route = createFileRoute("/_authenticated/_app/profile/")({
   component: Profile,
