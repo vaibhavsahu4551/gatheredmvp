@@ -15,6 +15,9 @@ function label(kind: string) {
     case "huddle_accepted": return "accepted your Huddle Up request";
     case "post_like": return "liked your post";
     case "post_comment": return "commented on your post";
+    case "join_request": return "requested to join your event";
+    case "join_approved": return "approved your request to join";
+    case "join_declined": return "couldn't fit you in this time";
     default: return "sent you a notification";
   }
 }
