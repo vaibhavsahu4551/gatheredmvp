@@ -39,6 +39,7 @@ function Profile() {
   const [tab, setTab] = useState<Tab>("posts");
   const [connIds, setConnIds] = useState<string[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
+  const [showConnections, setShowConnections] = useState(false);
 
   useEffect(() => {
     loadMe().then(async (data) => {
