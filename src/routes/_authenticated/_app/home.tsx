@@ -4,8 +4,10 @@ import { Search } from "lucide-react";
 import { loadMe } from "@/lib/huddl";
 import { CATEGORIES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipants } from "@/lib/events";
 import { listFeed, getLikes, toggleLike, signedFeedUrl, getEventsLite } from "@/lib/feed";
+import { loadBlockedIds } from "@/lib/safety";
 import { EventCard } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
+
 
 export const Route = createFileRoute("/_authenticated/_app/home")({
   component: HomeFeed,
