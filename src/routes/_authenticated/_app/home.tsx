@@ -38,9 +38,29 @@ function HomeFeed() {
   const [names, setNames] = useState<Record<string, { full_name: string | null }>>({});
   const [linkedEvents, setLinkedEvents] = useState<Record<string, { id: string; title: string; event_type: string | null }>>({});
 
+  const [locState, setLocState] = useState<"idle" | "detecting" | "denied">("idle");
   useEffect(() => {
-    loadMe().then((me) => setCity(me?.profile?.city ?? ""));
+    loadMe().then((me) => {
+      const saved = me?.profile?.city ?? "";
+      if (saved) { setCity(saved); return; }
+      if (!("geolocation" in navigator)) { setLocState("denied"); return; }
+      setLocState("detecting");
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&zoom=10`, { headers: { Accept: "application/json" } });
+            const j = await r.json();
+            const a = j?.address ?? {};
+            const detected = a.city || a.town || a.village || a.municipality || a.county || a.state || "";
+            if (detected) { setCity(detected); setLocState("idle"); } else { setLocState("denied"); }
+          } catch { setLocState("denied"); }
+        },
+        () => setLocState("denied"),
+        { timeout: 8000, maximumAge: 600000 }
+      );
+    });
   }, []);
+
 
   const [err, setErr] = useState<string | null>(null);
   const refresh = async () => {
