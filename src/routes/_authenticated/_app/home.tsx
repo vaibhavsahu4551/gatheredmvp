@@ -24,6 +24,8 @@ function HomeFeed() {
   const [cat, setCat] = useState<string>("All");
   const [girlsOnly, setGirlsOnly] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [unread, setUnread] = useState(0);
+  useEffect(() => { unreadCount().then(setUnread).catch(() => {}); }, []);
 
   const [events, setEvents] = useState<EventRow[]>([]);
   const [counts, setCounts] = useState<Record<string, { boys: number; girls: number; total: number }>>({});
