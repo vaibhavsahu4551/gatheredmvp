@@ -330,3 +330,35 @@ function EmptyState({ icon, title, cta, onClick }: { icon: React.ReactNode; titl
     </div>
   );
 }
+
+function ConnectionsModal({ ids, onClose }: { ids: string[]; onClose: () => void }) {
+  const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
+  useEffect(() => {
+    if (ids.length) getProfilesLite(ids).then(setNames);
+  }, [ids]);
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-4" onClick={onClose}>
+      <div className="w-full max-w-md rounded-2xl bg-card p-4 shadow-elevated max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="text-base font-semibold mb-3">Huddled with</div>
+        {ids.length === 0 ? (
+          <div className="text-sm text-muted-foreground py-8 text-center">No connections yet.</div>
+        ) : (
+          <div className="space-y-1">
+            {ids.map((uid) => (
+              <Link
+                key={uid}
+                to="/u/$userId"
+                params={{ userId: uid }}
+                onClick={onClose}
+                className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted transition"
+              >
+                <Avatar photo={names[uid]?.photo} name={names[uid]?.full_name} size={40} />
+                <div className="text-sm font-medium truncate">{names[uid]?.full_name ?? "Member"}</div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
