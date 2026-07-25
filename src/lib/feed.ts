@@ -11,6 +11,17 @@ export async function listFeed(city: string) {
   return data ?? [];
 }
 
+export async function listUserPosts(userId: string) {
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+
 export async function signedFeedUrl(path: string) {
   const { data } = await supabase.storage.from("feed-photos").createSignedUrl(path, 3600);
   return data?.signedUrl ?? "";
