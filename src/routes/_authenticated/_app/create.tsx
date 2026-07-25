@@ -41,6 +41,8 @@ function Create() {
   const [eventType, setEventType] = useState<EventType | "">("");
   const [startsAt, setStartsAt] = useState("");
   const [address, setAddress] = useState("");
+  const [exactLocation, setExactLocation] = useState("");
+
   const [city, setCity] = useState("");
   const [minSize, setMinSize] = useState(4);
   const [maxSize, setMaxSize] = useState(8);
@@ -79,13 +81,16 @@ function Create() {
       event_type: eventType,
       starts_at: new Date(startsAt).toISOString(),
       location_address: address.trim(),
+      exact_location: exactLocation.trim() || null,
       city: city.trim(),
+
       min_size: minSize,
       max_size: maxSize,
       entry_fee: fee ? Number(fee) : null,
       min_girls: minGirls ? Number(minGirls) : null,
       min_boys: minBoys ? Number(minBoys) : null,
-    }).select("id").maybeSingle();
+    } as any).select("id").maybeSingle();
+
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Event created");
@@ -130,8 +135,11 @@ function Create() {
           <input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} className={inputCls} />
         </Field>
 
-        <Field label="Location (public place)">
-          <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputCls} placeholder="Third Wave Coffee, Indiranagar" />
+        <Field label="Area / neighborhood (public)">
+          <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputCls} placeholder="Indiranagar, Bengaluru" />
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            Your exact location is only shared with approved attendees.
+          </p>
           {residentialWarn && (
             <div className="mt-2 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5">
               <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
@@ -139,6 +147,14 @@ function Create() {
             </div>
           )}
         </Field>
+
+        <Field label="Exact meeting point (optional, private)">
+          <input value={exactLocation} onChange={(e) => setExactLocation(e.target.value)} className={inputCls} placeholder="Third Wave Coffee, 12th Main — table by the window" />
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            Only shown to attendees you've approved.
+          </p>
+        </Field>
+
 
         <Field label="City">
           <input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} placeholder={defaultCity || "Bengaluru"} />

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Heart, MessageSquare, Link2 } from "lucide-react";
+import { SafetyMenu } from "@/components/SafetyMenu";
+
 
 export type PostItem = {
   kind: "post";
@@ -50,8 +52,12 @@ export function PostCard({
     <article className="rounded-2xl border border-border bg-card overflow-hidden">
       <div className="px-3 pt-2.5 pb-2 flex items-center justify-between">
         <div className="text-[13px] font-medium">{name}</div>
-        <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Post</span>
+        <div className="flex items-center gap-1">
+          <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Post</span>
+          <SafetyMenu targetType="user" targetId={p.user_id} userId={p.user_id} />
+        </div>
       </div>
+
       {img && <img src={img} className="w-full aspect-square object-cover" alt="" />}
       {p.caption && <div className="px-3 pt-2 text-[14px] whitespace-pre-wrap">{p.caption}</div>}
       {linked && (

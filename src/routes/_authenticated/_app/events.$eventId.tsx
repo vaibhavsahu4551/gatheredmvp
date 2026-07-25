@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { countByGender, getEvent, getParticipants, getProfilesLite, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
 import { toast } from "sonner";
 import { ArrowLeft, ShieldCheck, MapPin, Clock, Users, MessageCircle, Lock, Send } from "lucide-react";
+import { SafetyMenu } from "@/components/SafetyMenu";
+
 
 export const Route = createFileRoute("/_authenticated/_app/events/$eventId")({
   component: EventDetail,
@@ -102,12 +104,18 @@ function EventDetail() {
         <button onClick={() => navigate({ to: "/home" })} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
           <ArrowLeft className="h-4 w-4" />
         </button>
-        {event.status === "confirmed" && groupId && (
-          <Link to="/chat/$groupId" params={{ groupId }} className="rounded-full bg-primary text-primary-foreground px-3.5 py-1.5 text-sm font-medium flex items-center gap-1.5">
-            <MessageCircle className="h-4 w-4" /> Group chat
-          </Link>
-        )}
+        <div className="flex items-center gap-2">
+          {event.status === "confirmed" && groupId && (
+            <Link to="/chat/$groupId" params={{ groupId }} className="rounded-full bg-primary text-primary-foreground px-3.5 py-1.5 text-sm font-medium flex items-center gap-1.5">
+              <MessageCircle className="h-4 w-4" /> Group chat
+            </Link>
+          )}
+          {event.host_id !== me && (
+            <SafetyMenu targetType="event" targetId={event.id} userId={event.host_id} />
+          )}
+        </div>
       </div>
+
 
       <div className="px-5 pt-4">
         <div className="flex items-center gap-2 flex-wrap">
@@ -130,9 +138,16 @@ function EventDetail() {
         <div className="mt-4 space-y-2 text-sm">
           <Row icon={<Clock className="h-4 w-4" />}>{new Date(event.starts_at).toLocaleString()}</Row>
           <Row icon={<MapPin className="h-4 w-4" />}>{event.location_address}</Row>
+          {(event as any).exact_location && (event.host_id === me || my?.status === "approved") && (
+            <div className="ml-6 rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-[13px] text-emerald-900">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700">Exact meeting point</div>
+              <div className="mt-0.5">{(event as any).exact_location}</div>
+            </div>
+          )}
           <Row icon={<Users className="h-4 w-4" />}>{counts.boys} boys, {counts.girls} girls joined / max {event.max_size}</Row>
           {(event.entry_fee ?? 0) > 0 && <Row icon={<span className="text-sm">₹</span>}>{event.entry_fee}</Row>}
         </div>
+
 
         {event.description && <p className="mt-4 text-[14px] text-foreground/90 whitespace-pre-wrap">{event.description}</p>}
 

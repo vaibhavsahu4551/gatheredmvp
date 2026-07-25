@@ -4,8 +4,10 @@ import { Search } from "lucide-react";
 import { loadMe } from "@/lib/huddl";
 import { CATEGORIES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipants } from "@/lib/events";
 import { listFeed, getLikes, toggleLike, signedFeedUrl, getEventsLite } from "@/lib/feed";
+import { loadBlockedIds } from "@/lib/safety";
 import { EventCard } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
+
 
 export const Route = createFileRoute("/_authenticated/_app/home")({
   component: HomeFeed,
@@ -40,20 +42,23 @@ function HomeFeed() {
     if (!city) return;
     setLoading(true);
     try {
-      const [ev, ps] = await Promise.all([listEvents(city), listFeed(city)]);
-      setEvents(ev);
+      const [ev, ps, blocked] = await Promise.all([listEvents(city), listFeed(city), loadBlockedIds()]);
+      const evFiltered = ev.filter((e) => !blocked.has(e.host_id));
+      setEvents(evFiltered);
       const cts: typeof counts = {};
-      for (const e of ev) {
+      for (const e of evFiltered) {
         const parts = await getParticipants(e.id);
         cts[e.id] = countByGender(parts);
       }
       setCounts(cts);
-      setHosts(await getProfilesLite(ev.map((e) => e.host_id)));
+      setHosts(await getProfilesLite(evFiltered.map((e) => e.host_id)));
 
-      const pItems: PostItem[] = (ps as any[]).map((p) => ({
-        kind: "post", id: p.id, created_at: p.created_at, user_id: p.user_id,
-        caption: p.caption, photo_url: p.photo_url, event_id: p.event_id ?? null,
-      }));
+      const pItems: PostItem[] = (ps as any[])
+        .filter((p) => !blocked.has(p.user_id))
+        .map((p) => ({
+          kind: "post", id: p.id, created_at: p.created_at, user_id: p.user_id,
+          caption: p.caption, photo_url: p.photo_url, event_id: p.event_id ?? null,
+        }));
       setPosts(pItems);
       const [l, n, evMap] = await Promise.all([
         getLikes(pItems.map((p) => p.id)),
@@ -67,6 +72,7 @@ function HomeFeed() {
     } finally { setLoading(false); }
   };
   useEffect(() => { refresh(); }, [city]);
+
 
   const filteredEvents = useMemo(() => events.filter((e) => {
     if (cat !== "All" && e.category !== cat) return false;
