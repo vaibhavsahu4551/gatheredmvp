@@ -62,10 +62,15 @@ export async function getParticipants(eventId: string) {
 
 export async function getProfilesLite(ids: string[]) {
   if (!ids.length) return {};
-  const { data, error } = await supabase.from("profiles").select("id, full_name, gender").in("id", ids);
+  const uniq = Array.from(new Set(ids.filter(Boolean)));
+  if (!uniq.length) return {};
+  const { data, error } = await supabase.from("profiles").select("id, full_name, gender, photos").in("id", uniq);
   if (error) throw error;
-  const map: Record<string, { full_name: string | null; gender: string | null }> = {};
-  for (const p of data ?? []) map[p.id] = { full_name: p.full_name, gender: p.gender };
+  const map: Record<string, { full_name: string | null; gender: string | null; photo: string | null }> = {};
+  for (const p of data ?? []) {
+    const photos = ((p as any).photos as string[] | null) ?? [];
+    map[p.id] = { full_name: p.full_name, gender: p.gender, photo: photos[0] ?? null };
+  }
   return map;
 }
 
