@@ -20,7 +20,7 @@ function EventDetail() {
   const [me, setMe] = useState<string>("");
   const [event, setEvent] = useState<EventRow | null>(null);
   const [parts, setParts] = useState<ParticipantRow[]>([]);
-  const [profiles, setProfiles] = useState<Record<string, { full_name: string | null; gender: string | null }>>({});
+  const [profiles, setProfiles] = useState<Record<string, { full_name: string | null; gender: string | null; photo: string | null }>>({});
   const [my, setMy] = useState<ParticipantRow | null>(null);
   const [groupId, setGroupId] = useState<string | null>(null);
   const [comments, setComments] = useState<EventComment[]>([]);
