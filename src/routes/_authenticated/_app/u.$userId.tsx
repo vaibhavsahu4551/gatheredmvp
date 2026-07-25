@@ -5,6 +5,7 @@ import { signedPhotoUrl, ageFromDob, type ProfileRow } from "@/lib/huddl";
 import { huddleStatusWith, sendHuddleRequest, respondHuddleRequest, cancelHuddleRequest, listConnections, type HuddleStatus } from "@/lib/huddle-connect";
 import { getOrCreateThread } from "@/lib/dm";
 import { getProfilesLite } from "@/lib/events";
+import { Avatar } from "@/components/Avatar";
 import { toast } from "sonner";
 import { ArrowLeft, MapPin, UserPlus, Check, X, MessageCircle, Clock } from "lucide-react";
 
