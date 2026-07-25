@@ -70,11 +70,18 @@ function EditProfile() {
 
   return (
     <div className="min-h-screen bg-background pb-32">
-      <header className="px-5 pt-6 flex items-center gap-3">
+      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-5 py-3 flex items-center gap-3">
         <button onClick={() => navigate({ to: "/profile" })} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <h1 className="text-xl font-semibold tracking-tight">Edit profile</h1>
+        <h1 className="text-xl font-semibold tracking-tight flex-1">Edit profile</h1>
+        <button
+          onClick={save}
+          disabled={saving}
+          className="rounded-full bg-brand-gradient px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+        >
+          {saving ? "Saving…" : "Save"}
+        </button>
       </header>
 
       <div className="mt-6 px-6 max-w-md mx-auto space-y-6">
