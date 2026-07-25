@@ -19,10 +19,10 @@ import { Route as AuthenticatedAppRequestsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/_app/notifications'
 import { Route as AuthenticatedAppMessagesRouteImport } from './routes/_authenticated/_app/messages'
 import { Route as AuthenticatedAppHomeRouteImport } from './routes/_authenticated/_app/home'
-import { Route as AuthenticatedAppEventsRouteImport } from './routes/_authenticated/_app/events'
 import { Route as AuthenticatedAppCreateRouteImport } from './routes/_authenticated/_app/create'
 import { Route as AuthenticatedAppChatRouteImport } from './routes/_authenticated/_app/chat'
 import { Route as AuthenticatedAppProfileIndexRouteImport } from './routes/_authenticated/_app/profile.index'
+import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/_app/events.index'
 import { Route as AuthenticatedAppUUserIdRouteImport } from './routes/_authenticated/_app/u.$userId'
 import { Route as AuthenticatedAppProfileEditRouteImport } from './routes/_authenticated/_app/profile.edit'
 import { Route as AuthenticatedAppMessagesThreadIdRouteImport } from './routes/_authenticated/_app/messages.$threadId'
@@ -81,11 +81,6 @@ const AuthenticatedAppHomeRoute = AuthenticatedAppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
-const AuthenticatedAppEventsRoute = AuthenticatedAppEventsRouteImport.update({
-  id: '/events',
-  path: '/events',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
 const AuthenticatedAppCreateRoute = AuthenticatedAppCreateRouteImport.update({
   id: '/create',
   path: '/create',
@@ -100,6 +95,12 @@ const AuthenticatedAppProfileIndexRoute =
   AuthenticatedAppProfileIndexRouteImport.update({
     id: '/profile/',
     path: '/profile/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppEventsIndexRoute =
+  AuthenticatedAppEventsIndexRouteImport.update({
+    id: '/events/',
+    path: '/events/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppUUserIdRoute = AuthenticatedAppUUserIdRouteImport.update({
@@ -121,9 +122,9 @@ const AuthenticatedAppMessagesThreadIdRoute =
   } as any)
 const AuthenticatedAppEventsEventIdRoute =
   AuthenticatedAppEventsEventIdRouteImport.update({
-    id: '/$eventId',
-    path: '/$eventId',
-    getParentRoute: () => AuthenticatedAppEventsRoute,
+    id: '/events/$eventId',
+    path: '/events/$eventId',
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppChatGroupIdRoute =
   AuthenticatedAppChatGroupIdRouteImport.update({
@@ -145,7 +146,6 @@ export interface FileRoutesByFullPath {
   '/pending': typeof AuthenticatedPendingRoute
   '/chat': typeof AuthenticatedAppChatRouteWithChildren
   '/create': typeof AuthenticatedAppCreateRoute
-  '/events': typeof AuthenticatedAppEventsRouteWithChildren
   '/home': typeof AuthenticatedAppHomeRoute
   '/messages': typeof AuthenticatedAppMessagesRouteWithChildren
   '/notifications': typeof AuthenticatedAppNotificationsRoute
@@ -155,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
+  '/events/': typeof AuthenticatedAppEventsIndexRoute
   '/profile/': typeof AuthenticatedAppProfileIndexRoute
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
 }
@@ -165,7 +166,6 @@ export interface FileRoutesByTo {
   '/pending': typeof AuthenticatedPendingRoute
   '/chat': typeof AuthenticatedAppChatRouteWithChildren
   '/create': typeof AuthenticatedAppCreateRoute
-  '/events': typeof AuthenticatedAppEventsRouteWithChildren
   '/home': typeof AuthenticatedAppHomeRoute
   '/messages': typeof AuthenticatedAppMessagesRouteWithChildren
   '/notifications': typeof AuthenticatedAppNotificationsRoute
@@ -175,6 +175,7 @@ export interface FileRoutesByTo {
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
+  '/events': typeof AuthenticatedAppEventsIndexRoute
   '/profile': typeof AuthenticatedAppProfileIndexRoute
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
 }
@@ -188,7 +189,6 @@ export interface FileRoutesById {
   '/_authenticated/pending': typeof AuthenticatedPendingRoute
   '/_authenticated/_app/chat': typeof AuthenticatedAppChatRouteWithChildren
   '/_authenticated/_app/create': typeof AuthenticatedAppCreateRoute
-  '/_authenticated/_app/events': typeof AuthenticatedAppEventsRouteWithChildren
   '/_authenticated/_app/home': typeof AuthenticatedAppHomeRoute
   '/_authenticated/_app/messages': typeof AuthenticatedAppMessagesRouteWithChildren
   '/_authenticated/_app/notifications': typeof AuthenticatedAppNotificationsRoute
@@ -198,6 +198,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/_authenticated/_app/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/_authenticated/_app/u/$userId': typeof AuthenticatedAppUUserIdRoute
+  '/_authenticated/_app/events/': typeof AuthenticatedAppEventsIndexRoute
   '/_authenticated/_app/profile/': typeof AuthenticatedAppProfileIndexRoute
   '/_authenticated/_app/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
 }
@@ -210,7 +211,6 @@ export interface FileRouteTypes {
     | '/pending'
     | '/chat'
     | '/create'
-    | '/events'
     | '/home'
     | '/messages'
     | '/notifications'
@@ -220,6 +220,7 @@ export interface FileRouteTypes {
     | '/messages/$threadId'
     | '/profile/edit'
     | '/u/$userId'
+    | '/events/'
     | '/profile/'
     | '/events/$eventId/edit'
   fileRoutesByTo: FileRoutesByTo
@@ -230,7 +231,6 @@ export interface FileRouteTypes {
     | '/pending'
     | '/chat'
     | '/create'
-    | '/events'
     | '/home'
     | '/messages'
     | '/notifications'
@@ -240,6 +240,7 @@ export interface FileRouteTypes {
     | '/messages/$threadId'
     | '/profile/edit'
     | '/u/$userId'
+    | '/events'
     | '/profile'
     | '/events/$eventId/edit'
   id:
@@ -252,7 +253,6 @@ export interface FileRouteTypes {
     | '/_authenticated/pending'
     | '/_authenticated/_app/chat'
     | '/_authenticated/_app/create'
-    | '/_authenticated/_app/events'
     | '/_authenticated/_app/home'
     | '/_authenticated/_app/messages'
     | '/_authenticated/_app/notifications'
@@ -262,6 +262,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/messages/$threadId'
     | '/_authenticated/_app/profile/edit'
     | '/_authenticated/_app/u/$userId'
+    | '/_authenticated/_app/events/'
     | '/_authenticated/_app/profile/'
     | '/_authenticated/_app/events/$eventId/edit'
   fileRoutesById: FileRoutesById
@@ -344,13 +345,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppHomeRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/_app/events': {
-      id: '/_authenticated/_app/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof AuthenticatedAppEventsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
     '/_authenticated/_app/create': {
       id: '/_authenticated/_app/create'
       path: '/create'
@@ -370,6 +364,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile/'
       preLoaderRoute: typeof AuthenticatedAppProfileIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/events/': {
+      id: '/_authenticated/_app/events/'
+      path: '/events'
+      fullPath: '/events/'
+      preLoaderRoute: typeof AuthenticatedAppEventsIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/u/$userId': {
@@ -395,10 +396,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/_app/events/$eventId': {
       id: '/_authenticated/_app/events/$eventId'
-      path: '/$eventId'
+      path: '/events/$eventId'
       fullPath: '/events/$eventId'
       preLoaderRoute: typeof AuthenticatedAppEventsEventIdRouteImport
-      parentRoute: typeof AuthenticatedAppEventsRoute
+      parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/chat/$groupId': {
       id: '/_authenticated/_app/chat/$groupId'
@@ -428,36 +429,6 @@ const AuthenticatedAppChatRouteChildren: AuthenticatedAppChatRouteChildren = {
 const AuthenticatedAppChatRouteWithChildren =
   AuthenticatedAppChatRoute._addFileChildren(AuthenticatedAppChatRouteChildren)
 
-interface AuthenticatedAppEventsEventIdRouteChildren {
-  AuthenticatedAppEventsEventIdEditRoute: typeof AuthenticatedAppEventsEventIdEditRoute
-}
-
-const AuthenticatedAppEventsEventIdRouteChildren: AuthenticatedAppEventsEventIdRouteChildren =
-  {
-    AuthenticatedAppEventsEventIdEditRoute:
-      AuthenticatedAppEventsEventIdEditRoute,
-  }
-
-const AuthenticatedAppEventsEventIdRouteWithChildren =
-  AuthenticatedAppEventsEventIdRoute._addFileChildren(
-    AuthenticatedAppEventsEventIdRouteChildren,
-  )
-
-interface AuthenticatedAppEventsRouteChildren {
-  AuthenticatedAppEventsEventIdRoute: typeof AuthenticatedAppEventsEventIdRouteWithChildren
-}
-
-const AuthenticatedAppEventsRouteChildren: AuthenticatedAppEventsRouteChildren =
-  {
-    AuthenticatedAppEventsEventIdRoute:
-      AuthenticatedAppEventsEventIdRouteWithChildren,
-  }
-
-const AuthenticatedAppEventsRouteWithChildren =
-  AuthenticatedAppEventsRoute._addFileChildren(
-    AuthenticatedAppEventsRouteChildren,
-  )
-
 interface AuthenticatedAppMessagesRouteChildren {
   AuthenticatedAppMessagesThreadIdRoute: typeof AuthenticatedAppMessagesThreadIdRoute
 }
@@ -473,29 +444,47 @@ const AuthenticatedAppMessagesRouteWithChildren =
     AuthenticatedAppMessagesRouteChildren,
   )
 
+interface AuthenticatedAppEventsEventIdRouteChildren {
+  AuthenticatedAppEventsEventIdEditRoute: typeof AuthenticatedAppEventsEventIdEditRoute
+}
+
+const AuthenticatedAppEventsEventIdRouteChildren: AuthenticatedAppEventsEventIdRouteChildren =
+  {
+    AuthenticatedAppEventsEventIdEditRoute:
+      AuthenticatedAppEventsEventIdEditRoute,
+  }
+
+const AuthenticatedAppEventsEventIdRouteWithChildren =
+  AuthenticatedAppEventsEventIdRoute._addFileChildren(
+    AuthenticatedAppEventsEventIdRouteChildren,
+  )
+
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppChatRoute: typeof AuthenticatedAppChatRouteWithChildren
   AuthenticatedAppCreateRoute: typeof AuthenticatedAppCreateRoute
-  AuthenticatedAppEventsRoute: typeof AuthenticatedAppEventsRouteWithChildren
   AuthenticatedAppHomeRoute: typeof AuthenticatedAppHomeRoute
   AuthenticatedAppMessagesRoute: typeof AuthenticatedAppMessagesRouteWithChildren
   AuthenticatedAppNotificationsRoute: typeof AuthenticatedAppNotificationsRoute
   AuthenticatedAppRequestsRoute: typeof AuthenticatedAppRequestsRoute
+  AuthenticatedAppEventsEventIdRoute: typeof AuthenticatedAppEventsEventIdRouteWithChildren
   AuthenticatedAppProfileEditRoute: typeof AuthenticatedAppProfileEditRoute
   AuthenticatedAppUUserIdRoute: typeof AuthenticatedAppUUserIdRoute
+  AuthenticatedAppEventsIndexRoute: typeof AuthenticatedAppEventsIndexRoute
   AuthenticatedAppProfileIndexRoute: typeof AuthenticatedAppProfileIndexRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppChatRoute: AuthenticatedAppChatRouteWithChildren,
   AuthenticatedAppCreateRoute: AuthenticatedAppCreateRoute,
-  AuthenticatedAppEventsRoute: AuthenticatedAppEventsRouteWithChildren,
   AuthenticatedAppHomeRoute: AuthenticatedAppHomeRoute,
   AuthenticatedAppMessagesRoute: AuthenticatedAppMessagesRouteWithChildren,
   AuthenticatedAppNotificationsRoute: AuthenticatedAppNotificationsRoute,
   AuthenticatedAppRequestsRoute: AuthenticatedAppRequestsRoute,
+  AuthenticatedAppEventsEventIdRoute:
+    AuthenticatedAppEventsEventIdRouteWithChildren,
   AuthenticatedAppProfileEditRoute: AuthenticatedAppProfileEditRoute,
   AuthenticatedAppUUserIdRoute: AuthenticatedAppUUserIdRoute,
+  AuthenticatedAppEventsIndexRoute: AuthenticatedAppEventsIndexRoute,
   AuthenticatedAppProfileIndexRoute: AuthenticatedAppProfileIndexRoute,
 }
 
