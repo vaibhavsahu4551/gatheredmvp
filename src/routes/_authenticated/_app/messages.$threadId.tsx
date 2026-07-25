@@ -58,8 +58,14 @@ function DmRoom() {
       for (const e of data ?? []) upd[`event:${e.id}`] = e;
     }
     if (postIds.length) {
-      const { data } = await sb.from("posts").select("id, caption").in("id", postIds);
-      for (const p of data ?? []) upd[`post:${p.id}`] = p;
+      const { data } = await sb.from("posts").select("id, caption, photo_url, user_id").in("id", postIds);
+      const authorIds = Array.from(new Set((data ?? []).map((p: any) => p.user_id).filter(Boolean))) as string[];
+      const authors = authorIds.length ? await getProfilesLite(authorIds) : {};
+      const { signedFeedUrl } = await import("@/lib/feed");
+      for (const p of data ?? []) {
+        const thumb = p.photo_url ? await signedFeedUrl(p.photo_url) : "";
+        upd[`post:${p.id}`] = { ...p, author: (authors as any)[p.user_id], thumb };
+      }
     }
     if (Object.keys(upd).length) setShared((s) => ({ ...s, ...upd }));
   };
