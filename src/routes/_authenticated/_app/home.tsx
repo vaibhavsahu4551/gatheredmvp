@@ -41,11 +41,12 @@ function HomeFeed() {
     loadMe().then((me) => setCity(me?.profile?.city ?? ""));
   }, []);
 
+  const [err, setErr] = useState<string | null>(null);
   const refresh = async () => {
-    if (!city) return;
     setLoading(true);
+    setErr(null);
     try {
-      const [ev, ps, blocked] = await Promise.all([listEvents(city), listFeed(city), loadBlockedIds()]);
+      const [ev, ps, blocked] = await Promise.all([listEvents(), listFeed(), loadBlockedIds()]);
       const evFiltered = ev.filter((e) => !blocked.has(e.host_id));
       setEvents(evFiltered);
       const cts: typeof counts = {};
@@ -72,9 +73,11 @@ function HomeFeed() {
       const im: Record<string, string> = {};
       for (const p of pItems) if (p.photo_url) im[p.id] = await signedFeedUrl(p.photo_url);
       setImgs(im);
+    } catch (e: any) {
+      setErr(e?.message ?? "Failed to load feed");
     } finally { setLoading(false); }
   };
-  useEffect(() => { refresh(); }, [city]);
+  useEffect(() => { refresh(); }, []);
 
 
   const filteredEvents = useMemo(() => events.filter((e) => {
