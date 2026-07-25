@@ -54,11 +54,22 @@ function EditProfile() {
   };
 
   const save = async () => {
+    const name = fullName.trim();
+    if (!name) {
+      toast.error("Name is required");
+      return;
+    }
+    if (bio.length > 150) {
+      toast.error("Bio must be 150 characters or less");
+      return;
+    }
+    const finalInterests = interests.length > 0 ? interests : originalInterests;
+
     setSaving(true);
     const { error } = await supabase.from("profiles").update({
-      full_name: fullName.trim() || null,
+      full_name: name || null,
       bio: bio.trim() || null,
-      interests,
+      interests: finalInterests,
       photos: photoPath ? [photoPath] : [],
     }).eq("id", userId);
     setSaving(false);
