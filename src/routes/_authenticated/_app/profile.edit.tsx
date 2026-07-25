@@ -130,6 +130,22 @@ function EditProfile() {
             })}
           </div>
         </Field>
+
+        <div className="flex gap-3 pt-2">
+          <button
+            onClick={() => navigate({ to: "/profile" })}
+            className="flex-1 rounded-full border border-border bg-background py-3 text-[15px] font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={save}
+            disabled={saving}
+            className="flex-1 rounded-full bg-brand-gradient py-3 text-[15px] font-semibold text-white disabled:opacity-50"
+          >
+            {saving ? "Saving…" : "Save changes"}
+          </button>
+        </div>
       </div>
 
       <div className="fixed inset-x-0 bottom-0 bg-background/95 backdrop-blur border-t border-border p-4">
