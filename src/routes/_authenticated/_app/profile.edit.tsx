@@ -27,7 +27,9 @@ function EditProfile() {
       setUserId(me.user.id);
       setFullName(me.profile.full_name ?? "");
       setBio(me.profile.bio ?? "");
-      setInterests(me.profile.interests ?? []);
+      const loadedInterests = me.profile.interests ?? [];
+      setInterests(loadedInterests);
+      setOriginalInterests(loadedInterests);
       const existing = me.profile.photos?.[0];
       if (existing) {
         setPhotoPath(existing);
