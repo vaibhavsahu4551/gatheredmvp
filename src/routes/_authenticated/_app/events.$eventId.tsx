@@ -18,6 +18,10 @@ function EventDetail() {
   const [profiles, setProfiles] = useState<Record<string, { full_name: string | null; gender: string | null }>>({});
   const [my, setMy] = useState<ParticipantRow | null>(null);
   const [groupId, setGroupId] = useState<string | null>(null);
+  const [comments, setComments] = useState<EventComment[]>([]);
+  const [commentText, setCommentText] = useState("");
+  const [sending, setSending] = useState(false);
+  const commentsEndRef = useRef<HTMLDivElement>(null);
 
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
