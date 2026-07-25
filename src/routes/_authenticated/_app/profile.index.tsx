@@ -74,6 +74,7 @@ function Profile() {
               {p.full_name || "Add your name"}
               {p.dob && <span className="text-muted-foreground font-normal">, {ageFromDob(p.dob)}</span>}
             </h1>
+            {p.bio && <p className="mt-1 text-[15px] leading-relaxed">{p.bio}</p>}
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
               {p.city && (
                 <span className="inline-flex items-center gap-1">
@@ -105,13 +106,14 @@ function Profile() {
           </Link>
         </div>
 
-        <div className="mt-4 flex items-center gap-2 text-sm">
+        <button
+          onClick={() => setShowConnections(true)}
+          className="mt-4 flex items-center gap-2 text-sm hover:opacity-80 transition"
+        >
           <Users className="h-4 w-4 text-muted-foreground" />
           <span className="font-semibold">{connIds.length}</span>
           <span className="text-muted-foreground">Huddled with</span>
-        </div>
-
-        {p.bio && <p className="mt-4 text-[15px] leading-relaxed">{p.bio}</p>}
+        </button>
 
         {p.interests?.length > 0 && (
           <div className="mt-5">
@@ -122,6 +124,10 @@ function Profile() {
               ))}
             </div>
           </div>
+        )}
+
+        {showConnections && (
+          <ConnectionsModal ids={connIds} onClose={() => setShowConnections(false)} />
         )}
 
         <div className="mt-6 border-b border-border">
