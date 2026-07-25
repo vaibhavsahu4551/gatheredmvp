@@ -3,6 +3,7 @@ import { useNavigate, Link } from "@tanstack/react-router";
 import { Heart, MessageSquare, Link2, Trash2 } from "lucide-react";
 import { SafetyMenu } from "@/components/SafetyMenu";
 import { ShareButton } from "@/components/ShareToConnection";
+import { Avatar } from "@/components/Avatar";
 import { eventTypeStyle } from "@/lib/event-style";
 
 export type PostItem = {
@@ -19,6 +20,7 @@ export function PostCard({
   p,
   img,
   name,
+  avatarPhoto,
   linked,
   liked,
   likeCount,
@@ -28,6 +30,7 @@ export function PostCard({
   p: PostItem;
   img?: string;
   name: string;
+  avatarPhoto?: string | null;
   linked?: { id: string; title: string; event_type: string | null };
   liked: boolean;
   likeCount: number;
