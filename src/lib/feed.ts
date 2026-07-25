@@ -1,10 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export async function listFeed(city: string) {
+export async function listFeed(_city?: string) {
   const { data, error } = await supabase
     .from("posts")
     .select("*")
-    .eq("city", city)
     .order("created_at", { ascending: false })
     .limit(50);
   if (error) throw error;
