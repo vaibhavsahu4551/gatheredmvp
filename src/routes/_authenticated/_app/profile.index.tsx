@@ -209,25 +209,61 @@ function PostsTab({ userId, onCreate }: { userId: string; onCreate: () => void }
       />
     );
 
+  const [openId, setOpenId] = useState<string | null>(null);
+  const openPost = openId ? posts.find((p) => p.id === openId) : null;
+
   return (
-    <div className="space-y-3">
-      {posts.map((p) => (
-        <PostCard
-          key={p.id}
-          p={p}
-          img={imgs[p.id]}
-          name={names[p.user_id]?.full_name ?? "You"}
-          linked={p.event_id ? linked[p.event_id] : undefined}
-          liked={likes.mine.has(p.id)}
-          likeCount={likes.counts[p.id] ?? 0}
-          onLike={async () => { await toggleLike(p.id); await refresh(); }}
-          onDelete={async () => {
-            try { await deletePost(p.id); toast.success("Post deleted"); await refresh(); }
-            catch (e: any) { toast.error(e?.message ?? "Could not delete post"); }
-          }}
-        />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-3 gap-1">
+        {posts.map((p) => (
+          <button
+            key={p.id}
+            onClick={() => setOpenId(p.id)}
+            className="relative aspect-square overflow-hidden bg-muted focus:outline-none"
+          >
+            {p.photo_url && imgs[p.id] ? (
+              <img src={imgs[p.id]} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center p-2 bg-gradient-brand-soft">
+                <div className="text-[11px] leading-snug text-foreground/80 line-clamp-6 text-center whitespace-pre-wrap">
+                  {p.caption ?? ""}
+                </div>
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {openPost && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+          onClick={() => setOpenId(null)}
+        >
+          <div
+            className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl bg-background"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <PostCard
+              p={openPost}
+              img={imgs[openPost.id]}
+              name={names[openPost.user_id]?.full_name ?? "You"}
+              linked={openPost.event_id ? linked[openPost.event_id] : undefined}
+              liked={likes.mine.has(openPost.id)}
+              likeCount={likes.counts[openPost.id] ?? 0}
+              onLike={async () => { await toggleLike(openPost.id); await refresh(); }}
+              onDelete={async () => {
+                try {
+                  await deletePost(openPost.id);
+                  toast.success("Post deleted");
+                  setOpenId(null);
+                  await refresh();
+                } catch (e: any) { toast.error(e?.message ?? "Could not delete post"); }
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
