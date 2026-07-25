@@ -52,6 +52,77 @@ export function PostCard({
     await load();
   };
 
+  const isTextOnly = !img;
+
+  if (isTextOnly) {
+    return (
+      <article className="bg-background px-4 py-3 border-b border-border">
+        <div className="flex gap-3">
+          <Link to="/u/$userId" params={{ userId: p.user_id }} className="shrink-0">
+            <div className="h-10 w-10 rounded-full bg-gradient-brand" />
+          </Link>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <Link to="/u/$userId" params={{ userId: p.user_id }} className="flex items-center gap-1.5 min-w-0">
+                <span className="text-[14px] font-bold truncate hover:underline">{name}</span>
+                <span className="text-[13px] text-muted-foreground shrink-0">· {new Date(p.created_at).toLocaleDateString()}</span>
+              </Link>
+              {onDelete ? (
+                <button
+                  type="button"
+                  onClick={() => { if (confirm("Delete this post? This will remove all its likes and comments.")) onDelete(); }}
+                  className="h-7 w-7 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-destructive shrink-0"
+                  aria-label="Delete post"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              ) : (
+                <SafetyMenu targetType="user" targetId={p.user_id} userId={p.user_id} />
+              )}
+            </div>
+            {p.caption && (
+              <div className="mt-1 text-[15px] leading-relaxed whitespace-pre-wrap text-foreground">{p.caption}</div>
+            )}
+            {linked && linkedStyle && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate({ to: "/events/$eventId", params: { eventId: linked.id } });
+                }}
+                className="mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold text-white shadow-sm"
+                style={{ backgroundImage: linkedStyle.gradient }}
+              >
+                <Link2 className="h-3 w-3" />
+                {linked.event_type ? `${linked.event_type} · ${linked.title}` : linked.title}
+              </button>
+            )}
+            <div className="mt-3 flex items-center gap-6 text-sm text-muted-foreground">
+              <button onClick={onLike} className="flex items-center gap-1.5 hover:text-foreground">
+                <Heart className={`h-4 w-4 transition ${liked ? "fill-red-500 text-red-500 scale-110" : ""}`} /> {likeCount}
+              </button>
+              <button onClick={() => { setOpenC((v) => !v); if (!openC) load(); }} className="flex items-center gap-1.5 hover:text-foreground">
+                <MessageSquare className="h-4 w-4" /> Comments
+              </button>
+              <ShareButton kind="post" id={p.id} />
+            </div>
+            {openC && (
+              <div className="mt-3 border-t border-border pt-2 space-y-2">
+                {comments.map((c) => (
+                  <div key={c.id} className="text-[13px]"><span className="font-semibold">Guest</span> {c.body}</div>
+                ))}
+                <div className="flex gap-2">
+                  <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Add a comment…" className="flex-1 rounded-full border border-border bg-background px-3 py-1.5 text-sm" />
+                  <button onClick={submit} className="rounded-full bg-gradient-brand text-white px-4 text-sm font-semibold">Send</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article className="rounded-2xl bg-card overflow-hidden shadow-card ring-1 ring-black/[0.04]">
       <div className="px-3 pt-2.5 pb-2 flex items-center justify-between">
