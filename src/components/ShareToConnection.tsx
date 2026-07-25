@@ -4,6 +4,7 @@ import { listConnections } from "@/lib/huddle-connect";
 import { getProfilesLite } from "@/lib/events";
 import { shareToConnection } from "@/lib/dm";
 import { Share2, X, Send } from "lucide-react";
+import { Avatar } from "@/components/Avatar";
 import { toast } from "sonner";
 
 export function ShareButton({ kind, id }: { kind: "post" | "event"; id: string }) {
@@ -25,7 +26,7 @@ export function ShareButton({ kind, id }: { kind: "post" | "event"; id: string }
 
 function SharePicker({ kind, id, onClose }: { kind: "post" | "event"; id: string; onClose: () => void }) {
   const [connIds, setConnIds] = useState<string[]>([]);
-  const [names, setNames] = useState<Record<string, { full_name: string | null }>>({});
+  const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [note, setNote] = useState("");
   const [sending, setSending] = useState(false);
@@ -82,7 +83,7 @@ function SharePicker({ kind, id, onClose }: { kind: "post" | "event"; id: string
                   onClick={() => toggle(uid)}
                   className={`w-full flex items-center gap-3 p-2 rounded-xl text-left transition ${selected.has(uid) ? "bg-gradient-brand-soft" : "hover:bg-muted"}`}
                 >
-                  <div className="h-9 w-9 rounded-full bg-gradient-brand shrink-0" />
+                  <Avatar photo={names[uid]?.photo} name={names[uid]?.full_name} size={36} />
                   <div className="text-sm font-medium flex-1 truncate">{names[uid]?.full_name ?? "Member"}</div>
                   <div className={`h-5 w-5 rounded-full border-2 ${selected.has(uid) ? "border-primary bg-primary" : "border-border"}`} />
                 </button>

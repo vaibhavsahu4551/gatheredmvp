@@ -5,6 +5,7 @@ import { signedPhotoUrl, ageFromDob, type ProfileRow } from "@/lib/huddl";
 import { huddleStatusWith, sendHuddleRequest, respondHuddleRequest, cancelHuddleRequest, listConnections, type HuddleStatus } from "@/lib/huddle-connect";
 import { getOrCreateThread } from "@/lib/dm";
 import { getProfilesLite } from "@/lib/events";
+import { Avatar } from "@/components/Avatar";
 import { toast } from "sonner";
 import { ArrowLeft, MapPin, UserPlus, Check, X, MessageCircle, Clock } from "lucide-react";
 
@@ -21,7 +22,7 @@ function UserProfile() {
   const [status, setStatus] = useState<HuddleStatus>("none");
   const [reqId, setReqId] = useState<string | undefined>();
   const [connIds, setConnIds] = useState<string[]>([]);
-  const [connNames, setConnNames] = useState<Record<string, { full_name: string | null }>>({});
+  const [connNames, setConnNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [busy, setBusy] = useState(false);
 
   const load = async () => {
@@ -170,7 +171,7 @@ function UserProfile() {
               {connIds.map((uid) => (
                 <Link key={uid} to="/u/$userId" params={{ userId: uid }}
                   className="flex items-center gap-2 rounded-full bg-muted px-3 py-1.5">
-                  <div className="h-6 w-6 rounded-full bg-gradient-brand" />
+                  <Avatar photo={connNames[uid]?.photo} name={connNames[uid]?.full_name} size={24} />
                   <span className="text-[13px] font-medium truncate max-w-[120px]">{connNames[uid]?.full_name ?? "Member"}</span>
                 </Link>
               ))}

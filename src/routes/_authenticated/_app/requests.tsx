@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { listIncomingRequests, respondHuddleRequest } from "@/lib/huddle-connect";
 import { getProfilesLite } from "@/lib/events";
+import { Avatar } from "@/components/Avatar";
 import { ArrowLeft, Check, X, Users } from "lucide-react";
 import { toast } from "sonner";
 
@@ -12,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/_app/requests")({
 function Requests() {
   const navigate = useNavigate();
   const [rows, setRows] = useState<any[]>([]);
-  const [names, setNames] = useState<Record<string, { full_name: string | null }>>({});
+  const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
@@ -53,7 +54,7 @@ function Requests() {
         {rows.map((r) => (
           <div key={r.id} className="flex items-center gap-3 rounded-2xl border border-border p-3 bg-card">
             <Link to="/u/$userId" params={{ userId: r.from_id }} className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="h-11 w-11 rounded-full bg-gradient-brand shrink-0" />
+              <Avatar photo={names[r.from_id]?.photo} name={names[r.from_id]?.full_name} size={44} />
               <div className="min-w-0">
                 <div className="text-sm font-semibold truncate">{names[r.from_id]?.full_name ?? "Member"}</div>
                 <div className="text-[11px] text-muted-foreground">wants to Huddle Up</div>

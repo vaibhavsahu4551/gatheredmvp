@@ -7,6 +7,7 @@ import { countByGender, deleteEvent, getEvent, getParticipants, getProfilesLite,
 import { toast } from "sonner";
 import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2 } from "lucide-react";
 import { SafetyMenu } from "@/components/SafetyMenu";
+import { Avatar } from "@/components/Avatar";
 
 
 export const Route = createFileRoute("/_authenticated/_app/events/$eventId")({
@@ -19,7 +20,7 @@ function EventDetail() {
   const [me, setMe] = useState<string>("");
   const [event, setEvent] = useState<EventRow | null>(null);
   const [parts, setParts] = useState<ParticipantRow[]>([]);
-  const [profiles, setProfiles] = useState<Record<string, { full_name: string | null; gender: string | null }>>({});
+  const [profiles, setProfiles] = useState<Record<string, { full_name: string | null; gender: string | null; photo: string | null }>>({});
   const [my, setMy] = useState<ParticipantRow | null>(null);
   const [groupId, setGroupId] = useState<string | null>(null);
   const [comments, setComments] = useState<EventComment[]>([]);
@@ -204,7 +205,10 @@ function EventDetail() {
           <h3 className="text-sm font-semibold">Going ({approved.length})</h3>
           <div className="mt-2 space-y-1.5">
             {approved.map((p) => (
-              <Link key={p.id} to="/u/$userId" params={{ userId: p.user_id }} className="block text-sm text-muted-foreground hover:text-foreground">{profiles[p.user_id]?.full_name ?? "Someone"} · {profiles[p.user_id]?.gender ?? "—"}</Link>
+              <Link key={p.id} to="/u/$userId" params={{ userId: p.user_id }} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+                <Avatar photo={profiles[p.user_id]?.photo} name={profiles[p.user_id]?.full_name} size={28} />
+                <span>{profiles[p.user_id]?.full_name ?? "Someone"} · {profiles[p.user_id]?.gender ?? "—"}</span>
+              </Link>
             ))}
             {approved.length === 0 && <div className="text-sm text-muted-foreground">No one yet.</div>}
           </div>
