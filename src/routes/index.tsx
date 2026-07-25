@@ -40,21 +40,20 @@ function Landing() {
           plan it together with people who actually show up.
         </p>
 
-        <div className="mt-8 space-y-3">
-          <Feature icon={<Users className="h-4 w-4" />} title="Groups, not 1:1s" body="Every event is a small group, so nobody's stuck alone." />
-          <Feature icon={<ShieldCheck className="h-4 w-4" />} title="ID + selfie verified" body="Every profile is reviewed before you see the feed." />
-          <Feature icon={<Sparkles className="h-4 w-4" />} title="Interest-first" body="Match on what you want to do, not just who you are." />
-        </div>
-
         <Link
           to="/auth"
-          className="mt-10 flex w-full items-center justify-center rounded-full bg-white px-6 py-4 text-[15px] font-bold text-gradient-brand shadow-glow active:scale-[0.99] transition"
+          className="mt-8 flex w-full items-center justify-center rounded-full bg-white px-6 py-4 text-[15px] font-bold text-gradient-brand shadow-glow active:scale-[0.99] transition"
         >
           Get started — it's free
         </Link>
-        <p className="mt-3 text-center text-xs text-white/80">
-          By continuing you confirm you're 18 or older.
+        <p className="mt-3 text-center text-xs text-black font-medium">
+          By continuing you confirm you are 18 or older.
         </p>
+
+        <div className="mt-8 space-y-3">
+          <Feature icon={<Users className="h-4 w-4" />} title="Groups, not 1:1s" body="Every event is a small group, so nobody's stuck alone." />
+          <Feature icon={<Sparkles className="h-4 w-4" />} title="Interest-first" body="Match on what you want to do, not just who you are." />
+        </div>
       </main>
     </div>
   );
