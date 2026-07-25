@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       chat_groups: {
         Row: {
           created_at: string
@@ -151,6 +172,7 @@ export type Database = {
           description: string | null
           entry_fee: number | null
           event_type: string | null
+          exact_location: string | null
           host_id: string
           id: string
           location_address: string
@@ -173,6 +195,7 @@ export type Database = {
           description?: string | null
           entry_fee?: number | null
           event_type?: string | null
+          exact_location?: string | null
           host_id: string
           id?: string
           location_address: string
@@ -195,6 +218,7 @@ export type Database = {
           description?: string | null
           entry_fee?: number | null
           event_type?: string | null
+          exact_location?: string | null
           host_id?: string
           id?: string
           location_address?: string
@@ -361,6 +385,36 @@ export type Database = {
         }
         Relationships: []
       }
+      reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reporter_id: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reporter_id: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reporter_id?: string
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: []
+      }
       verification_status: {
         Row: {
           notes: string | null
@@ -387,6 +441,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      is_blocked: { Args: { _a: string; _b: string }; Returns: boolean }
       is_event_host: {
         Args: { _event: string; _user: string }
         Returns: boolean
