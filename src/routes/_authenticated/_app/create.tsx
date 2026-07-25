@@ -191,3 +191,94 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </div>
   );
 }
+
+function CreatePost() {
+  const navigate = useNavigate();
+  const [city, setCity] = useState("");
+  const [caption, setCaption] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>("");
+  const [eventId, setEventId] = useState<string>("");
+  const [myEvents, setMyEvents] = useState<{ id: string; title: string; starts_at: string }[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    loadMe().then((me) => setCity(me?.profile?.city ?? ""));
+    listMyEvents().then(setMyEvents);
+  }, []);
+
+  useEffect(() => {
+    if (!file) { setPreview(""); return; }
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  const submit = async () => {
+    if (!caption.trim() && !file) return toast.error("Add text or a photo");
+    if (!city.trim()) return toast.error("City missing on your profile");
+    setSaving(true);
+    try {
+      await createPost(city, caption, file ?? undefined, eventId || null);
+      toast.success("Posted");
+      navigate({ to: "/home" });
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not post");
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <div>
+      <header className="px-5 pt-6 pb-4">
+        <h1 className="text-2xl font-semibold tracking-tight">Share a post</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Add a photo, some words, or both.</p>
+      </header>
+
+      <div className="px-5 space-y-5 max-w-md mx-auto">
+        <Field label="What's on your mind?">
+          <textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={4} maxLength={280}
+            placeholder="Say something to your city…"
+            className={inputCls + " resize-none"} />
+          <div className="mt-1 text-right text-[11px] text-muted-foreground">{caption.length}/280</div>
+        </Field>
+
+        <Field label="Photo (optional)">
+          {preview ? (
+            <div className="relative">
+              <img src={preview} alt="" className="w-full aspect-square object-cover rounded-2xl" />
+              <button type="button" onClick={() => setFile(null)}
+                className="absolute top-2 right-2 rounded-full bg-black/60 text-white text-xs px-3 py-1">Remove</button>
+            </div>
+          ) : (
+            <label className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border py-10 text-sm text-muted-foreground cursor-pointer">
+              <ImagePlus className="h-5 w-5" />
+              Tap to add a photo
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+            </label>
+          )}
+        </Field>
+
+        <Field label="Link to your event (optional)">
+          <select value={eventId} onChange={(e) => setEventId(e.target.value)} className={inputCls}>
+            <option value="">None</option>
+            {myEvents.map((e) => (
+              <option key={e.id} value={e.id}>{e.title} · {new Date(e.starts_at).toLocaleDateString()}</option>
+            ))}
+          </select>
+          {myEvents.length === 0 && (
+            <div className="mt-1 text-[11px] text-muted-foreground">You haven't hosted any events yet.</div>
+          )}
+        </Field>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-16 bg-background/95 backdrop-blur border-t border-border p-4">
+        <div className="max-w-md mx-auto">
+          <button onClick={submit} disabled={saving} className="w-full rounded-full bg-primary py-3.5 text-[15px] font-medium text-primary-foreground disabled:opacity-50">
+            {saving ? "Posting…" : "Share post"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
