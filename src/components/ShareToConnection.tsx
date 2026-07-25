@@ -4,6 +4,7 @@ import { listConnections } from "@/lib/huddle-connect";
 import { getProfilesLite } from "@/lib/events";
 import { shareToConnection } from "@/lib/dm";
 import { Share2, X, Send } from "lucide-react";
+import { Avatar } from "@/components/Avatar";
 import { toast } from "sonner";
 
 export function ShareButton({ kind, id }: { kind: "post" | "event"; id: string }) {
