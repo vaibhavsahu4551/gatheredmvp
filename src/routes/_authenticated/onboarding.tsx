@@ -85,6 +85,20 @@ function Onboarding() {
           <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadPhoto(e.target.files[0])} />
         </label>
         {photoPreview && <div className="mt-4 text-xs text-muted-foreground">Tap the photo to replace</div>}
+
+        <button
+          onClick={submit}
+          disabled={saving || !photoPath}
+          className="mt-8 w-full rounded-full bg-brand-gradient py-3.5 text-[15px] font-semibold text-white shadow-elevated disabled:opacity-50"
+        >
+          {saving ? "Saving…" : photoPath ? "Continue" : "Add a photo to continue"}
+        </button>
+        <button
+          onClick={() => navigate({ to: "/home" })}
+          className="mt-3 text-xs text-muted-foreground hover:text-foreground"
+        >
+          Skip for now
+        </button>
       </div>
 
       <div className="fixed inset-x-0 bottom-0 bg-background/95 backdrop-blur border-t border-border p-4">
