@@ -196,9 +196,7 @@ export function PostCard({
       </div>
       {openC && (
         <div className="border-t border-border px-3 py-2 space-y-2 bg-gradient-brand-soft/40">
-          {comments.map((c) => (
-            <div key={c.id} className="text-[13px]"><span className="font-semibold">Guest</span> {c.body}</div>
-          ))}
+          {comments.map(renderComment)}
           <div className="flex gap-2">
             <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Add a comment…" className="flex-1 rounded-full border border-border bg-white px-3 py-1.5 text-sm" />
             <button onClick={submit} className="rounded-full bg-gradient-brand text-white px-4 text-sm font-semibold">Send</button>
