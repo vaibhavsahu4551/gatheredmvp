@@ -7,6 +7,7 @@ import { countByGender, deleteEvent, getEvent, getParticipants, getProfilesLite,
 import { toast } from "sonner";
 import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2 } from "lucide-react";
 import { SafetyMenu } from "@/components/SafetyMenu";
+import { Avatar } from "@/components/Avatar";
 
 
 export const Route = createFileRoute("/_authenticated/_app/events/$eventId")({
