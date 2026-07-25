@@ -102,3 +102,33 @@ export async function myParticipation(eventId: string, userId: string) {
     .select("*").eq("event_id", eventId).eq("user_id", userId).maybeSingle();
   return data;
 }
+
+export type EventComment = {
+  id: string;
+  event_id: string;
+  user_id: string;
+  body: string;
+  created_at: string;
+};
+
+export async function listEventComments(eventId: string): Promise<EventComment[]> {
+  const { data, error } = await supabase
+    .from("event_comments")
+    .select("*")
+    .eq("event_id", eventId)
+    .order("created_at", { ascending: true })
+    .limit(500);
+  if (error) throw error;
+  return (data ?? []) as EventComment[];
+}
+
+export async function postEventComment(eventId: string, body: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Sign in required");
+  const trimmed = body.trim();
+  if (!trimmed) throw new Error("Empty message");
+  const { error } = await supabase.from("event_comments").insert({
+    event_id: eventId, user_id: user.id, body: trimmed,
+  });
+  if (error) throw error;
+}
