@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getProfilesLite, getEventsLite } from "@/lib/events";
-import { signedFeedUrl, getLikes, toggleLike, deletePost } from "@/lib/feed";
+import { getProfilesLite } from "@/lib/events";
+import { signedFeedUrl, getLikes, toggleLike, deletePost, getEventsLite } from "@/lib/feed";
 import { PostCard, type PostItem } from "@/components/PostCard";
 import { ArrowLeft } from "lucide-react";
 
