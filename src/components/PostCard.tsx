@@ -43,9 +43,14 @@ export function PostCard({
   const [text, setText] = useState("");
   const linkedStyle = linked ? eventTypeStyle(linked.event_type) : null;
 
+  const [authors, setAuthors] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const load = async () => {
     const { listComments } = await import("@/lib/feed");
-    setComments(await listComments(p.id));
+    const { getProfilesLite } = await import("@/lib/events");
+    const cs = await listComments(p.id);
+    setComments(cs);
+    const ids = Array.from(new Set(cs.map((c: any) => c.user_id).filter(Boolean))) as string[];
+    if (ids.length) setAuthors(await getProfilesLite(ids) as any);
   };
   const submit = async () => {
     if (!text.trim()) return;
@@ -53,6 +58,21 @@ export function PostCard({
     await addComment(p.id, text.trim());
     setText("");
     await load();
+  };
+  const renderComment = (c: any) => {
+    const a = authors[c.user_id];
+    const nm = a?.full_name ?? "Someone";
+    return (
+      <div key={c.id} className="flex gap-2 items-start">
+        <Link to="/u/$userId" params={{ userId: c.user_id }} className="shrink-0 mt-0.5">
+          <Avatar photo={a?.photo ?? null} name={nm} size={24} />
+        </Link>
+        <div className="text-[13px] leading-snug">
+          <Link to="/u/$userId" params={{ userId: c.user_id }} className="font-semibold hover:underline">{nm}</Link>{" "}
+          <span>{c.body}</span>
+        </div>
+      </div>
+    );
   };
 
   const isTextOnly = !img;
