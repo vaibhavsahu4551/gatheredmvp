@@ -2,16 +2,27 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { listNotifications, markAllRead, type Notification } from "@/lib/notifications";
 import { getProfilesLite } from "@/lib/events";
-import { ArrowLeft, Bell, UserPlus, HeartHandshake } from "lucide-react";
+import { Avatar } from "@/components/Avatar";
+import { ArrowLeft, Bell } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/_app/notifications")({
   component: Notifications,
 });
 
+function label(kind: string) {
+  switch (kind) {
+    case "huddle_request": return "sent you a Huddle Up request";
+    case "huddle_accepted": return "accepted your Huddle Up request";
+    case "post_like": return "liked your post";
+    case "post_comment": return "commented on your post";
+    default: return "sent you a notification";
+  }
+}
+
 function Notifications() {
   const navigate = useNavigate();
   const [rows, setRows] = useState<Notification[]>([]);
-  const [names, setNames] = useState<Record<string, { full_name: string | null }>>({});
+  const [profiles, setProfiles] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,7 +30,7 @@ function Notifications() {
       const r = await listNotifications();
       setRows(r);
       const ids = Array.from(new Set(r.map((x) => x.actor_id).filter(Boolean) as string[]));
-      if (ids.length) setNames(await getProfilesLite(ids));
+      if (ids.length) setProfiles(await getProfilesLite(ids) as any);
       setLoading(false);
       await markAllRead();
     })();
@@ -44,22 +55,25 @@ function Notifications() {
           </div>
         )}
         {rows.map((n) => {
-          const name = n.actor_id ? names[n.actor_id]?.full_name ?? "Someone" : "Someone";
+          const p = n.actor_id ? profiles[n.actor_id] : null;
+          const name = p?.full_name ?? "Someone";
           const isReq = n.kind === "huddle_request";
+          const toProps: any = isReq
+            ? { to: "/requests" }
+            : n.actor_id
+              ? { to: "/u/$userId", params: { userId: n.actor_id } }
+              : { to: "/home" };
           return (
             <Link
               key={n.id}
-              to={isReq ? "/requests" : "/u/$userId"}
-              params={isReq ? undefined as any : { userId: n.actor_id! }}
+              {...toProps}
               className="flex items-center gap-3 rounded-2xl border border-border p-3 bg-card"
             >
-              <div className="h-10 w-10 rounded-full bg-gradient-brand text-white flex items-center justify-center">
-                {isReq ? <UserPlus className="h-5 w-5" /> : <HeartHandshake className="h-5 w-5" />}
-              </div>
+              <Avatar photo={p?.photo ?? null} name={name} size={40} />
               <div className="min-w-0 flex-1">
                 <div className="text-sm">
                   <span className="font-semibold">{name}</span>{" "}
-                  {isReq ? "sent you a Huddle Up request" : "accepted your Huddle Up request"}
+                  {label(n.kind)}
                 </div>
                 <div className="text-[11px] text-muted-foreground">{new Date(n.created_at).toLocaleString()}</div>
               </div>
