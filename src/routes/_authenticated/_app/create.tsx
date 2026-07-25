@@ -3,15 +3,36 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CATEGORIES, EVENT_TYPES, looksResidential, type Category, type EventType } from "@/lib/events";
 import { loadMe } from "@/lib/huddl";
+import { createPost, listMyEvents } from "@/lib/feed";
 import { toast } from "sonner";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, ImagePlus } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/_app/create")({
-  component: Create,
+  component: CreateScreen,
 });
+
+function CreateScreen() {
+  const [mode, setMode] = useState<"event" | "post">("event");
+  return (
+    <div className="pb-32">
+      <div className="px-5 pt-8">
+        <div className="inline-flex rounded-full border border-border p-0.5 text-sm">
+          {(["event","post"] as const).map((t) => (
+            <button key={t} onClick={() => setMode(t)}
+              className={`px-4 py-1.5 rounded-full font-medium transition ${mode === t ? "bg-foreground text-background" : "text-muted-foreground"}`}>
+              {t === "event" ? "Event" : "Post"}
+            </button>
+          ))}
+        </div>
+      </div>
+      {mode === "event" ? <Create /> : <CreatePost />}
+    </div>
+  );
+}
 
 function Create() {
   const navigate = useNavigate();
+
   const [userId, setUserId] = useState("");
   const [defaultCity, setDefaultCity] = useState("");
   const [title, setTitle] = useState("");
