@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Heart, MessageSquare, Link2 } from "lucide-react";
+import { SafetyMenu } from "@/components/SafetyMenu";
+
 
 export type PostItem = {
   kind: "post";
