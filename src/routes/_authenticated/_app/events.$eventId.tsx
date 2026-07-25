@@ -63,7 +63,12 @@ function EventDetail() {
       </div>
 
       <div className="px-5 pt-4">
-        <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">{event.category}</div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {event.event_type && (
+            <span className="rounded-full bg-primary/10 text-primary px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide">{event.event_type}</span>
+          )}
+          <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">{event.category}</span>
+        </div>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">{event.title}</h1>
         <div className="mt-1 text-sm text-muted-foreground flex items-center gap-1.5">
           <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Hosted by {profiles[event.host_id]?.full_name ?? "Host"}

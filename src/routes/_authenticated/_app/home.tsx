@@ -106,9 +106,14 @@ function EventsList({ city }: { city: string }) {
           return (
             <Link key={e.id} to="/events/$eventId" params={{ eventId: e.id }}
               className="block rounded-2xl border border-border p-4 bg-card">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{e.category}</span>
-                <span className="text-[11px] text-muted-foreground">{new Date(e.starts_at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}</span>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  {e.event_type && (
+                    <span className="rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">{e.event_type}</span>
+                  )}
+                  <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground truncate">{e.category}</span>
+                </div>
+                <span className="text-[11px] text-muted-foreground shrink-0">{new Date(e.starts_at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}</span>
               </div>
               <h3 className="mt-1.5 text-[17px] font-semibold leading-snug">{e.title}</h3>
               <div className="mt-1 text-[13px] text-muted-foreground">{e.location_address}</div>

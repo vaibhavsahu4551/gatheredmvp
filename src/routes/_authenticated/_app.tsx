@@ -15,7 +15,6 @@ function AppShell() {
     loadMe().then((me) => {
       if (!me) return;
       if (!me.profile?.onboarding_complete) { navigate({ to: "/onboarding" }); return; }
-      if (me.verification?.status !== "verified") { navigate({ to: "/pending" }); return; }
       setReady(true);
     });
   }, [navigate]);
