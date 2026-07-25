@@ -86,7 +86,7 @@ function Onboarding() {
     if (!city.trim()) return toast.error("Add your city");
     if (interests.length === 0) return toast.error("Pick at least one interest");
     if (photos.length < 2) return toast.error("Upload at least 2 photos");
-    if (!selfiePath) return toast.error("Upload a selfie for verification");
+    
 
     setSaving(true);
     const { error } = await supabase.from("profiles").update({
@@ -102,8 +102,8 @@ function Onboarding() {
     }).eq("id", userId);
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Profile submitted for review");
-    navigate({ to: "/pending" });
+    toast.success("Profile saved");
+    navigate({ to: "/home" });
   };
 
   if (loading) {
@@ -187,25 +187,6 @@ function Onboarding() {
             )}
           </div>
         </Field>
-
-        <Field label="Selfie for verification" hint="Reviewed manually">
-          <label className="flex items-center gap-3 rounded-2xl border border-border p-3 cursor-pointer hover:bg-muted">
-            <div className="h-14 w-14 rounded-full bg-muted overflow-hidden flex items-center justify-center">
-              {selfiePreview ? (
-                <img src={selfiePreview} className="h-full w-full object-cover" alt="" />
-              ) : selfiePath ? (
-                <Check className="h-5 w-5 text-primary" />
-              ) : (
-                <Camera className="h-5 w-5 text-muted-foreground" />
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium">{selfiePath ? "Selfie uploaded" : "Upload selfie"}</div>
-              <div className="text-xs text-muted-foreground">Face clearly, good lighting</div>
-            </div>
-            <input type="file" accept="image/*" capture="user" className="hidden" onChange={(e) => e.target.files?.[0] && uploadSelfie(e.target.files[0])} />
-          </label>
-        </Field>
       </div>
 
       <div className="fixed inset-x-0 bottom-0 bg-background/95 backdrop-blur border-t border-border p-4">
@@ -215,7 +196,7 @@ function Onboarding() {
             disabled={saving}
             className="w-full rounded-full bg-primary py-3.5 text-[15px] font-medium text-primary-foreground disabled:opacity-50"
           >
-            {saving ? "Saving…" : "Submit for verification"}
+            {saving ? "Saving…" : "Save & continue"}
           </button>
         </div>
       </div>
