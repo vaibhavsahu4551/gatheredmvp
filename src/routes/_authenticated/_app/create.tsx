@@ -89,7 +89,8 @@ function Create() {
       entry_fee: fee ? Number(fee) : null,
       min_girls: minGirls ? Number(minGirls) : null,
       min_boys: minBoys ? Number(minBoys) : null,
-    }).select("id").maybeSingle();
+    } as any).select("id").maybeSingle();
+
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Event created");
