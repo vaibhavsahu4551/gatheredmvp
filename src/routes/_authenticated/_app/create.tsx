@@ -17,6 +17,7 @@ function Create() {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [category, setCategory] = useState<Category>("Coffee");
+  const [eventType, setEventType] = useState<EventType | "">("");
   const [startsAt, setStartsAt] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
@@ -39,6 +40,7 @@ function Create() {
   const residentialWarn = address.length > 4 && looksResidential(address);
 
   const submit = async () => {
+    if (!eventType) return toast.error("Pick an event type");
     if (!title.trim()) return toast.error("Add a title");
     if (!startsAt) return toast.error("Pick date and time");
     if (new Date(startsAt).getTime() < Date.now()) return toast.error("Pick a future time");
@@ -53,6 +55,7 @@ function Create() {
       title: title.trim(),
       description: desc.trim() || null,
       category,
+      event_type: eventType,
       starts_at: new Date(startsAt).toISOString(),
       location_address: address.trim(),
       city: city.trim(),
@@ -77,6 +80,21 @@ function Create() {
       </header>
 
       <div className="px-5 space-y-5 max-w-md mx-auto">
+        <Field label="Event type">
+          <div className="flex flex-wrap gap-2">
+            {EVENT_TYPES.map((t) => (
+              <button
+                type="button"
+                key={t}
+                onClick={() => setEventType(t)}
+                className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium border transition ${eventType === t ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </Field>
+
         <Field label="Title">
           <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls} placeholder="Sunday coffee run" />
         </Field>
