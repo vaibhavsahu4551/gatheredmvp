@@ -94,7 +94,10 @@ function EventDetail() {
 
   const doJoin = async () => {
     try { await requestJoin(eventId); toast.success("Request sent"); await load(); }
-    catch (e: any) { toast.error(e.message); }
+    catch (e: any) {
+      console.error("Join failed", e);
+      toast.error(e?.message || e?.error_description || "Couldn't send request. Please try again.");
+    }
   };
   const decide = async (id: string, s: "approved" | "rejected") => {
     await setParticipantStatus(id, s); await load();
