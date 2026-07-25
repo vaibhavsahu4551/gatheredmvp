@@ -26,6 +26,29 @@ export async function listEvents(city: string) {
   return data ?? [];
 }
 
+export async function listHostedEvents(userId: string) {
+  const { data, error } = await supabase
+    .from("events")
+    .select("*")
+    .eq("host_id", userId)
+    .order("starts_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function listJoinedEvents(userId: string) {
+  const { data, error } = await supabase
+    .from("event_participants")
+    .select("event_id, status, events(*)")
+    .eq("user_id", userId);
+  if (error) throw error;
+  return (data ?? [])
+    .map((r: any) => r.events as EventRow)
+    .filter((e): e is EventRow => !!e)
+    .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime());
+}
+
+
 export async function getEvent(id: string) {
   const { data, error } = await supabase.from("events").select("*").eq("id", id).maybeSingle();
   if (error) throw error;
