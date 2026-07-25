@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Search, Bell } from "lucide-react";
+import { Bell } from "lucide-react";
 import { unreadCount } from "@/lib/notifications";
 import { loadMe } from "@/lib/huddl";
 import { CATEGORIES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipants } from "@/lib/events";
