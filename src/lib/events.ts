@@ -6,6 +6,9 @@ export type ParticipantRow = Database["public"]["Tables"]["event_participants"][
 export const CATEGORIES = ["Gaming","Coffee","Dinner","Movie","Hangout","Sports","Party"] as const;
 export type Category = typeof CATEGORIES[number];
 
+export const EVENT_TYPES = ["Breakfast","Lunch","Dinner","Drinks","Club","Gaming","Movies","Trek","Other"] as const;
+export type EventType = typeof EVENT_TYPES[number];
+
 const RESIDENTIAL_HINTS = ["apartment","apartments","flat ","flat,","villa","house no","house #","road no","block ","layout"];
 export function looksResidential(addr: string): boolean {
   const a = addr.toLowerCase();
