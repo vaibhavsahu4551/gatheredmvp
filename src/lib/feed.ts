@@ -1,11 +1,14 @@
 import { supabase } from "@/integrations/supabase/client";
+import { compressImage } from "@/lib/image-compress";
 
-export async function listFeed(_city?: string) {
+export async function listFeed(opts?: { limit?: number; offset?: number }) {
+  const from = opts?.offset ?? 0;
+  const to = from + (opts?.limit ?? 15) - 1;
   const { data, error } = await supabase
     .from("posts")
-    .select("*")
+    .select("id, user_id, caption, photo_url, event_id, created_at")
     .order("created_at", { ascending: false })
-    .limit(50);
+    .range(from, to);
   if (error) throw error;
   return data ?? [];
 }
@@ -13,9 +16,10 @@ export async function listFeed(_city?: string) {
 export async function listUserPosts(userId: string) {
   const { data, error } = await supabase
     .from("posts")
-    .select("*")
+    .select("id, user_id, caption, photo_url, event_id, created_at")
     .eq("user_id", userId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(60);
   if (error) throw error;
   return data ?? [];
 }
@@ -32,9 +36,9 @@ export async function createPost(city: string, caption: string, file?: File, eve
   if (!caption.trim() && !file) throw new Error("Add text or a photo");
   let photo_url: string | null = null;
   if (file) {
-    const ext = file.name.split(".").pop() ?? "jpg";
-    const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from("feed-photos").upload(path, file);
+    const compressed = await compressImage(file, { maxDim: 1280, quality: 0.82 });
+    const path = `${user.id}/${crypto.randomUUID()}.jpg`;
+    const { error } = await supabase.storage.from("feed-photos").upload(path, compressed, { contentType: compressed.type });
     if (error) throw error;
     photo_url = path;
   }
