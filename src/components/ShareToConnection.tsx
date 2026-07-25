@@ -72,7 +72,7 @@ function SharePicker({ kind, id, onClose }: { kind: "post" | "event"; id: string
         </div>
         {connIds.length === 0 ? (
           <div className="text-sm text-muted-foreground py-8 text-center">
-            You have no Huddle Up connections yet.
+            You have no Linkup connections yet.
           </div>
         ) : (
           <>

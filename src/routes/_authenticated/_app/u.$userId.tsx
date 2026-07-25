@@ -56,7 +56,7 @@ function UserProfile() {
     setBusy(true);
     try {
       await respondHuddleRequest(reqId, accept);
-      toast.success(accept ? "Huddled up!" : "Declined");
+      toast.success(accept ? "Linked up!" : "Declined");
       await load();
     } catch (e: any) { toast.error(e.message ?? "Failed"); }
     finally { setBusy(false); }
@@ -110,7 +110,7 @@ function UserProfile() {
             {status === "none" && (
               <button disabled={busy} onClick={doHuddle}
                 className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-brand text-white py-2.5 text-sm font-semibold disabled:opacity-50">
-                <UserPlus className="h-4 w-4" /> Huddle Up
+                <UserPlus className="h-4 w-4" /> Linkup
               </button>
             )}
             {status === "outgoing" && (
@@ -134,7 +134,7 @@ function UserProfile() {
             {status === "connected" && (
               <>
                 <button disabled className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-brand-soft text-foreground py-2.5 text-sm font-semibold">
-                  <Check className="h-4 w-4" /> Huddled
+                  <Check className="h-4 w-4" /> Linked
                 </button>
                 <button onClick={openDm} className="rounded-full bg-primary text-primary-foreground py-2.5 px-4 text-sm font-semibold inline-flex items-center gap-2">
                   <MessageCircle className="h-4 w-4" /> Message
@@ -163,7 +163,7 @@ function UserProfile() {
         )}
 
         <div className="mt-6">
-          <div className="text-xs font-medium text-muted-foreground mb-2">HUDDLED WITH · {connIds.length}</div>
+          <div className="text-xs font-medium text-muted-foreground mb-2">LINKED WITH · {connIds.length}</div>
           {connIds.length === 0 ? (
             <div className="text-sm text-muted-foreground">No connections yet.</div>
           ) : (

@@ -101,7 +101,7 @@ function Create() {
   return (
     <div className="pb-32">
       <header className="px-5 pt-8 pb-4">
-        <h1 className="text-2xl font-semibold tracking-tight">Create a HUDDL</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Create a Gathr</h1>
         <p className="mt-1 text-sm text-muted-foreground">Groups of 4 or more only. No solo hangs.</p>
       </header>
 
@@ -143,7 +143,7 @@ function Create() {
           {residentialWarn && (
             <div className="mt-2 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5">
               <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
-              <span>This looks like a residential address. HUDDLs should meet at public places.</span>
+              <span>This looks like a residential address. Gathrs should meet at public places.</span>
             </div>
           )}
         </Field>
@@ -190,7 +190,7 @@ function Create() {
       <div className="fixed inset-x-0 bottom-16 bg-background/95 backdrop-blur border-t border-border p-4">
         <div className="max-w-md mx-auto">
           <button onClick={submit} disabled={saving} className="w-full rounded-full bg-primary py-3.5 text-[15px] font-medium text-primary-foreground disabled:opacity-50">
-            {saving ? "Creating…" : "Create HUDDL"}
+            {saving ? "Creating…" : "Create Gathr"}
           </button>
         </div>
       </div>

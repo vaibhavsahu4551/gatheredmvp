@@ -29,7 +29,7 @@ function Messages() {
     <div>
       <header className="px-5 pt-8 pb-4">
         <h1 className="text-2xl font-semibold tracking-tight">Messages</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Direct chats with your Huddle Up connections.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Direct chats with your Linkup connections.</p>
       </header>
       <div className="px-5 space-y-2">
         {loading && <div className="text-sm text-muted-foreground text-center py-8">Loading…</div>}
@@ -38,7 +38,7 @@ function Messages() {
             <div className="mx-auto h-14 w-14 rounded-full bg-muted flex items-center justify-center">
               <MessageCircle className="h-6 w-6 text-muted-foreground" />
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">No direct chats yet. Huddle Up with someone to start one.</p>
+            <p className="mt-4 text-sm text-muted-foreground">No direct chats yet. Linkup with someone to start one.</p>
           </div>
         )}
         {threads.map((t) => {
