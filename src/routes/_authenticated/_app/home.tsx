@@ -134,11 +134,13 @@ function HomeFeed() {
         <div>
           <div className="text-xs font-medium text-muted-foreground flex items-center gap-1">
             {city ? (
-              <span>📍 Showing events near <span className="text-foreground font-semibold">{city}</span></span>
+              <button onClick={() => setCityModal(true)} className="text-left">
+                📍 Showing events near <span className="text-foreground font-semibold underline">{city}</span>
+              </button>
             ) : locState === "detecting" ? (
               <span>📍 Detecting your location…</span>
             ) : (
-              <Link to="/profile/edit" className="underline text-primary">📍 Set your location</Link>
+              <button onClick={() => setCityModal(true)} className="underline text-primary">📍 Set your location</button>
             )}
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">Happening near you</h1>
