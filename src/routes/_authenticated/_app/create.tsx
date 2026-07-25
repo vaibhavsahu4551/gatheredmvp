@@ -134,8 +134,11 @@ function Create() {
           <input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} className={inputCls} />
         </Field>
 
-        <Field label="Location (public place)">
-          <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputCls} placeholder="Third Wave Coffee, Indiranagar" />
+        <Field label="Area / neighborhood (public)">
+          <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputCls} placeholder="Indiranagar, Bengaluru" />
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            Your exact location is only shared with approved attendees.
+          </p>
           {residentialWarn && (
             <div className="mt-2 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5">
               <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
@@ -143,6 +146,14 @@ function Create() {
             </div>
           )}
         </Field>
+
+        <Field label="Exact meeting point (optional, private)">
+          <input value={exactLocation} onChange={(e) => setExactLocation(e.target.value)} className={inputCls} placeholder="Third Wave Coffee, 12th Main — table by the window" />
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            Only shown to attendees you've approved.
+          </p>
+        </Field>
+
 
         <Field label="City">
           <input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} placeholder={defaultCity || "Bengaluru"} />
