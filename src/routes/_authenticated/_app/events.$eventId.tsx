@@ -187,10 +187,10 @@ function EventDetail() {
             <div className="mt-2 space-y-2">
               {pending.map((p) => (
                 <div key={p.id} className="flex items-center justify-between rounded-2xl border border-border p-3">
-                  <div className="text-sm">
-                    <div className="font-medium">{profiles[p.user_id]?.full_name ?? "Someone"}</div>
+                  <Link to="/u/$userId" params={{ userId: p.user_id }} className="text-sm min-w-0 flex-1">
+                    <div className="font-medium truncate">{profiles[p.user_id]?.full_name ?? "Someone"}</div>
                     <div className="text-xs text-muted-foreground">{profiles[p.user_id]?.gender ?? "—"}</div>
-                  </div>
+                  </Link>
                   <div className="flex gap-2">
                     <button onClick={() => decide(p.id, "rejected")} className="rounded-full border border-border px-3 py-1.5 text-xs">Reject</button>
                     <button onClick={() => decide(p.id, "approved")} className="rounded-full bg-primary text-primary-foreground px-3 py-1.5 text-xs">Approve</button>
