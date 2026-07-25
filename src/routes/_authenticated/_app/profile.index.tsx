@@ -14,12 +14,14 @@ import {
   type EventRow,
 } from "@/lib/events";
 import {
+  deletePost,
   getEventsLite,
   getLikes,
   listUserPosts,
   signedFeedUrl,
   toggleLike,
 } from "@/lib/feed";
+import { toast } from "sonner";
 
 import { EventCard, type EventCounts } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
