@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Users, ShieldCheck } from "lucide-react";
 import type { EventRow } from "@/lib/events";
 import { SafetyMenu } from "@/components/SafetyMenu";
+import { ShareButton } from "@/components/ShareToConnection";
 import { eventTypeStyle } from "@/lib/event-style";
 
 export type EventCounts = { boys: number; girls: number; total: number };
