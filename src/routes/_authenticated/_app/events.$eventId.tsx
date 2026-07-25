@@ -221,12 +221,16 @@ function EventDetail() {
                   const mine = c.user_id === me;
                   return (
                     <div key={c.id} className="flex items-start gap-2">
-                      <div className="h-8 w-8 shrink-0 rounded-full bg-muted flex items-center justify-center text-[11px] font-semibold text-foreground/70">
+                      <Link to="/u/$userId" params={{ userId: c.user_id }} className="h-8 w-8 shrink-0 rounded-full bg-muted flex items-center justify-center text-[11px] font-semibold text-foreground/70">
                         {initial}
-                      </div>
+                      </Link>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-baseline gap-1.5">
-                          <span className="text-[13px] font-medium truncate">{mine ? "You" : name}</span>
+                          {mine ? (
+                            <span className="text-[13px] font-medium truncate">You</span>
+                          ) : (
+                            <Link to="/u/$userId" params={{ userId: c.user_id }} className="text-[13px] font-medium truncate hover:underline">{name}</Link>
+                          )}
                           <span className="text-[10px] text-muted-foreground">{new Date(c.created_at).toLocaleString([], { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })}</span>
                         </div>
                         <div className="text-sm text-foreground/90 whitespace-pre-wrap break-words">{c.body}</div>
