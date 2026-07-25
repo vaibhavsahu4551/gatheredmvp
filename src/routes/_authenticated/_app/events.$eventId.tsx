@@ -104,12 +104,18 @@ function EventDetail() {
         <button onClick={() => navigate({ to: "/home" })} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
           <ArrowLeft className="h-4 w-4" />
         </button>
-        {event.status === "confirmed" && groupId && (
-          <Link to="/chat/$groupId" params={{ groupId }} className="rounded-full bg-primary text-primary-foreground px-3.5 py-1.5 text-sm font-medium flex items-center gap-1.5">
-            <MessageCircle className="h-4 w-4" /> Group chat
-          </Link>
-        )}
+        <div className="flex items-center gap-2">
+          {event.status === "confirmed" && groupId && (
+            <Link to="/chat/$groupId" params={{ groupId }} className="rounded-full bg-primary text-primary-foreground px-3.5 py-1.5 text-sm font-medium flex items-center gap-1.5">
+              <MessageCircle className="h-4 w-4" /> Group chat
+            </Link>
+          )}
+          {event.host_id !== me && (
+            <SafetyMenu targetType="event" targetId={event.id} userId={event.host_id} />
+          )}
+        </div>
       </div>
+
 
       <div className="px-5 pt-4">
         <div className="flex items-center gap-2 flex-wrap">
