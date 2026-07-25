@@ -1,25 +1,19 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Search, Users, ShieldCheck, Heart, MessageSquare, Link2 } from "lucide-react";
+import { Search } from "lucide-react";
 import { loadMe } from "@/lib/huddl";
 import { CATEGORIES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipants } from "@/lib/events";
 import { listFeed, getLikes, toggleLike, signedFeedUrl, getEventsLite } from "@/lib/feed";
+import { EventCard } from "@/components/EventCard";
+import { PostCard, type PostItem } from "@/components/PostCard";
 
 export const Route = createFileRoute("/_authenticated/_app/home")({
   component: HomeFeed,
 });
 
-type PostItem = {
-  kind: "post";
-  id: string;
-  created_at: string;
-  user_id: string;
-  caption: string | null;
-  photo_url: string | null;
-  event_id: string | null;
-};
 type EventItem = { kind: "event"; id: string; created_at: string; ev: EventRow };
 type FeedItem = PostItem | EventItem;
+
 
 function HomeFeed() {
   const [city, setCity] = useState("");
