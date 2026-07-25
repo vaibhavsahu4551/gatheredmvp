@@ -130,7 +130,15 @@ function HomeFeed() {
     <div>
       <header className="px-5 pt-8 pb-3 flex items-center justify-between">
         <div>
-          <div className="text-xs font-medium text-muted-foreground">{city || "—"}</div>
+          <div className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+            {city ? (
+              <span>📍 Showing events near <span className="text-foreground font-semibold">{city}</span></span>
+            ) : locState === "detecting" ? (
+              <span>📍 Detecting your location…</span>
+            ) : (
+              <Link to="/profile/edit" className="underline text-primary">📍 Set your location</Link>
+            )}
+          </div>
           <h1 className="text-2xl font-semibold tracking-tight">Happening near you</h1>
         </div>
         <Link to="/notifications" className="relative h-10 w-10 rounded-full bg-muted flex items-center justify-center">
