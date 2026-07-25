@@ -96,6 +96,16 @@ export async function setParticipantStatus(id: string, status: "approved" | "rej
   if (error) throw error;
 }
 
+export async function updateEvent(id: string, patch: Partial<EventRow>) {
+  const { error } = await supabase.from("events").update(patch as any).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteEvent(id: string) {
+  const { error } = await supabase.from("events").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export async function myParticipation(eventId: string, userId: string) {
   const { data } = await supabase.from("event_participants")
     .select("*").eq("event_id", eventId).eq("user_id", userId).maybeSingle();
