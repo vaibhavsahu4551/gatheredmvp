@@ -6,7 +6,7 @@ import { huddleStatusWith, sendHuddleRequest, respondHuddleRequest, cancelHuddle
 import { getOrCreateThread } from "@/lib/dm";
 import { getProfilesLite } from "@/lib/events";
 import { toast } from "sonner";
-import { ArrowLeft, MapPin, ShieldCheck, UserPlus, Check, X, MessageCircle, Clock } from "lucide-react";
+import { ArrowLeft, MapPin, UserPlus, Check, X, MessageCircle, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/_app/u/$userId")({
   component: UserProfile,
@@ -100,7 +100,6 @@ function UserProfile() {
             </h1>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
               {profile.city && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{profile.city}</span>}
-              <span className="inline-flex items-center gap-1 text-primary"><ShieldCheck className="h-3.5 w-3.5" />Verified</span>
             </div>
           </div>
         </div>

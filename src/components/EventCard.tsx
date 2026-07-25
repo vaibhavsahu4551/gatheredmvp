@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Users, ShieldCheck } from "lucide-react";
+import { Users } from "lucide-react";
 import type { EventRow } from "@/lib/events";
 import { SafetyMenu } from "@/components/SafetyMenu";
 import { ShareButton } from "@/components/ShareToConnection";
@@ -59,7 +59,7 @@ export function EventCard({
         <h3 className="mt-1.5 text-[17px] font-semibold leading-snug">{e.title}</h3>
         <div className="mt-1 text-[13px] text-muted-foreground">{e.location_address}</div>
         <div className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-          <ShieldCheck className="h-3 w-3" style={{ color: style.ring }} /> {host?.full_name ?? "Host"}
+          <span>{host?.full_name ?? "Host"}</span>
           {e.status === "confirmed" && (
             <span className="ml-auto rounded-full bg-emerald-100 text-emerald-700 px-2 py-0.5 text-[10px] font-semibold">Confirmed</span>
           )}

@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { loadMe, signedPhotoUrl, ageFromDob } from "@/lib/huddl";
-import { LogOut, ShieldCheck, MapPin, Plus, CalendarPlus, Pencil, UserPlus, Users } from "lucide-react";
+import { LogOut, MapPin, Plus, CalendarPlus, Pencil, UserPlus, Users } from "lucide-react";
 import { listConnections } from "@/lib/huddle-connect";
 import { listIncomingRequests } from "@/lib/huddle-connect";
 import {
@@ -81,10 +81,6 @@ function Profile() {
                   {p.city}
                 </span>
               )}
-              <span className="inline-flex items-center gap-1 text-primary">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Verified
-              </span>
             </div>
           </div>
         </div>
