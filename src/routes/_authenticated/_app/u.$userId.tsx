@@ -134,7 +134,7 @@ function UserProfile() {
             {status === "connected" && (
               <>
                 <button disabled className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-brand-soft text-foreground py-2.5 text-sm font-semibold">
-                  <Check className="h-4 w-4" /> Huddled
+                  <Check className="h-4 w-4" /> Linked
                 </button>
                 <button onClick={openDm} className="rounded-full bg-primary text-primary-foreground py-2.5 px-4 text-sm font-semibold inline-flex items-center gap-2">
                   <MessageCircle className="h-4 w-4" /> Message
