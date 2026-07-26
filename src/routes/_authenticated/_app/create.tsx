@@ -92,13 +92,14 @@ function Create() {
       entry_fee: null,
       min_girls: minGirls ? Number(minGirls) : null,
       min_boys: minBoys ? Number(minBoys) : null,
+      is_pride: prideOptIn && isPride,
     } as any).select("id").maybeSingle();
 
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Event created");
     if (data) navigate({ to: "/events/$eventId", params: { eventId: data.id } });
-    else navigate({ to: "/events" });
+    else navigate({ to: prideOptIn && isPride ? "/pride" : "/events" });
   };
 
   return (
