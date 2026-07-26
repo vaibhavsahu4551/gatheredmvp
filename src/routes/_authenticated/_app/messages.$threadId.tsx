@@ -37,6 +37,7 @@ function DmRoom() {
       const msgs = await listDm(threadId);
       setMessages(msgs);
       await hydrateShares(msgs);
+      markDmRead(threadId).catch(() => {});
     })();
 
     const channel = supabase.channel(`dm-${threadId}`)
@@ -45,6 +46,7 @@ function DmRoom() {
           const m = payload.new as any;
           setMessages((prev) => [...prev, m]);
           await hydrateShares([m]);
+          markDmRead(threadId).catch(() => {});
         }).subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [threadId]);
