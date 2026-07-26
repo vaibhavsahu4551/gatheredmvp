@@ -57,7 +57,7 @@ function Events() {
         {list.map((e) => (
           <Link key={e.id} to="/events/$eventId" params={{ eventId: e.id }} className="block rounded-2xl border border-border p-4 bg-card">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{e.category}</span>
+              <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{e.event_type ?? ""}</span>
               <span className="text-[11px] text-muted-foreground">{new Date(e.starts_at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}</span>
             </div>
             <h3 className="mt-1.5 text-[16px] font-semibold">{e.title}</h3>
