@@ -44,9 +44,6 @@ export function EventCard({
                 {e.event_type}
               </span>
             )}
-            <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground truncate">
-              {e.category}
-            </span>
           </div>
           <div className="flex items-center gap-0.5 shrink-0">
             <span className="text-[11px] text-muted-foreground">
