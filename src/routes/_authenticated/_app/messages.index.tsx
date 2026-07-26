@@ -16,6 +16,7 @@ function Messages() {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [loading, setLoading] = useState(true);
+  const { map: unread } = useDmUnread();
 
   useEffect(() => {
     (async () => {
