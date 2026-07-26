@@ -42,7 +42,14 @@ function EventDetail() {
     const { data: g } = await supabase.from("chat_groups").select("id").eq("event_id", eventId).maybeSingle();
     setGroupId(g?.id ?? null);
   };
-  useEffect(() => { load(); }, [eventId]);
+  useEffect(() => {
+    load();
+    const ch = supabase.channel(`event-parts-${eventId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "event_participants", filter: `event_id=eq.${eventId}` }, () => { load(); })
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${eventId}` }, () => { load(); })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [eventId]);
 
   const canDiscuss = !!event && (event.host_id === me || my?.status === "approved");
 
