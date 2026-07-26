@@ -66,8 +66,8 @@ function PrideScreen() {
         const pmap = await getParticipantsForEvents(all.map((e) => e.id));
         const c: Record<string, { boys: number; girls: number; total: number }> = {};
         for (const e of all) {
-          const { boys, girls, total } = countByGender(pmap[e.id] ?? []);
-          c[e.id] = { boys, girls, total };
+          const parts = (pmap[e.id] ?? []).filter((p: any) => p.status === "approved" || p.status === "pending");
+          c[e.id] = { boys: 0, girls: 0, total: parts.length };
         }
         setCounts(c);
         const prideIds = all.map((e) => (e as any).pride_actor_id).filter(Boolean) as string[];

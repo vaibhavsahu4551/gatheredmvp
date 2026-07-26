@@ -72,7 +72,9 @@ export function EventCard({
         </div>
         <div className="mt-3 flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
-            <Users className="h-3.5 w-3.5" /> {counts.boys} boys, {counts.girls} girls · max {e.max_size}
+            <Users className="h-3.5 w-3.5" /> {pride
+              ? `${counts.total} joined · max ${e.max_size}`
+              : `${counts.boys} boys, ${counts.girls} girls · max ${e.max_size}`}
           </div>
           <div
             className="rounded-full text-[13px] font-semibold px-4 py-1.5 text-white shadow-sm"
