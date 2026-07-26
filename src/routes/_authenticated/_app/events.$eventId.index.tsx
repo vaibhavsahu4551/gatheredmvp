@@ -79,9 +79,18 @@ function EventDetail() {
 
   if (!event) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
   const isHost = event.host_id === me;
-  const counts = countByGender(parts);
   const approved = parts.filter((p) => p.status === "approved");
   const pending = parts.filter((p) => p.status === "pending");
+  const counts = approved.reduce(
+    (acc, p) => {
+      const g = (profiles[p.user_id]?.gender ?? p.gender ?? "").toLowerCase();
+      if (g === "man" || g === "male" || g === "boy") acc.boys++;
+      else if (g === "woman" || g === "female" || g === "girl") acc.girls++;
+      else acc.other++;
+      return acc;
+    },
+    { boys: 0, girls: 0, other: 0 },
+  );
 
   const sendComment = async () => {
     const body = commentText.trim();
