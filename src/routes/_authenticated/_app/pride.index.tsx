@@ -86,11 +86,16 @@ function PrideScreen() {
   return (
     <div>
       <header className="px-5 pt-8 pb-4">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-rose-400 via-fuchsia-500 to-indigo-500 flex items-center justify-center shadow-glow">
-            <Sparkles className="h-4 w-4 text-white" />
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-rose-400 via-fuchsia-500 to-indigo-500 flex items-center justify-center shadow-glow">
+              <Sparkles className="h-4 w-4 text-white" />
+            </div>
+            <h1 className="text-2xl font-semibold tracking-tight">Pride</h1>
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight">Pride</h1>
+          <Link to="/pride/notifications" className="h-9 w-9 rounded-full bg-muted flex items-center justify-center" aria-label="Pride notifications">
+            <Bell className="h-4 w-4" />
+          </Link>
         </div>
         <p className="mt-2 text-sm text-muted-foreground">
           A private space for LGBTQ+ members. Your real profile is never shown here — only your Pride identity.
