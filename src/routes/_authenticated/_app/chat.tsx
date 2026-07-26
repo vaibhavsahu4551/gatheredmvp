@@ -5,6 +5,7 @@ import { listMyGroups } from "@/lib/chat";
 import { getProfilesLite } from "@/lib/events";
 import { Avatar } from "@/components/Avatar";
 import { MessageCircle, Users } from "lucide-react";
+import { useDmUnread } from "@/hooks/useDmUnread";
 
 export const Route = createFileRoute("/_authenticated/_app/chat")({
   component: Chat,
