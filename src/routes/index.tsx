@@ -22,7 +22,10 @@ function Landing() {
       <div aria-hidden className="absolute inset-x-0 top-[60vh] h-40 -z-10 bg-gradient-to-b from-transparent to-background" />
 
       <header className="px-6 pt-8 flex items-center justify-between">
-        <div className="text-lg font-black tracking-tight text-white">[Gathr]</div>
+        <div className="flex items-center gap-2">
+          <img src="/icon-192.png" alt="Gathr" className="h-8 w-8 rounded-lg shadow-card" />
+          <span className="text-lg font-black tracking-tight text-white">Gathr</span>
+        </div>
         <Link to="/auth" className="text-sm font-semibold text-white/90 hover:text-white">
           Sign in
         </Link>
