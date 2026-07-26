@@ -4,7 +4,7 @@ import { Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { unreadCount } from "@/lib/notifications";
 import { loadMe } from "@/lib/huddl";
-import { CATEGORIES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipantsForEvents } from "@/lib/events";
+import { EVENT_TYPES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipantsForEvents } from "@/lib/events";
 import { listFeed, getLikes, toggleLike, signedFeedUrl, getEventsLite } from "@/lib/feed";
 import { loadBlockedIds } from "@/lib/safety";
 import { EventCard } from "@/components/EventCard";
@@ -189,7 +189,7 @@ function HomeFeed() {
   }, []);
 
   const filteredEvents = useMemo(() => events.filter((e) => {
-    if (cat !== "All" && e.category !== cat) return false;
+    if (cat !== "All" && e.event_type !== cat) return false;
     if (girlsOnly && !(e.min_girls && e.min_girls > 0)) return false;
     if (q && !e.title.toLowerCase().includes(q.toLowerCase())) return false;
     return true;
@@ -239,7 +239,7 @@ function HomeFeed() {
           className="w-full rounded-full border border-border bg-muted/40 px-4 py-2 text-sm" />
       </div>
       <div className="px-5 mt-3 flex gap-2 overflow-x-auto pb-2">
-        {["All", ...CATEGORIES].map((t) => (
+        {["All", ...EVENT_TYPES].map((t) => (
           <button key={t} onClick={() => setCat(t)}
             className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border ${cat === t ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}>{t}</button>
         ))}
