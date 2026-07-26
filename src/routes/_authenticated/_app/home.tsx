@@ -239,7 +239,7 @@ function HomeFeed() {
           className="w-full rounded-full border border-border bg-muted/40 px-4 py-2 text-sm" />
       </div>
       <div className="px-5 mt-3 flex gap-2 overflow-x-auto pb-2">
-        {["All", ...CATEGORIES].map((t) => (
+        {["All", ...EVENT_TYPES].map((t) => (
           <button key={t} onClick={() => setCat(t)}
             className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border ${cat === t ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}>{t}</button>
         ))}
