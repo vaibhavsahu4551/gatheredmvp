@@ -1,11 +1,12 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { EVENT_TYPES, looksResidential, type EventType } from "@/lib/events";
 import { loadMe } from "@/lib/huddl";
+import { loadMyPrideProfile, isPrideSuspended } from "@/lib/pride";
 import { createPost, listMyEvents } from "@/lib/feed";
 import { toast } from "sonner";
-import { AlertTriangle, ImagePlus } from "lucide-react";
+import { AlertTriangle, ImagePlus, ShieldAlert, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/_app/create")({
   component: CreateScreen,
@@ -53,13 +54,22 @@ function Create() {
   const [prideOptIn, setPrideOptIn] = useState(false);
   const [isPride, setIsPride] = useState(false);
 
+  const [hasPrideIdentity, setHasPrideIdentity] = useState(false);
+  const [prideSuspended, setPrideSuspendedState] = useState(false);
+
   useEffect(() => {
-    loadMe().then((me) => {
+    loadMe().then(async (me) => {
       if (!me) return;
       setUserId(me.user.id);
       setDefaultCity(me.profile?.city ?? "");
       setCity(me.profile?.city ?? "");
-      setPrideOptIn(!!me.profile?.pride_opt_in);
+      const opted = !!me.profile?.pride_opt_in;
+      setPrideOptIn(opted);
+      if (opted) {
+        const [ident, suspended] = await Promise.all([loadMyPrideProfile(), isPrideSuspended()]);
+        setHasPrideIdentity(!!ident);
+        setPrideSuspendedState(suspended);
+      }
     });
   }, []);
 
