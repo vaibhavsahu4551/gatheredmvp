@@ -87,9 +87,17 @@ function BottomNav({ pride }: { pride: boolean }) {
             );
           }
 
+          const showBadge = it.to === "/chat" && totalUnread > 0;
           return (
             <Link key={it.to} to={it.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold ${active ? "text-gradient-brand" : "text-muted-foreground"}`}>
-              <Icon className={`h-5 w-5 ${active ? "" : "opacity-70"}`} />
+              <div className="relative">
+                <Icon className={`h-5 w-5 ${active ? "" : "opacity-70"}`} />
+                {showBadge && (
+                  <span className="absolute -top-1 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+                    {totalUnread > 9 ? "9+" : totalUnread}
+                  </span>
+                )}
+              </div>
               {it.label}
             </Link>
           );
