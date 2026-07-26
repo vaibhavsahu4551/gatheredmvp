@@ -156,6 +156,8 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          last_read_a: string | null
+          last_read_b: string | null
           updated_at: string
           user_a: string
           user_b: string
@@ -163,6 +165,8 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          last_read_a?: string | null
+          last_read_b?: string | null
           updated_at?: string
           user_a: string
           user_b: string
@@ -170,6 +174,8 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          last_read_a?: string | null
+          last_read_b?: string | null
           updated_at?: string
           user_a?: string
           user_b?: string
@@ -746,6 +752,16 @@ export type Database = {
     }
     Functions: {
       are_huddled: { Args: { _a: string; _b: string }; Returns: boolean }
+      get_dm_unread: {
+        Args: never
+        Returns: {
+          last_body: string
+          last_created_at: string
+          last_sender: string
+          thread_id: string
+          unread: number
+        }[]
+      }
       get_pride_identities: {
         Args: { _pride_ids: string[] }
         Returns: {
@@ -781,6 +797,7 @@ export type Database = {
         Returns: boolean
       }
       is_verified: { Args: { _user: string }; Returns: boolean }
+      mark_dm_read: { Args: { _thread: string }; Returns: undefined }
       pride_suspended: { Args: { _user: string }; Returns: boolean }
     }
     Enums: {
