@@ -4,7 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { signedPhotoUrl, ageFromDob, type ProfileRow } from "@/lib/huddl";
 import { huddleStatusWith, sendHuddleRequest, respondHuddleRequest, cancelHuddleRequest, listConnections, type HuddleStatus } from "@/lib/huddle-connect";
 import { getOrCreateThread } from "@/lib/dm";
-import { getProfilesLite } from "@/lib/events";
+import { countByGender, getParticipants, getProfilesLite, listHostedEvents, listJoinedEvents, type EventRow } from "@/lib/events";
+import { getEventsLite, getLikes, listUserPosts, signedFeedUrl, toggleLike } from "@/lib/feed";
+import { EventCard, type EventCounts } from "@/components/EventCard";
+import { PostCard, type PostItem } from "@/components/PostCard";
 import { Avatar } from "@/components/Avatar";
 import { toast } from "sonner";
 import { ArrowLeft, MapPin, UserPlus, Check, X, MessageCircle, Clock } from "lucide-react";
@@ -24,6 +27,7 @@ function UserProfile() {
   const [connIds, setConnIds] = useState<string[]>([]);
   const [connNames, setConnNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [busy, setBusy] = useState(false);
+  const [tab, setTab] = useState<"posts" | "hosting" | "joined">("posts");
 
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -178,7 +182,127 @@ function UserProfile() {
             </div>
           )}
         </div>
+
+        <div className="mt-6 border-b border-border">
+          <div className="flex gap-6 text-sm">
+            {([["posts","Posts"],["hosting","Hosted"],["joined","Joined"]] as const).map(([k,label]) => (
+              <button key={k} onClick={() => setTab(k)}
+                className={`pb-3 -mb-px border-b-2 font-medium transition ${tab === k ? "border-foreground text-foreground" : "border-transparent text-muted-foreground"}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="py-5">
+          {tab === "posts" && <UserPosts userId={userId} name={profile.full_name} />}
+          {tab === "hosting" && <UserEvents kind="hosting" userId={userId} />}
+          {tab === "joined" && <UserEvents kind="joined" userId={userId} />}
+        </div>
       </div>
+    </div>
+  );
+}
+
+function UserPosts({ userId, name }: { userId: string; name: string | null }) {
+  const [posts, setPosts] = useState<PostItem[]>([]);
+  const [imgs, setImgs] = useState<Record<string, string>>({});
+  const [likes, setLikes] = useState<{ counts: Record<string, number>; mine: Set<string> }>({ counts: {}, mine: new Set() });
+  const [linked, setLinked] = useState<Record<string, { id: string; title: string; event_type: string | null }>>({});
+  const [avatarPhoto, setAvatarPhoto] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  const refresh = async () => {
+    setLoading(true);
+    try {
+      const raw = await listUserPosts(userId);
+      const items: PostItem[] = (raw as any[]).map((p) => ({
+        kind: "post", id: p.id, created_at: p.created_at, user_id: p.user_id,
+        caption: p.caption, photo_url: p.photo_url, event_id: p.event_id ?? null,
+      }));
+      setPosts(items);
+      const [l, prof, ev] = await Promise.all([
+        getLikes(items.map((p) => p.id)),
+        getProfilesLite([userId]),
+        getEventsLite(items.map((p) => p.event_id ?? "")),
+      ]);
+      setLikes(l); setLinked(ev);
+      setAvatarPhoto(prof[userId]?.photo ?? null);
+      const im: Record<string, string> = {};
+      for (const p of items) if (p.photo_url) im[p.id] = await signedFeedUrl(p.photo_url);
+      setImgs(im);
+    } finally { setLoading(false); }
+  };
+  useEffect(() => { refresh(); }, [userId]);
+
+  if (loading) return <div className="text-sm text-muted-foreground text-center py-8">Loading…</div>;
+  if (posts.length === 0) return <div className="text-sm text-muted-foreground text-center py-8">No posts yet.</div>;
+
+  const openPost = openId ? posts.find((p) => p.id === openId) : null;
+  return (
+    <>
+      <div className="grid grid-cols-3 gap-1">
+        {posts.map((p) => (
+          <button key={p.id} onClick={() => setOpenId(p.id)}
+            className="relative aspect-square overflow-hidden bg-muted focus:outline-none">
+            {p.photo_url && imgs[p.id] ? (
+              <img src={imgs[p.id]} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center p-3 bg-background ring-1 ring-inset ring-border">
+                <div className="text-[12px] leading-snug text-foreground line-clamp-6 text-left whitespace-pre-wrap font-medium">
+                  {p.caption ?? ""}
+                </div>
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
+      {openPost && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setOpenId(null)}>
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl bg-background" onClick={(e) => e.stopPropagation()}>
+            <PostCard
+              p={openPost}
+              img={imgs[openPost.id]}
+              name={name ?? "Member"}
+              avatarPhoto={avatarPhoto}
+              linked={openPost.event_id ? linked[openPost.event_id] : undefined}
+              liked={likes.mine.has(openPost.id)}
+              likeCount={likes.counts[openPost.id] ?? 0}
+              onLike={async () => { await toggleLike(openPost.id); await refresh(); }}
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function UserEvents({ kind, userId }: { kind: "hosting" | "joined"; userId: string }) {
+  const [events, setEvents] = useState<EventRow[]>([]);
+  const [counts, setCounts] = useState<Record<string, EventCounts>>({});
+  const [hosts, setHosts] = useState<Record<string, { full_name: string | null }>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    (async () => {
+      const ev = kind === "hosting" ? await listHostedEvents(userId) : await listJoinedEvents(userId);
+      setEvents(ev);
+      const cts: Record<string, EventCounts> = {};
+      for (const e of ev) cts[e.id] = countByGender(await getParticipants(e.id));
+      setCounts(cts);
+      setHosts(await getProfilesLite(ev.map((e) => e.host_id)));
+      setLoading(false);
+    })().catch(() => setLoading(false));
+  }, [kind, userId]);
+
+  if (loading) return <div className="text-sm text-muted-foreground text-center py-8">Loading…</div>;
+  if (events.length === 0) return <div className="text-sm text-muted-foreground text-center py-8">{kind === "hosting" ? "No hosted events yet." : "No joined events yet."}</div>;
+  return (
+    <div className="space-y-3">
+      {events.map((e) => (
+        <EventCard key={e.id} e={e} c={counts[e.id]} host={hosts[e.host_id]} />
+      ))}
     </div>
   );
 }
