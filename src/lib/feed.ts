@@ -60,7 +60,7 @@ export async function deletePost(id: string) {
 export async function listMyEvents() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
-  const { data } = await supabase.from("events").select("id, title, starts_at").eq("host_id", user.id).order("starts_at", { ascending: false }).limit(30);
+  const { data } = await supabase.from("events").select("id, title, starts_at").eq("host_id", user.id).or("is_pride.is.null,is_pride.eq.false").order("starts_at", { ascending: false }).limit(30);
   return data ?? [];
 }
 
