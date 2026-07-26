@@ -31,6 +31,25 @@ export async function listMyThreads() {
   }));
 }
 
+export async function getDmUnread(): Promise<Record<string, { unread: number; last_body: string | null; last_sender: string | null; last_created_at: string | null }>> {
+  const { data, error } = await sb.rpc("get_dm_unread");
+  if (error) return {};
+  const out: Record<string, any> = {};
+  for (const r of data ?? []) {
+    out[r.thread_id] = {
+      unread: r.unread ?? 0,
+      last_body: r.last_body,
+      last_sender: r.last_sender,
+      last_created_at: r.last_created_at,
+    };
+  }
+  return out;
+}
+
+export async function markDmRead(threadId: string) {
+  await sb.rpc("mark_dm_read", { _thread: threadId });
+}
+
 export async function listDm(threadId: string) {
   const { data, error } = await sb.from("dm_messages")
     .select("*").eq("thread_id", threadId).order("created_at", { ascending: true }).limit(500);
