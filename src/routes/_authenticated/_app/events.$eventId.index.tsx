@@ -10,7 +10,7 @@ import { SafetyMenu } from "@/components/SafetyMenu";
 import { Avatar } from "@/components/Avatar";
 
 
-export const Route = createFileRoute("/_authenticated/_app/events/$eventId")({
+export const Route = createFileRoute("/_authenticated/_app/events/$eventId/")({
   component: EventDetail,
 });
 
@@ -193,7 +193,7 @@ function EventDetail() {
             </div>
           )}
           <Row icon={<Users className="h-4 w-4" />}>{counts.boys} boys, {counts.girls} girls joined / max {event.max_size}</Row>
-          {(event.entry_fee ?? 0) > 0 && <Row icon={<span className="text-sm">₹</span>}>{event.entry_fee}</Row>}
+          
         </div>
 
 
