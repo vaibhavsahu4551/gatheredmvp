@@ -165,3 +165,13 @@ function UserModal({ user, onClose, onChanged }: { user: any; onClose: () => voi
     </div>
   );
 }
+
+function StatCard({ label, value, hint }: { label: string; value: number; hint?: string }) {
+  return (
+    <div className="rounded-xl border border-border p-4 bg-background">
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="text-2xl font-semibold mt-1 tabular-nums">{value}</div>
+      {hint && <div className="text-[10px] text-muted-foreground mt-1">{hint}</div>}
+    </div>
+  );
+}
