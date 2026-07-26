@@ -120,8 +120,9 @@ export async function setParticipantStatus(id: string, status: "approved" | "rej
 }
 
 export async function updateEvent(id: string, patch: Partial<EventRow>) {
-  const { error } = await supabase.from("events").update(patch as any).eq("id", id);
+  const { data, error } = await supabase.from("events").update(patch as any).eq("id", id).select("id");
   if (error) throw error;
+  if (!data || data.length === 0) throw new Error("Update blocked — you may not be the host of this event.");
 }
 
 export async function deleteEvent(id: string) {
