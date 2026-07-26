@@ -2,14 +2,18 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Sparkles, ShieldAlert, Plus } from "lucide-react";
 import { loadMe } from "@/lib/huddl";
+import { supabase } from "@/integrations/supabase/client";
 import {
   listPrideEvents,
+  listHostedEvents,
+  listJoinedEvents,
   getParticipantsForEvents,
   countByGender,
   type EventRow,
 } from "@/lib/events";
 import { getPrideIdentities, loadMyPrideProfile, type PrideIdentity } from "@/lib/pride";
 import { EventCard } from "@/components/EventCard";
+
 
 export const Route = createFileRoute("/_authenticated/_app/pride/")({
   component: PrideScreen,
