@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { eventTypeStyle } from "@/lib/event-style";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { countByGender, deleteEvent, getEvent, getParticipants, getProfilesLite, leaveEvent, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
+import { getPrideIdentities, signedPridePhotoUrl, type PrideIdentity } from "@/lib/pride";
 import { toast } from "sonner";
-import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2, Sparkles } from "lucide-react";
 import { SafetyMenu } from "@/components/SafetyMenu";
 import { Avatar } from "@/components/Avatar";
 
@@ -21,12 +22,16 @@ function EventDetail() {
   const [event, setEvent] = useState<EventRow | null>(null);
   const [parts, setParts] = useState<ParticipantRow[]>([]);
   const [profiles, setProfiles] = useState<Record<string, { full_name: string | null; gender: string | null; photo: string | null }>>({});
+  const [prideIdentities, setPrideIdentities] = useState<Record<string, PrideIdentity>>({});
+  const [pridePhotoUrls, setPridePhotoUrls] = useState<Record<string, string>>({});
   const [my, setMy] = useState<ParticipantRow | null>(null);
   const [groupId, setGroupId] = useState<string | null>(null);
   const [comments, setComments] = useState<EventComment[]>([]);
   const [commentText, setCommentText] = useState("");
   const [sending, setSending] = useState(false);
   const commentsEndRef = useRef<HTMLDivElement>(null);
+
+  const isPride = !!(event as any)?.is_pride;
 
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -36,8 +41,22 @@ function EventDetail() {
     setEvent(ev);
     const ps = await getParticipants(eventId);
     setParts(ps);
-    const ids = Array.from(new Set([...(ev ? [ev.host_id] : []), ...ps.map((p) => p.user_id)]));
-    setProfiles(await getProfilesLite(ids));
+    if ((ev as any)?.is_pride) {
+      // In Pride, DO NOT hydrate real profiles for host/attendees.
+      const prideIds = [
+        (ev as any)?.pride_actor_id,
+        ...ps.map((p) => (p as any).pride_actor_id),
+      ].filter(Boolean) as string[];
+      const idents = await getPrideIdentities(prideIds);
+      setPrideIdentities((s) => ({ ...s, ...idents }));
+      // Prefetch signed URLs for pride photos.
+      const paths = Array.from(new Set(Object.values(idents).map((i) => i.photo_path).filter(Boolean) as string[]));
+      const entries = await Promise.all(paths.map(async (p) => [p, await signedPridePhotoUrl(p)] as const));
+      setPridePhotoUrls((s) => ({ ...s, ...Object.fromEntries(entries) }));
+    } else {
+      const ids = Array.from(new Set([...(ev ? [ev.host_id] : []), ...ps.map((p) => p.user_id)]));
+      setProfiles(await getProfilesLite(ids));
+    }
     setMy((await myParticipation(eventId, user.id)) as ParticipantRow | null);
     const { data: g } = await supabase.from("chat_groups").select("id").eq("event_id", eventId).maybeSingle();
     setGroupId(g?.id ?? null);
@@ -61,10 +80,18 @@ function EventDetail() {
         const list = await listEventComments(eventId);
         if (cancelled) return;
         setComments(list);
-        const ids = Array.from(new Set(list.map((c) => c.user_id)));
-        if (ids.length) {
-          const p = await getProfilesLite(ids);
-          setProfiles((prev) => ({ ...prev, ...p }));
+        if (isPride) {
+          const prideIds = Array.from(new Set(list.map((c) => c.pride_actor_id).filter(Boolean) as string[]));
+          if (prideIds.length) {
+            const idents = await getPrideIdentities(prideIds);
+            setPrideIdentities((s) => ({ ...s, ...idents }));
+          }
+        } else {
+          const ids = Array.from(new Set(list.map((c) => c.user_id)));
+          if (ids.length) {
+            const p = await getProfilesLite(ids);
+            setProfiles((prev) => ({ ...prev, ...p }));
+          }
         }
       } catch (e) { /* RLS may reject briefly during transitions */ }
     })();
@@ -73,16 +100,26 @@ function EventDetail() {
         async (payload) => {
           const c = payload.new as EventComment;
           setComments((prev) => prev.some((x) => x.id === c.id) ? prev : [...prev, c]);
-          setProfiles((prev) => {
-            if (prev[c.user_id]) return prev;
-            getProfilesLite([c.user_id]).then((p) => setProfiles((s) => ({ ...s, ...p })));
-            return prev;
-          });
+          if (isPride && c.pride_actor_id) {
+            const idents = await getPrideIdentities([c.pride_actor_id]);
+            setPrideIdentities((s) => ({ ...s, ...idents }));
+          } else if (!isPride) {
+            setProfiles((prev) => {
+              if (prev[c.user_id]) return prev;
+              getProfilesLite([c.user_id]).then((p) => setProfiles((s) => ({ ...s, ...p })));
+              return prev;
+            });
+          }
         }).subscribe();
     return () => { cancelled = true; supabase.removeChannel(channel); };
-  }, [eventId, canDiscuss]);
+  }, [eventId, canDiscuss, isPride]);
 
   useEffect(() => { commentsEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [comments.length]);
+
+  const prideHostIdentity = useMemo(() => {
+    const pid = (event as any)?.pride_actor_id as string | undefined;
+    return pid ? prideIdentities[pid] : undefined;
+  }, [event, prideIdentities]);
 
   if (!event) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
   const isHost = event.host_id === me;
@@ -120,10 +157,25 @@ function EventDetail() {
     await setParticipantStatus(id, s); await load();
   };
 
+  const attendeeDisplay = (p: ParticipantRow) => {
+    if (isPride) {
+      const pid = (p as any).pride_actor_id as string | undefined;
+      const ident = pid ? prideIdentities[pid] : undefined;
+      const photoUrl = ident?.photo_path ? pridePhotoUrls[ident.photo_path] : "";
+      return { name: ident?.display_name ?? "Pride member", photoUrl, gender: null as string | null };
+    }
+    return {
+      name: profiles[p.user_id]?.full_name ?? "Someone",
+      photoUrl: "",
+      photoPath: profiles[p.user_id]?.photo ?? null,
+      gender: profiles[p.user_id]?.gender ?? "—",
+    };
+  };
+
   return (
     <div className="pb-24">
       <div className="px-5 pt-6 flex items-center justify-between">
-        <button onClick={() => navigate({ to: "/home" })} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
+        <button onClick={() => navigate({ to: isPride ? "/pride" : "/home" })} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
           <ArrowLeft className="h-4 w-4" />
         </button>
         <div className="flex items-center gap-2">
@@ -149,7 +201,7 @@ function EventDetail() {
                   try {
                     await deleteEvent(event.id);
                     toast.success("Event deleted");
-                    navigate({ to: "/events" });
+                    navigate({ to: isPride ? "/pride" : "/events" });
                   } catch (e: any) {
                     toast.error(e?.message ?? "Could not delete event");
                   }
@@ -162,34 +214,42 @@ function EventDetail() {
             </>
           )}
           {!isHost && (
-            <SafetyMenu targetType="event" targetId={event.id} userId={event.host_id} />
+            // In Pride, never expose the real host id via the report menu.
+            <SafetyMenu targetType="event" targetId={event.id} userId={isPride ? undefined : event.host_id} />
           )}
         </div>
       </div>
 
-
-
       <div className="px-5 pt-4">
         <div className="flex items-center gap-2 flex-wrap">
+          {isPride && (
+            <span className="rounded-full bg-gradient-to-r from-rose-500 via-fuchsia-500 to-indigo-500 text-white text-[10px] font-bold px-2.5 py-0.5 uppercase tracking-wide flex items-center gap-1">
+              <Sparkles className="h-3 w-3" /> Pride
+            </span>
+          )}
           {event.event_type && (
             <span
               className="rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm"
               style={{ backgroundImage: eventTypeStyle(event.event_type).gradient }}
             >{event.event_type}</span>
-
           )}
-          
         </div>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">{event.title}</h1>
         <div className="mt-1 text-sm text-muted-foreground">
           Hosted by{" "}
-          <Link
-            to="/u/$userId"
-            params={{ userId: event.host_id }}
-            className="font-medium text-foreground hover:underline"
-          >
-            {profiles[event.host_id]?.full_name ?? "Host"}
-          </Link>
+          {isPride ? (
+            <span className="font-medium text-foreground">
+              {prideHostIdentity?.display_name ?? "Pride member"}
+            </span>
+          ) : (
+            <Link
+              to="/u/$userId"
+              params={{ userId: event.host_id }}
+              className="font-medium text-foreground hover:underline"
+            >
+              {profiles[event.host_id]?.full_name ?? "Host"}
+            </Link>
+          )}
         </div>
 
 
@@ -208,8 +268,9 @@ function EventDetail() {
               <div className="mt-0.5">{(event as any).exact_location}</div>
             </div>
           )}
-          <Row icon={<Users className="h-4 w-4" />}>{counts.boys} boys, {counts.girls} girls joined / max {event.max_size}</Row>
-          
+          <Row icon={<Users className="h-4 w-4" />}>
+            {isPride ? `${approved.length} joined` : `${counts.boys} boys, ${counts.girls} girls joined`} / max {event.max_size}
+          </Row>
         </div>
 
 
@@ -267,12 +328,30 @@ function EventDetail() {
         <div className="mt-6">
           <h3 className="text-sm font-semibold">Going ({approved.length})</h3>
           <div className="mt-2 space-y-1.5">
-            {approved.map((p) => (
-              <Link key={p.id} to="/u/$userId" params={{ userId: p.user_id }} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-                <Avatar photo={profiles[p.user_id]?.photo} name={profiles[p.user_id]?.full_name} size={28} />
-                <span>{profiles[p.user_id]?.full_name ?? "Someone"} · {profiles[p.user_id]?.gender ?? "—"}</span>
-              </Link>
-            ))}
+            {approved.map((p) => {
+              const d = attendeeDisplay(p);
+              const inner = (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  {isPride ? (
+                    <div className="h-7 w-7 rounded-full overflow-hidden bg-gradient-to-br from-rose-400 via-fuchsia-500 to-indigo-500 flex items-center justify-center text-white text-[11px] font-semibold shrink-0">
+                      {d.photoUrl
+                        ? <img src={d.photoUrl} alt="" className="h-full w-full object-cover" />
+                        : (d.name?.[0] ?? "?").toUpperCase()}
+                    </div>
+                  ) : (
+                    <Avatar photo={(d as any).photoPath} name={d.name} size={28} />
+                  )}
+                  <span>{d.name}{!isPride && d.gender ? ` · ${d.gender}` : ""}</span>
+                </div>
+              );
+              return isPride ? (
+                <div key={p.id}>{inner}</div>
+              ) : (
+                <Link key={p.id} to="/u/$userId" params={{ userId: p.user_id }} className="block hover:text-foreground">
+                  {inner}
+                </Link>
+              );
+            })}
             {approved.length === 0 && <div className="text-sm text-muted-foreground">No one yet.</div>}
           </div>
         </div>
@@ -281,18 +360,26 @@ function EventDetail() {
           <div className="mt-6">
             <h3 className="text-sm font-semibold">Requests ({pending.length})</h3>
             <div className="mt-2 space-y-2">
-              {pending.map((p) => (
-                <div key={p.id} className="flex items-center justify-between rounded-2xl border border-border p-3">
-                  <Link to="/u/$userId" params={{ userId: p.user_id }} className="text-sm min-w-0 flex-1">
-                    <div className="font-medium truncate">{profiles[p.user_id]?.full_name ?? "Someone"}</div>
-                    <div className="text-xs text-muted-foreground">{profiles[p.user_id]?.gender ?? "—"}</div>
-                  </Link>
-                  <div className="flex gap-2">
-                    <button onClick={() => decide(p.id, "rejected")} className="rounded-full border border-border px-3 py-1.5 text-xs">Reject</button>
-                    <button onClick={() => decide(p.id, "approved")} className="rounded-full bg-primary text-primary-foreground px-3 py-1.5 text-xs">Approve</button>
+              {pending.map((p) => {
+                const d = attendeeDisplay(p);
+                const body = (
+                  <div className="text-sm min-w-0 flex-1">
+                    <div className="font-medium truncate">{d.name}</div>
+                    {!isPride && <div className="text-xs text-muted-foreground">{d.gender ?? "—"}</div>}
                   </div>
-                </div>
-              ))}
+                );
+                return (
+                  <div key={p.id} className="flex items-center justify-between rounded-2xl border border-border p-3">
+                    {isPride ? body : (
+                      <Link to="/u/$userId" params={{ userId: p.user_id }} className="flex-1 min-w-0">{body}</Link>
+                    )}
+                    <div className="flex gap-2">
+                      <button onClick={() => decide(p.id, "rejected")} className="rounded-full border border-border px-3 py-1.5 text-xs">Reject</button>
+                      <button onClick={() => decide(p.id, "approved")} className="rounded-full bg-primary text-primary-foreground px-3 py-1.5 text-xs">Approve</button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -312,18 +399,31 @@ function EventDetail() {
                   <div className="text-xs text-muted-foreground text-center py-4">No messages yet. Say hi 👋</div>
                 )}
                 {comments.map((c) => {
-                  const name = profiles[c.user_id]?.full_name ?? "Someone";
-                  const initial = (name?.[0] ?? "?").toUpperCase();
                   const mine = c.user_id === me;
+                  let name = "Someone";
+                  if (isPride) {
+                    const pid = c.pride_actor_id;
+                    name = (pid && prideIdentities[pid]?.display_name) || "Pride member";
+                  } else {
+                    name = profiles[c.user_id]?.full_name ?? "Someone";
+                  }
+                  const initial = (name?.[0] ?? "?").toUpperCase();
+                  const avatar = (
+                    <div className={`h-8 w-8 shrink-0 rounded-full flex items-center justify-center text-[11px] font-semibold ${isPride ? "bg-gradient-to-br from-rose-400 via-fuchsia-500 to-indigo-500 text-white" : "bg-muted text-foreground/70"}`}>
+                      {initial}
+                    </div>
+                  );
                   return (
                     <div key={c.id} className="flex items-start gap-2">
-                      <Link to="/u/$userId" params={{ userId: c.user_id }} className="h-8 w-8 shrink-0 rounded-full bg-muted flex items-center justify-center text-[11px] font-semibold text-foreground/70">
-                        {initial}
-                      </Link>
+                      {isPride ? avatar : (
+                        <Link to="/u/$userId" params={{ userId: c.user_id }}>{avatar}</Link>
+                      )}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-baseline gap-1.5">
                           {mine ? (
                             <span className="text-[13px] font-medium truncate">You</span>
+                          ) : isPride ? (
+                            <span className="text-[13px] font-medium truncate">{name}</span>
                           ) : (
                             <Link to="/u/$userId" params={{ userId: c.user_id }} className="text-[13px] font-medium truncate hover:underline">{name}</Link>
                           )}
