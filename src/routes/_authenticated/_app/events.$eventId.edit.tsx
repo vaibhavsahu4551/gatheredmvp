@@ -124,11 +124,6 @@ function EditEvent() {
         <Field label="Description">
           <textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={3} className={inputCls + " resize-none"} />
         </Field>
-        <Field label="Category">
-          <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className={inputCls}>
-            {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-          </select>
-        </Field>
         <Field label="Date & time">
           <input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} className={inputCls} />
         </Field>
