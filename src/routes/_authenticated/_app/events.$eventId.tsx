@@ -118,14 +118,15 @@ function EventDetail() {
           )}
           {isHost && (
             <>
-              <Link
-                to="/events/$eventId/edit"
-                params={{ eventId: event.id }}
+              <button
+                type="button"
+                onClick={() => navigate({ to: "/events/$eventId/edit", params: { eventId: event.id } })}
                 className="h-9 w-9 rounded-full bg-muted flex items-center justify-center"
                 aria-label="Edit event"
               >
                 <Pencil className="h-4 w-4" />
-              </Link>
+              </button>
+
               <button
                 onClick={async () => {
                   if (!confirm("Delete this event? All requests, attendees, comments, and the group chat will be removed.")) return;
