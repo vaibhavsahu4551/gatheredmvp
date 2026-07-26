@@ -2,12 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  CATEGORIES,
   EVENT_TYPES,
   getEvent,
   looksResidential,
   updateEvent,
-  type Category,
   type EventType,
 } from "@/lib/events";
 import { toast } from "sonner";
@@ -31,7 +29,7 @@ function EditEvent() {
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
-  const [category, setCategory] = useState<Category>("Coffee");
+  
   const [eventType, setEventType] = useState<EventType | "">("");
   const [startsAt, setStartsAt] = useState("");
   const [address, setAddress] = useState("");
@@ -51,7 +49,7 @@ function EditEvent() {
       if (!user || ev.host_id !== user.id) { toast.error("Only the host can edit"); navigate({ to: "/events/$eventId", params: { eventId } }); return; }
       setTitle(ev.title);
       setDesc(ev.description ?? "");
-      setCategory(ev.category as Category);
+      
       setEventType((ev.event_type as EventType) ?? "");
       setStartsAt(toLocalInput(ev.starts_at));
       setAddress(ev.location_address);
@@ -81,7 +79,7 @@ function EditEvent() {
       await updateEvent(eventId, {
         title: title.trim(),
         description: desc.trim() || null,
-        category,
+        
         event_type: eventType,
         starts_at: new Date(startsAt).toISOString(),
         location_address: address.trim(),
@@ -125,11 +123,6 @@ function EditEvent() {
         <Field label="Title"><input value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls} /></Field>
         <Field label="Description">
           <textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={3} className={inputCls + " resize-none"} />
-        </Field>
-        <Field label="Category">
-          <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className={inputCls}>
-            {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-          </select>
         </Field>
         <Field label="Date & time">
           <input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} className={inputCls} />

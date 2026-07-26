@@ -178,7 +178,7 @@ function EventDetail() {
             >{event.event_type}</span>
 
           )}
-          <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">{event.category}</span>
+          
         </div>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">{event.title}</h1>
         <div className="mt-1 text-sm text-muted-foreground">

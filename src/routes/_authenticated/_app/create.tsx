@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { CATEGORIES, EVENT_TYPES, looksResidential, type Category, type EventType } from "@/lib/events";
+import { EVENT_TYPES, looksResidential, type EventType } from "@/lib/events";
 import { loadMe } from "@/lib/huddl";
 import { createPost, listMyEvents } from "@/lib/feed";
 import { toast } from "sonner";
@@ -37,7 +37,7 @@ function Create() {
   const [defaultCity, setDefaultCity] = useState("");
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
-  const [category, setCategory] = useState<Category>("Coffee");
+  
   const [eventType, setEventType] = useState<EventType | "">("");
   const [startsAt, setStartsAt] = useState("");
   const [address, setAddress] = useState("");
@@ -77,7 +77,7 @@ function Create() {
       host_id: userId,
       title: title.trim(),
       description: desc.trim() || null,
-      category,
+      
       event_type: eventType,
       starts_at: new Date(startsAt).toISOString(),
       location_address: address.trim(),
@@ -125,11 +125,8 @@ function Create() {
           <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls} placeholder="Sunday coffee run" />
         </Field>
 
-        <Field label="Category">
-          <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className={inputCls}>
-            {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-          </select>
-        </Field>
+
+
 
         <Field label="Date & time">
           <input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} className={inputCls} />
