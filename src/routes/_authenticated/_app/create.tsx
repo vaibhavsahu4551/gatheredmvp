@@ -50,6 +50,8 @@ function Create() {
   const [minGirls, setMinGirls] = useState("");
   const [minBoys, setMinBoys] = useState("");
   const [saving, setSaving] = useState(false);
+  const [prideOptIn, setPrideOptIn] = useState(false);
+  const [isPride, setIsPride] = useState(false);
 
   useEffect(() => {
     loadMe().then((me) => {
