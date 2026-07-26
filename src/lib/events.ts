@@ -59,12 +59,13 @@ export async function listJoinedEvents(userId: string, opts?: { pride?: boolean 
   const pride = opts?.pride ?? false;
   const { data, error } = await supabase
     .from("event_participants")
-    .select("event_id, status, events(*)")
-    .eq("user_id", userId);
+    .select("event_id, status, events!inner(*)")
+    .eq("user_id", userId)
+    .eq("events.is_pride", pride);
   if (error) throw error;
   return (data ?? [])
     .map((r: any) => r.events as EventRow)
-    .filter((e): e is EventRow => !!e && !!e.is_pride === pride)
+    .filter((e): e is EventRow => !!e)
     .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime());
 }
 
