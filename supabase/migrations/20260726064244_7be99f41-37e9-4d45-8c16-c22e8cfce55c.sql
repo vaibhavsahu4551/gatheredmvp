@@ -1,0 +1,1 @@
+CREATE POLICY "Anyone auth views approved participants" ON public.event_participants FOR SELECT TO authenticated USING (status = 'approved');
