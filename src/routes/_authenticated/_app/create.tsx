@@ -77,7 +77,7 @@ function Create() {
       host_id: userId,
       title: title.trim(),
       description: desc.trim() || null,
-      category,
+      
       event_type: eventType,
       starts_at: new Date(startsAt).toISOString(),
       location_address: address.trim(),
