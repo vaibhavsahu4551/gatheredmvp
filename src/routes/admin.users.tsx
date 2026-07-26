@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { adminListUsers, suspendUser } from "@/lib/admin";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/users")({
@@ -12,17 +13,40 @@ function AdminUsers() {
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<any | null>(null);
+  const [stats, setStats] = useState<{ total: number; new7: number; new30: number } | null>(null);
 
   async function refresh() {
     setLoading(true);
     setRows(await adminListUsers(q));
     setLoading(false);
   }
-  useEffect(() => { refresh(); /* eslint-disable-next-line */ }, []);
+
+  async function loadStats() {
+    // Counts derive strictly from profiles.created_at (account creation time).
+    // Repeat logins do NOT change created_at, so these numbers only move on a true first-time signup.
+    const now = Date.now();
+    const d7 = new Date(now - 7 * 86400000).toISOString();
+    const d30 = new Date(now - 30 * 86400000).toISOString();
+    const [total, new7, new30] = await Promise.all([
+      supabase.from("profiles").select("id", { count: "exact", head: true }),
+      supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", d7),
+      supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", d30),
+    ]);
+    setStats({ total: total.count ?? 0, new7: new7.count ?? 0, new30: new30.count ?? 0 });
+  }
+
+  useEffect(() => { refresh(); loadStats(); /* eslint-disable-next-line */ }, []);
 
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Users</h1>
+
+      <div className="grid grid-cols-3 gap-3">
+        <StatCard label="Total users" value={stats?.total ?? 0} hint="Distinct accounts" />
+        <StatCard label="New (7d)" value={stats?.new7 ?? 0} hint="Signups in last 7 days" />
+        <StatCard label="New (30d)" value={stats?.new30 ?? 0} hint="Signups in last 30 days" />
+      </div>
+
       <div className="flex gap-2">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name…"
           className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm" />
@@ -138,6 +162,16 @@ function UserModal({ user, onClose, onChanged }: { user: any; onClose: () => voi
           <button onClick={onClose} className="ml-auto rounded-lg border border-border px-3 py-2 text-sm">Close</button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value, hint }: { label: string; value: number; hint?: string }) {
+  return (
+    <div className="rounded-xl border border-border p-4 bg-background">
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="text-2xl font-semibold mt-1 tabular-nums">{value}</div>
+      {hint && <div className="text-[10px] text-muted-foreground mt-1">{hint}</div>}
     </div>
   );
 }
