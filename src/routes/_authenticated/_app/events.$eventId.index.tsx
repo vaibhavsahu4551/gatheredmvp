@@ -269,7 +269,9 @@ function EventDetail() {
             </div>
           )}
           <Row icon={<Users className="h-4 w-4" />}>
-            {isPride ? `${approved.length} joined` : `${counts.boys} boys, ${counts.girls} girls joined`} / max {event.max_size}
+            {isPride
+              ? `${parts.filter((p) => p.status === "approved" || p.status === "pending").length} joined / max ${event.max_size}`
+              : `${counts.boys} boys, ${counts.girls} girls joined / max ${event.max_size}`}
           </Row>
         </div>
 
