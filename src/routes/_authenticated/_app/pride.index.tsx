@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Sparkles, ShieldAlert, Plus } from "lucide-react";
+import { Sparkles, ShieldAlert, Plus, Bell } from "lucide-react";
 import { loadMe } from "@/lib/huddl";
 import { supabase } from "@/integrations/supabase/client";
 import {
