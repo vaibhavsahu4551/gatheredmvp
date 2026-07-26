@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          id: number
+          subscription_enabled: boolean
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          subscription_enabled?: boolean
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          subscription_enabled?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blocks: {
         Row: {
           blocked_id: string
@@ -312,6 +330,56 @@ export type Database = {
         }
         Relationships: []
       }
+      home_banners: {
+        Row: {
+          active: boolean
+          body: string | null
+          created_at: string
+          created_by: string | null
+          ends_at: string | null
+          event_id: string | null
+          id: string
+          image_url: string | null
+          starts_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          event_id?: string | null
+          id?: string
+          image_url?: string | null
+          starts_at?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          event_id?: string | null
+          id?: string
+          image_url?: string | null
+          starts_at?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "home_banners_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       huddle_requests: {
         Row: {
           created_at: string
@@ -544,6 +612,8 @@ export type Database = {
           photos: string[]
           pride_opt_in: boolean
           selfie_url: string | null
+          suspended_until: string | null
+          suspension_reason: string | null
           updated_at: string
         }
         Insert: {
@@ -561,6 +631,8 @@ export type Database = {
           photos?: string[]
           pride_opt_in?: boolean
           selfie_url?: string | null
+          suspended_until?: string | null
+          suspension_reason?: string | null
           updated_at?: string
         }
         Update: {
@@ -578,37 +650,72 @@ export type Database = {
           photos?: string[]
           pride_opt_in?: boolean
           selfie_url?: string | null
+          suspended_until?: string | null
+          suspension_reason?: string | null
           updated_at?: string
         }
         Relationships: []
       }
       reports: {
         Row: {
+          admin_notes: string | null
           created_at: string
           details: string | null
           id: string
           reason: string
           reporter_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
           target_id: string
           target_type: string
         }
         Insert: {
+          admin_notes?: string | null
           created_at?: string
           details?: string | null
           id?: string
           reason: string
           reporter_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
           target_id: string
           target_type: string
         }
         Update: {
+          admin_notes?: string | null
           created_at?: string
           details?: string | null
           id?: string
           reason?: string
           reporter_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
           target_id?: string
           target_type?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -649,6 +756,13 @@ export type Database = {
         }[]
       }
       has_pride_access: { Args: { _user: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_blocked: { Args: { _a: string; _b: string }; Returns: boolean }
       is_dm_member: {
         Args: { _thread: string; _user: string }
@@ -670,6 +784,7 @@ export type Database = {
       pride_suspended: { Args: { _user: string }; Returns: boolean }
     }
     Enums: {
+      app_role: "admin"
       event_category:
         | "Gaming"
         | "Coffee"
@@ -808,6 +923,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin"],
       event_category: [
         "Gaming",
         "Coffee",
