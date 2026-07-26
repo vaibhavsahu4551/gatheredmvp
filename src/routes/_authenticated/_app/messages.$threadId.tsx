@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { listDm, sendDm } from "@/lib/dm";
+import { listDm, sendDm, markDmRead } from "@/lib/dm";
 import { getProfilesLite } from "@/lib/events";
 import { Avatar } from "@/components/Avatar";
 import { ArrowLeft, Send, Link2 } from "lucide-react";
