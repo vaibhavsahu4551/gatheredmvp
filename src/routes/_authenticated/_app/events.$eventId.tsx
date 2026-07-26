@@ -166,8 +166,16 @@ function EventDetail() {
         </div>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">{event.title}</h1>
         <div className="mt-1 text-sm text-muted-foreground">
-          Hosted by {profiles[event.host_id]?.full_name ?? "Host"}
+          Hosted by{" "}
+          <Link
+            to="/u/$userId"
+            params={{ userId: event.host_id }}
+            className="font-medium text-foreground hover:underline"
+          >
+            {profiles[event.host_id]?.full_name ?? "Host"}
+          </Link>
         </div>
+
 
         <div className={`mt-3 rounded-2xl p-3 text-sm ${event.status === "confirmed" ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : event.status === "cancelled" ? "bg-red-50 text-red-800 border border-red-200" : "bg-amber-50 text-amber-800 border border-amber-200"}`}>
           {event.status === "confirmed" && "Confirmed — group chat unlocked."}
