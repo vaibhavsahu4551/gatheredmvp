@@ -1,0 +1,1 @@
+ALTER TABLE public.events ALTER COLUMN category DROP NOT NULL;

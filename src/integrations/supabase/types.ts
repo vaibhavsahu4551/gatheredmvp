@@ -228,7 +228,7 @@ export type Database = {
       events: {
         Row: {
           auto_cancel_hours: number
-          category: Database["public"]["Enums"]["event_category"]
+          category: Database["public"]["Enums"]["event_category"] | null
           city: string
           created_at: string
           description: string | null
@@ -251,7 +251,7 @@ export type Database = {
         }
         Insert: {
           auto_cancel_hours?: number
-          category: Database["public"]["Enums"]["event_category"]
+          category?: Database["public"]["Enums"]["event_category"] | null
           city: string
           created_at?: string
           description?: string | null
@@ -274,7 +274,7 @@ export type Database = {
         }
         Update: {
           auto_cancel_hours?: number
-          category?: Database["public"]["Enums"]["event_category"]
+          category?: Database["public"]["Enums"]["event_category"] | null
           city?: string
           created_at?: string
           description?: string | null
