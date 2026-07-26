@@ -74,7 +74,8 @@ function EditProfile() {
       bio: bio.trim() || null,
       interests: finalInterests,
       photos: photoPath ? [photoPath] : [],
-    }).eq("id", userId);
+      pride_opt_in: prideOptIn,
+    } as any).eq("id", userId);
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Profile updated");
