@@ -345,6 +345,7 @@ export type Database = {
           created_at: string
           data: Json | null
           id: string
+          is_pride: boolean
           kind: string
           read_at: string | null
           target_id: string | null
@@ -355,6 +356,7 @@ export type Database = {
           created_at?: string
           data?: Json | null
           id?: string
+          is_pride?: boolean
           kind: string
           read_at?: string | null
           target_id?: string | null
@@ -365,6 +367,7 @@ export type Database = {
           created_at?: string
           data?: Json | null
           id?: string
+          is_pride?: boolean
           kind?: string
           read_at?: string | null
           target_id?: string | null
