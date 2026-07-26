@@ -18,6 +18,7 @@ function Chat() {
   const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [groups, setGroups] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { map: unread } = useDmUnread();
 
   useEffect(() => {
     (async () => {
