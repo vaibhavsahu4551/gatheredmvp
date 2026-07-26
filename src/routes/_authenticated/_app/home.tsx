@@ -189,7 +189,7 @@ function HomeFeed() {
   }, []);
 
   const filteredEvents = useMemo(() => events.filter((e) => {
-    if (cat !== "All" && e.category !== cat) return false;
+    if (cat !== "All" && e.event_type !== cat) return false;
     if (girlsOnly && !(e.min_girls && e.min_girls > 0)) return false;
     if (q && !e.title.toLowerCase().includes(q.toLowerCase())) return false;
     return true;
