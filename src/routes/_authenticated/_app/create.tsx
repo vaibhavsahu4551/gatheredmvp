@@ -110,6 +110,26 @@ function Create() {
       </header>
 
       <div className="px-5 space-y-5 max-w-md mx-auto">
+        {prideOptIn && (
+          <div className="rounded-2xl border border-border p-4 bg-gradient-to-r from-rose-50 via-fuchsia-50 to-indigo-50">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-sm font-semibold">Post in Pride section</div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Only visible to other Pride members. Won't appear in the main feed.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsPride((v) => !v)}
+                aria-pressed={isPride}
+                className={`relative shrink-0 h-6 w-11 rounded-full transition ${isPride ? "bg-gradient-brand" : "bg-muted"}`}
+              >
+                <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${isPride ? "left-[22px]" : "left-0.5"}`} />
+              </button>
+            </div>
+          </div>
+        )}
         <Field label="Event type">
           <div className="flex flex-wrap gap-2">
             {EVENT_TYPES.map((t) => (
