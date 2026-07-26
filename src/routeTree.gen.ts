@@ -26,6 +26,7 @@ import { Route as AuthenticatedAppMessagesIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/_app/events.index'
 import { Route as AuthenticatedAppUUserIdRouteImport } from './routes/_authenticated/_app/u.$userId'
 import { Route as AuthenticatedAppProfileEditRouteImport } from './routes/_authenticated/_app/profile.edit'
+import { Route as AuthenticatedAppPrideSetupRouteImport } from './routes/_authenticated/_app/pride.setup'
 import { Route as AuthenticatedAppPostsPostIdRouteImport } from './routes/_authenticated/_app/posts.$postId'
 import { Route as AuthenticatedAppMessagesThreadIdRouteImport } from './routes/_authenticated/_app/messages.$threadId'
 import { Route as AuthenticatedAppChatGroupIdRouteImport } from './routes/_authenticated/_app/chat.$groupId'
@@ -122,6 +123,12 @@ const AuthenticatedAppProfileEditRoute =
     path: '/profile/edit',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppPrideSetupRoute =
+  AuthenticatedAppPrideSetupRouteImport.update({
+    id: '/pride/setup',
+    path: '/pride/setup',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppPostsPostIdRoute =
   AuthenticatedAppPostsPostIdRouteImport.update({
     id: '/posts/$postId',
@@ -166,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
+  '/pride/setup': typeof AuthenticatedAppPrideSetupRoute
   '/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/events/': typeof AuthenticatedAppEventsIndexRoute
@@ -188,6 +196,7 @@ export interface FileRoutesByTo {
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
+  '/pride/setup': typeof AuthenticatedAppPrideSetupRoute
   '/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/events': typeof AuthenticatedAppEventsIndexRoute
@@ -213,6 +222,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/_authenticated/_app/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/_authenticated/_app/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
+  '/_authenticated/_app/pride/setup': typeof AuthenticatedAppPrideSetupRoute
   '/_authenticated/_app/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/_authenticated/_app/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/_authenticated/_app/events/': typeof AuthenticatedAppEventsIndexRoute
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/chat/$groupId'
     | '/messages/$threadId'
     | '/posts/$postId'
+    | '/pride/setup'
     | '/profile/edit'
     | '/u/$userId'
     | '/events/'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/chat/$groupId'
     | '/messages/$threadId'
     | '/posts/$postId'
+    | '/pride/setup'
     | '/profile/edit'
     | '/u/$userId'
     | '/events'
@@ -283,6 +295,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/chat/$groupId'
     | '/_authenticated/_app/messages/$threadId'
     | '/_authenticated/_app/posts/$postId'
+    | '/_authenticated/_app/pride/setup'
     | '/_authenticated/_app/profile/edit'
     | '/_authenticated/_app/u/$userId'
     | '/_authenticated/_app/events/'
@@ -420,6 +433,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppProfileEditRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/pride/setup': {
+      id: '/_authenticated/_app/pride/setup'
+      path: '/pride/setup'
+      fullPath: '/pride/setup'
+      preLoaderRoute: typeof AuthenticatedAppPrideSetupRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/posts/$postId': {
       id: '/_authenticated/_app/posts/$postId'
       path: '/posts/$postId'
@@ -477,6 +497,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppRequestsRoute: typeof AuthenticatedAppRequestsRoute
   AuthenticatedAppMessagesThreadIdRoute: typeof AuthenticatedAppMessagesThreadIdRoute
   AuthenticatedAppPostsPostIdRoute: typeof AuthenticatedAppPostsPostIdRoute
+  AuthenticatedAppPrideSetupRoute: typeof AuthenticatedAppPrideSetupRoute
   AuthenticatedAppProfileEditRoute: typeof AuthenticatedAppProfileEditRoute
   AuthenticatedAppUUserIdRoute: typeof AuthenticatedAppUUserIdRoute
   AuthenticatedAppEventsIndexRoute: typeof AuthenticatedAppEventsIndexRoute
@@ -495,6 +516,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppRequestsRoute: AuthenticatedAppRequestsRoute,
   AuthenticatedAppMessagesThreadIdRoute: AuthenticatedAppMessagesThreadIdRoute,
   AuthenticatedAppPostsPostIdRoute: AuthenticatedAppPostsPostIdRoute,
+  AuthenticatedAppPrideSetupRoute: AuthenticatedAppPrideSetupRoute,
   AuthenticatedAppProfileEditRoute: AuthenticatedAppProfileEditRoute,
   AuthenticatedAppUUserIdRoute: AuthenticatedAppUUserIdRoute,
   AuthenticatedAppEventsIndexRoute: AuthenticatedAppEventsIndexRoute,
