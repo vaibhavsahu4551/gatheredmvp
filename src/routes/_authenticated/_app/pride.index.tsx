@@ -8,7 +8,7 @@ import {
   countByGender,
   type EventRow,
 } from "@/lib/events";
-import { getPrideIdentities, loadMyPrideProfile } from "@/lib/pride";
+import { getPrideIdentities, loadMyPrideProfile, type PrideIdentity } from "@/lib/pride";
 import { EventCard } from "@/components/EventCard";
 
 export const Route = createFileRoute("/_authenticated/_app/pride/")({
@@ -20,18 +20,20 @@ function PrideScreen() {
   const [ok, setOk] = useState<null | boolean>(null);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [counts, setCounts] = useState<Record<string, { boys: number; girls: number; total: number }>>({});
-  const [hosts, setHosts] = useState<Record<string, { display_name: string }>>({});
+  const [prideHosts, setPrideHosts] = useState<Record<string, PrideIdentity>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       const me = await loadMe();
-      if (!me?.profile?.pride_opt_in) {
+      const opted = !!me?.profile?.pride_opt_in;
+      if (!opted) {
+        setOk(false);
         navigate({ to: "/home", replace: true });
         return;
       }
-      const identity = await loadMyPrideProfile();
-      if (!identity) {
+      const ident = await loadMyPrideProfile();
+      if (!ident) {
         navigate({ to: "/pride/setup", replace: true });
         return;
       }
@@ -54,13 +56,7 @@ function PrideScreen() {
         }
         setCounts(c);
         const prideIds = ev.map((e) => (e as any).pride_actor_id).filter(Boolean) as string[];
-        const idents = await getPrideIdentities(prideIds);
-        const hostMap: Record<string, { display_name: string }> = {};
-        for (const e of ev) {
-          const pid = (e as any).pride_actor_id as string | null;
-          if (pid && idents[pid]) hostMap[e.id] = { display_name: idents[pid].display_name };
-        }
-        setHosts(hostMap);
+        if (prideIds.length) setPrideHosts(await getPrideIdentities(prideIds));
       } finally { setLoading(false); }
     })();
   }, [ok]);
@@ -80,21 +76,14 @@ function PrideScreen() {
           <h1 className="text-2xl font-semibold tracking-tight">Pride</h1>
         </div>
         <p className="mt-2 text-sm text-muted-foreground">
-          A private space for LGBTQ+ members. In here you appear as your Pride identity — never
-          your real name or main profile.
+          A private space for LGBTQ+ members. Your real profile is never shown here — only your Pride identity.
         </p>
         <div className="mt-3 flex items-start gap-2 rounded-xl border border-border bg-muted/50 p-3 text-[12px]">
           <ShieldAlert className="h-4 w-4 mt-0.5 text-rose-500 shrink-0" />
           <div>
-            Tap <span className="font-semibold">•••</span> on any event to report content. No
-            nudity or explicit content is allowed — every uploaded photo is automatically checked.
-            Repeated violations suspend Pride access.
+            Safety first. Tap the <span className="font-semibold">•••</span> on any event to report.
+            No nudity or sexually explicit content — uploads are auto-moderated. Exact meeting points appear only after host approval.
           </div>
-        </div>
-        <div className="mt-3">
-          <Link to="/pride/setup" className="text-[12px] font-medium text-fuchsia-600 hover:underline">
-            Edit my Pride identity
-          </Link>
         </div>
       </header>
 
@@ -115,9 +104,11 @@ function PrideScreen() {
             No Pride events yet. Be the first to host one — toggle "Post in Pride section" when you create.
           </div>
         )}
-        {events.map((e) => (
-          <EventCard key={e.id} e={e} c={counts[e.id]} prideHost={hosts[e.id] ?? null} />
-        ))}
+        {events.map((e) => {
+          const pid = (e as any).pride_actor_id as string | undefined;
+          const prideHost = pid ? prideHosts[pid] : undefined;
+          return <EventCard key={e.id} e={e} c={counts[e.id]} prideHost={prideHost} />;
+        })}
       </div>
     </div>
   );
