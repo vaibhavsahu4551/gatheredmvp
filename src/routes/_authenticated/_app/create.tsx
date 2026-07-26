@@ -86,7 +86,7 @@ function Create() {
 
       min_size: minSize,
       max_size: maxSize,
-      entry_fee: fee ? Number(fee) : null,
+      entry_fee: null,
       min_girls: minGirls ? Number(minGirls) : null,
       min_boys: minBoys ? Number(minBoys) : null,
     } as any).select("id").maybeSingle();
@@ -169,9 +169,6 @@ function Create() {
           </Field>
         </div>
 
-        <Field label="Entry fee (optional)">
-          <input type="number" value={fee} onChange={(e) => setFee(e.target.value)} className={inputCls} placeholder="₹ 0" />
-        </Field>
 
         <div className="rounded-2xl border border-border p-4">
           <div className="text-sm font-medium">Gender balance (optional)</div>

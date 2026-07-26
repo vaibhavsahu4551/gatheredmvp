@@ -39,7 +39,7 @@ function EditEvent() {
   const [city, setCity] = useState("");
   const [minSize, setMinSize] = useState(4);
   const [maxSize, setMaxSize] = useState(8);
-  const [fee, setFee] = useState("");
+  
   const [minGirls, setMinGirls] = useState("");
   const [minBoys, setMinBoys] = useState("");
 
@@ -59,7 +59,7 @@ function EditEvent() {
       setCity(ev.city);
       setMinSize(ev.min_size);
       setMaxSize(ev.max_size);
-      setFee(ev.entry_fee != null ? String(ev.entry_fee) : "");
+      
       setMinGirls(ev.min_girls != null ? String(ev.min_girls) : "");
       setMinBoys(ev.min_boys != null ? String(ev.min_boys) : "");
       setLoading(false);
@@ -89,7 +89,7 @@ function EditEvent() {
         city: city.trim(),
         min_size: minSize,
         max_size: maxSize,
-        entry_fee: fee ? Number(fee) : null,
+        entry_fee: null,
         min_girls: minGirls ? Number(minGirls) : null,
         min_boys: minBoys ? Number(minBoys) : null,
       } as any);
@@ -155,9 +155,6 @@ function EditEvent() {
             <input type="number" min={minSize} value={maxSize} onChange={(e) => setMaxSize(Number(e.target.value))} className={inputCls} />
           </Field>
         </div>
-        <Field label="Entry fee (optional)">
-          <input type="number" value={fee} onChange={(e) => setFee(e.target.value)} className={inputCls} />
-        </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Min girls">
             <input type="number" min={0} value={minGirls} onChange={(e) => setMinGirls(e.target.value)} className={inputCls} />
