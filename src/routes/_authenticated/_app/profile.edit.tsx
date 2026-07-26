@@ -20,6 +20,7 @@ function EditProfile() {
   const [originalInterests, setOriginalInterests] = useState<string[]>([]);
   const [photoPath, setPhotoPath] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
+  const [prideOptIn, setPrideOptIn] = useState(false);
 
   useEffect(() => {
     loadMe().then(async (me) => {
@@ -30,6 +31,7 @@ function EditProfile() {
       const loadedInterests = me.profile.interests ?? [];
       setInterests(loadedInterests);
       setOriginalInterests(loadedInterests);
+      setPrideOptIn(!!me.profile.pride_opt_in);
       const existing = me.profile.photos?.[0];
       if (existing) {
         setPhotoPath(existing);
