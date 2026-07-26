@@ -185,7 +185,10 @@ function UserProfile() {
 
         <div className="mt-6 border-b border-border">
           <div className="flex gap-6 text-sm">
-            {([["posts","Posts"],["hosting","Hosted"],["joined","Joined"]] as const).map(([k,label]) => (
+            {(isMe
+              ? ([["posts","Posts"],["hosting","Hosted"],["joined","Joined"]] as const)
+              : ([["posts","Posts"]] as const)
+            ).map(([k,label]) => (
               <button key={k} onClick={() => setTab(k)}
                 className={`pb-3 -mb-px border-b-2 font-medium transition ${tab === k ? "border-foreground text-foreground" : "border-transparent text-muted-foreground"}`}>
                 {label}
@@ -195,8 +198,8 @@ function UserProfile() {
         </div>
         <div className="py-5">
           {tab === "posts" && <UserPosts userId={userId} name={profile.full_name} />}
-          {tab === "hosting" && <UserEvents kind="hosting" userId={userId} />}
-          {tab === "joined" && <UserEvents kind="joined" userId={userId} />}
+          {isMe && tab === "hosting" && <UserEvents kind="hosting" userId={userId} />}
+          {isMe && tab === "joined" && <UserEvents kind="joined" userId={userId} />}
         </div>
       </div>
     </div>
