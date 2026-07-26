@@ -217,8 +217,46 @@ function EventDetail() {
 
         {!isHost && (
           <div className="mt-6">
-            {my?.status === "approved" && <div className="w-full rounded-full bg-emerald-500 text-white py-3 text-sm text-center font-medium">You're in ✓</div>}
-            {my?.status === "pending" && <div className="w-full rounded-full bg-muted text-foreground py-3 text-sm text-center font-medium">Request pending</div>}
+            {my?.status === "approved" && (
+              <div className="space-y-2">
+                <div className="w-full rounded-full bg-emerald-500 text-white py-3 text-sm text-center font-medium">You're in ✓</div>
+                <button
+                  onClick={async () => {
+                    if (!confirm("Are you sure you want to leave this event?")) return;
+                    try {
+                      await leaveEvent(event.id);
+                      toast.success("You left the event");
+                      await load();
+                    } catch (e: any) {
+                      toast.error(e?.message ?? "Couldn't leave event");
+                    }
+                  }}
+                  className="w-full rounded-full border border-destructive text-destructive py-3 text-sm font-medium"
+                >
+                  Leave event
+                </button>
+              </div>
+            )}
+            {my?.status === "pending" && (
+              <div className="space-y-2">
+                <div className="w-full rounded-full bg-muted text-foreground py-3 text-sm text-center font-medium">Request pending</div>
+                <button
+                  onClick={async () => {
+                    if (!confirm("Cancel your join request?")) return;
+                    try {
+                      await leaveEvent(event.id);
+                      toast.success("Request cancelled");
+                      await load();
+                    } catch (e: any) {
+                      toast.error(e?.message ?? "Couldn't cancel request");
+                    }
+                  }}
+                  className="w-full rounded-full border border-border text-foreground py-3 text-sm font-medium"
+                >
+                  Cancel request
+                </button>
+              </div>
+            )}
             {my?.status === "rejected" && <div className="w-full rounded-full bg-red-100 text-red-700 py-3 text-sm text-center font-medium">Request declined</div>}
             {!my && event.status !== "cancelled" && (
               <button onClick={doJoin} className="w-full rounded-full bg-primary text-primary-foreground py-3.5 text-sm font-medium">Request to Join</button>
