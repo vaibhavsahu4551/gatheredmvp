@@ -46,7 +46,7 @@ function Create() {
   const [city, setCity] = useState("");
   const [minSize, setMinSize] = useState(4);
   const [maxSize, setMaxSize] = useState(8);
-  const [fee, setFee] = useState("");
+  
   const [minGirls, setMinGirls] = useState("");
   const [minBoys, setMinBoys] = useState("");
   const [saving, setSaving] = useState(false);
