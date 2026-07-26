@@ -67,6 +67,7 @@ export type Database = {
           created_at: string
           group_id: string
           id: string
+          pride_actor_id: string | null
           user_id: string
         }
         Insert: {
@@ -74,6 +75,7 @@ export type Database = {
           created_at?: string
           group_id: string
           id?: string
+          pride_actor_id?: string | null
           user_id: string
         }
         Update: {
@@ -81,6 +83,7 @@ export type Database = {
           created_at?: string
           group_id?: string
           id?: string
+          pride_actor_id?: string | null
           user_id?: string
         }
         Relationships: [
@@ -161,6 +164,7 @@ export type Database = {
           created_at: string
           event_id: string
           id: string
+          pride_actor_id: string | null
           user_id: string
         }
         Insert: {
@@ -168,6 +172,7 @@ export type Database = {
           created_at?: string
           event_id: string
           id?: string
+          pride_actor_id?: string | null
           user_id: string
         }
         Update: {
@@ -175,6 +180,7 @@ export type Database = {
           created_at?: string
           event_id?: string
           id?: string
+          pride_actor_id?: string | null
           user_id?: string
         }
         Relationships: [
@@ -193,6 +199,7 @@ export type Database = {
           event_id: string
           gender: string | null
           id: string
+          pride_actor_id: string | null
           status: Database["public"]["Enums"]["participant_status"]
           updated_at: string
           user_id: string
@@ -202,6 +209,7 @@ export type Database = {
           event_id: string
           gender?: string | null
           id?: string
+          pride_actor_id?: string | null
           status?: Database["public"]["Enums"]["participant_status"]
           updated_at?: string
           user_id: string
@@ -211,6 +219,7 @@ export type Database = {
           event_id?: string
           gender?: string | null
           id?: string
+          pride_actor_id?: string | null
           status?: Database["public"]["Enums"]["participant_status"]
           updated_at?: string
           user_id?: string
@@ -245,6 +254,7 @@ export type Database = {
           min_boys: number | null
           min_girls: number | null
           min_size: number
+          pride_actor_id: string | null
           starts_at: string
           status: Database["public"]["Enums"]["event_status"]
           title: string
@@ -269,6 +279,7 @@ export type Database = {
           min_boys?: number | null
           min_girls?: number | null
           min_size: number
+          pride_actor_id?: string | null
           starts_at: string
           status?: Database["public"]["Enums"]["event_status"]
           title: string
@@ -293,6 +304,7 @@ export type Database = {
           min_boys?: number | null
           min_girls?: number | null
           min_size?: number
+          pride_actor_id?: string | null
           starts_at?: string
           status?: Database["public"]["Enums"]["event_status"]
           title?: string
@@ -459,6 +471,60 @@ export type Database = {
           },
         ]
       }
+      pride_profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          display_name: string
+          photo_path: string | null
+          pride_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          display_name: string
+          photo_path?: string | null
+          pride_id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          display_name?: string
+          photo_path?: string | null
+          pride_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pride_violations: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          kind: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          kind: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          kind?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           bio: string | null
@@ -570,6 +636,15 @@ export type Database = {
     }
     Functions: {
       are_huddled: { Args: { _a: string; _b: string }; Returns: boolean }
+      get_pride_identities: {
+        Args: { _pride_ids: string[] }
+        Returns: {
+          bio: string
+          display_name: string
+          photo_path: string
+          pride_id: string
+        }[]
+      }
       has_pride_access: { Args: { _user: string }; Returns: boolean }
       is_blocked: { Args: { _a: string; _b: string }; Returns: boolean }
       is_dm_member: {
@@ -589,6 +664,7 @@ export type Database = {
         Returns: boolean
       }
       is_verified: { Args: { _user: string }; Returns: boolean }
+      pride_suspended: { Args: { _user: string }; Returns: boolean }
     }
     Enums: {
       event_category:

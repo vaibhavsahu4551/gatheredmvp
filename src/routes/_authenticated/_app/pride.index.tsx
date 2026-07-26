@@ -5,10 +5,10 @@ import { loadMe } from "@/lib/huddl";
 import {
   listPrideEvents,
   getParticipantsForEvents,
-  getProfilesLite,
   countByGender,
   type EventRow,
 } from "@/lib/events";
+import { getPrideIdentities, loadMyPrideProfile, type PrideIdentity } from "@/lib/pride";
 import { EventCard } from "@/components/EventCard";
 
 export const Route = createFileRoute("/_authenticated/_app/pride/")({
@@ -20,18 +20,25 @@ function PrideScreen() {
   const [ok, setOk] = useState<null | boolean>(null);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [counts, setCounts] = useState<Record<string, { boys: number; girls: number; total: number }>>({});
-  const [hosts, setHosts] = useState<Record<string, { full_name: string | null; gender: string | null }>>({});
+  const [prideHosts, setPrideHosts] = useState<Record<string, PrideIdentity>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadMe().then((me) => {
+    (async () => {
+      const me = await loadMe();
       const opted = !!me?.profile?.pride_opt_in;
-      setOk(opted);
       if (!opted) {
-        // No trace: bounce out for anyone not opted in.
+        setOk(false);
         navigate({ to: "/home", replace: true });
+        return;
       }
-    });
+      const ident = await loadMyPrideProfile();
+      if (!ident) {
+        navigate({ to: "/pride/setup", replace: true });
+        return;
+      }
+      setOk(true);
+    })();
   }, [navigate]);
 
   useEffect(() => {
@@ -41,17 +48,15 @@ function PrideScreen() {
       try {
         const ev = await listPrideEvents({ limit: 100 });
         setEvents(ev);
-        const [pmap, hmap] = await Promise.all([
-          getParticipantsForEvents(ev.map((e) => e.id)),
-          getProfilesLite(ev.map((e) => e.host_id)),
-        ]);
+        const pmap = await getParticipantsForEvents(ev.map((e) => e.id));
         const c: Record<string, { boys: number; girls: number; total: number }> = {};
         for (const e of ev) {
           const { boys, girls, total } = countByGender(pmap[e.id] ?? []);
           c[e.id] = { boys, girls, total };
         }
         setCounts(c);
-        setHosts(hmap);
+        const prideIds = ev.map((e) => (e as any).pride_actor_id).filter(Boolean) as string[];
+        if (prideIds.length) setPrideHosts(await getPrideIdentities(prideIds));
       } finally { setLoading(false); }
     })();
   }, [ok]);
@@ -71,14 +76,13 @@ function PrideScreen() {
           <h1 className="text-2xl font-semibold tracking-tight">Pride</h1>
         </div>
         <p className="mt-2 text-sm text-muted-foreground">
-          A private space for LGBTQ+ members to organize house parties and social events.
-          Everything here stays inside Pride.
+          A private space for LGBTQ+ members. Your real profile is never shown here — only your Pride identity.
         </p>
         <div className="mt-3 flex items-start gap-2 rounded-xl border border-border bg-muted/50 p-3 text-[12px]">
           <ShieldAlert className="h-4 w-4 mt-0.5 text-rose-500 shrink-0" />
           <div>
-            Your safety matters. Tap the <span className="font-semibold">•••</span> on any event or profile to
-            report or block. Exact meeting points are only shared after the host approves you.
+            Safety first. Tap the <span className="font-semibold">•••</span> on any event to report.
+            No nudity or sexually explicit content — uploads are auto-moderated. Exact meeting points appear only after host approval.
           </div>
         </div>
       </header>
@@ -100,9 +104,11 @@ function PrideScreen() {
             No Pride events yet. Be the first to host one — toggle "Post in Pride section" when you create.
           </div>
         )}
-        {events.map((e) => (
-          <EventCard key={e.id} e={e} c={counts[e.id]} host={hosts[e.host_id]} />
-        ))}
+        {events.map((e) => {
+          const pid = (e as any).pride_actor_id as string | undefined;
+          const prideHost = pid ? prideHosts[pid] : undefined;
+          return <EventCard key={e.id} e={e} c={counts[e.id]} prideHost={prideHost} />;
+        })}
       </div>
     </div>
   );

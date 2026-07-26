@@ -1,11 +1,12 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { EVENT_TYPES, looksResidential, type EventType } from "@/lib/events";
 import { loadMe } from "@/lib/huddl";
+import { loadMyPrideProfile, isPrideSuspended } from "@/lib/pride";
 import { createPost, listMyEvents } from "@/lib/feed";
 import { toast } from "sonner";
-import { AlertTriangle, ImagePlus } from "lucide-react";
+import { AlertTriangle, ImagePlus, ShieldAlert, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/_app/create")({
   component: CreateScreen,
@@ -53,13 +54,22 @@ function Create() {
   const [prideOptIn, setPrideOptIn] = useState(false);
   const [isPride, setIsPride] = useState(false);
 
+  const [hasPrideIdentity, setHasPrideIdentity] = useState(false);
+  const [prideSuspended, setPrideSuspendedState] = useState(false);
+
   useEffect(() => {
-    loadMe().then((me) => {
+    loadMe().then(async (me) => {
       if (!me) return;
       setUserId(me.user.id);
       setDefaultCity(me.profile?.city ?? "");
       setCity(me.profile?.city ?? "");
-      setPrideOptIn(!!me.profile?.pride_opt_in);
+      const opted = !!me.profile?.pride_opt_in;
+      setPrideOptIn(opted);
+      if (opted) {
+        const [ident, suspended] = await Promise.all([loadMyPrideProfile(), isPrideSuspended()]);
+        setHasPrideIdentity(!!ident);
+        setPrideSuspendedState(suspended);
+      }
     });
   }, []);
 
@@ -74,6 +84,10 @@ function Create() {
     if (!city.trim()) return toast.error("Add city");
     if (minSize < 4) return toast.error("Minimum group size is 4");
     if (maxSize < minSize) return toast.error("Max must be ≥ min");
+    if (prideOptIn && isPride) {
+      if (prideSuspended) return toast.error("Your Pride access is suspended.");
+      if (!hasPrideIdentity) return toast.error("Set up your Pride identity first");
+    }
 
     setSaving(true);
     const { data, error } = await supabase.from("events").insert({
@@ -114,20 +128,42 @@ function Create() {
           <div className="rounded-2xl border border-border p-4 bg-gradient-to-r from-rose-50 via-fuchsia-50 to-indigo-50">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <div className="text-sm font-semibold">Post in Pride section</div>
+                <div className="text-sm font-semibold flex items-center gap-1.5">
+                  <Sparkles className="h-4 w-4 text-fuchsia-500" /> Post in Pride section
+                </div>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Only visible to other Pride members. Won't appear in the main feed.
+                  Only visible to other Pride members. Won't appear in the main feed. Your Pride identity is used — not your real profile.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsPride((v) => !v)}
                 aria-pressed={isPride}
-                className={`relative shrink-0 h-6 w-11 rounded-full transition ${isPride ? "bg-gradient-brand" : "bg-muted"}`}
+                disabled={prideSuspended}
+                className={`relative shrink-0 h-6 w-11 rounded-full transition ${isPride ? "bg-gradient-brand" : "bg-muted"} disabled:opacity-40`}
               >
                 <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${isPride ? "left-[22px]" : "left-0.5"}`} />
               </button>
             </div>
+            {isPride && !hasPrideIdentity && !prideSuspended && (
+              <div className="mt-3 flex items-start gap-2 rounded-xl border border-fuchsia-200 bg-white/60 p-2.5 text-xs">
+                <ShieldAlert className="h-4 w-4 mt-0.5 text-fuchsia-600 shrink-0" />
+                <div className="flex-1">
+                  You need a Pride identity before posting here.{" "}
+                  <Link to="/pride/setup" className="font-semibold underline">Set it up →</Link>
+                </div>
+              </div>
+            )}
+            {isPride && prideSuspended && (
+              <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-2.5 text-xs text-red-700">
+                Your Pride access is suspended due to community guideline violations.
+              </div>
+            )}
+            {isPride && hasPrideIdentity && (
+              <div className="mt-3 rounded-xl border border-fuchsia-200 bg-white/60 p-2.5 text-[11px] text-muted-foreground">
+                Community rule: No nudity or sexually explicit content. Photos are auto-moderated; violations may suspend Pride access.
+              </div>
+            )}
           </div>
         )}
         <Field label="Event type">

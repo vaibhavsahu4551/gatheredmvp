@@ -85,7 +85,7 @@ export async function getParticipantsForEvents(eventIds: string[]) {
   if (!uniq.length) return map;
   const { data, error } = await supabase
     .from("event_participants")
-    .select("event_id, user_id, status, gender")
+    .select("event_id, user_id, status, gender, pride_actor_id")
     .in("event_id", uniq);
   if (error) throw error;
   for (const id of uniq) map[id] = [];
@@ -165,12 +165,13 @@ export type EventComment = {
   user_id: string;
   body: string;
   created_at: string;
+  pride_actor_id?: string | null;
 };
 
 export async function listEventComments(eventId: string): Promise<EventComment[]> {
   const { data, error } = await supabase
     .from("event_comments")
-    .select("*")
+    .select("id, event_id, user_id, body, created_at, pride_actor_id")
     .eq("event_id", eventId)
     .order("created_at", { ascending: true })
     .limit(500);

@@ -11,13 +11,18 @@ export function EventCard({
   e,
   c,
   host,
+  prideHost,
 }: {
   e: EventRow;
   c?: EventCounts;
   host?: { full_name: string | null };
+  /** When set (Pride surfaces), shown in place of the real host. */
+  prideHost?: { display_name: string } | null;
 }) {
   const counts = c ?? { boys: 0, girls: 0, total: 0 };
   const style = eventTypeStyle(e.event_type);
+  const pride = !!(e as any).is_pride;
+  const hostLabel = pride ? (prideHost?.display_name ?? "Pride member") : (host?.full_name ?? "Host");
   return (
     <Link
       to="/events/$eventId"
@@ -49,14 +54,15 @@ export function EventCard({
             <span className="text-[11px] text-muted-foreground">
               {new Date(e.starts_at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}
             </span>
-            <ShareButton kind="event" id={e.id} />
-            <SafetyMenu targetType="event" targetId={e.id} userId={e.host_id} />
+            {!pride && <ShareButton kind="event" id={e.id} />}
+            {/* In Pride, never expose a report link keyed on the real host id. */}
+            <SafetyMenu targetType="event" targetId={e.id} userId={pride ? undefined : e.host_id} />
           </div>
         </div>
         <h3 className="mt-1.5 text-[17px] font-semibold leading-snug">{e.title}</h3>
         <div className="mt-1 text-[13px] text-muted-foreground">{e.location_address}</div>
         <div className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-          <span>{host?.full_name ?? "Host"}</span>
+          <span>{hostLabel}</span>
           {e.status === "confirmed" && (
             <span className="ml-auto rounded-full bg-emerald-100 text-emerald-700 px-2 py-0.5 text-[10px] font-semibold">Confirmed</span>
           )}
