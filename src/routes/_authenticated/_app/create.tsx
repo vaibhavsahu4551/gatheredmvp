@@ -37,7 +37,7 @@ function Create() {
   const [defaultCity, setDefaultCity] = useState("");
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
-  const [category, setCategory] = useState<Category>("Coffee");
+  
   const [eventType, setEventType] = useState<EventType | "">("");
   const [startsAt, setStartsAt] = useState("");
   const [address, setAddress] = useState("");
