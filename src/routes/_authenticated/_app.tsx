@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { loadMe } from "@/lib/huddl";
 import { supabase } from "@/integrations/supabase/client";
 import { Home, Calendar, Plus, MessageCircle, User, Sparkles } from "lucide-react";
+import { useDmUnread } from "@/hooks/useDmUnread";
 
 export const Route = createFileRoute("/_authenticated/_app")({
   component: AppShell,
@@ -54,6 +55,7 @@ function AppShell() {
 
 function BottomNav({ pride }: { pride: boolean }) {
   const { pathname } = useLocation();
+  const { totalUnread } = useDmUnread();
   type NavItem = { to: "/home" | "/events" | "/create" | "/chat" | "/profile" | "/pride"; label: string; icon: typeof Home; primary?: boolean };
   const items: NavItem[] = [
     { to: "/home", label: "Home", icon: Home },
@@ -85,9 +87,17 @@ function BottomNav({ pride }: { pride: boolean }) {
             );
           }
 
+          const showBadge = it.to === "/chat" && totalUnread > 0;
           return (
             <Link key={it.to} to={it.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold ${active ? "text-gradient-brand" : "text-muted-foreground"}`}>
-              <Icon className={`h-5 w-5 ${active ? "" : "opacity-70"}`} />
+              <div className="relative">
+                <Icon className={`h-5 w-5 ${active ? "" : "opacity-70"}`} />
+                {showBadge && (
+                  <span className="absolute -top-1 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+                    {totalUnread > 9 ? "9+" : totalUnread}
+                  </span>
+                )}
+              </div>
               {it.label}
             </Link>
           );

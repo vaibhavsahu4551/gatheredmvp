@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { listDm, sendDm } from "@/lib/dm";
+import { listDm, sendDm, markDmRead } from "@/lib/dm";
 import { getProfilesLite } from "@/lib/events";
 import { Avatar } from "@/components/Avatar";
 import { ArrowLeft, Send, Link2 } from "lucide-react";
@@ -37,6 +37,7 @@ function DmRoom() {
       const msgs = await listDm(threadId);
       setMessages(msgs);
       await hydrateShares(msgs);
+      markDmRead(threadId).catch(() => {});
     })();
 
     const channel = supabase.channel(`dm-${threadId}`)
@@ -45,6 +46,7 @@ function DmRoom() {
           const m = payload.new as any;
           setMessages((prev) => [...prev, m]);
           await hydrateShares([m]);
+          markDmRead(threadId).catch(() => {});
         }).subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [threadId]);
