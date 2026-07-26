@@ -10,6 +10,7 @@ import { loadBlockedIds } from "@/lib/safety";
 import { EventCard } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
 import { CityPickerModal } from "@/components/CityPickerModal";
+import { getActiveBanner, getAppSettings, type HomeBanner } from "@/lib/admin";
 
 
 export const Route = createFileRoute("/_authenticated/_app/home")({
@@ -28,7 +29,13 @@ function HomeFeed() {
   const [girlsOnly, setGirlsOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [unread, setUnread] = useState(0);
+  const [banner, setBanner] = useState<HomeBanner | null>(null);
+  const [premium, setPremium] = useState(false);
   useEffect(() => { unreadCount().then(setUnread).catch(() => {}); }, []);
+  useEffect(() => {
+    getActiveBanner().then(setBanner).catch(() => {});
+    getAppSettings().then((s) => setPremium(s.subscription_enabled)).catch(() => {});
+  }, []);
 
   const [events, setEvents] = useState<EventRow[]>([]);
   const [counts, setCounts] = useState<Record<string, { boys: number; girls: number; total: number }>>({});
@@ -248,6 +255,30 @@ function HomeFeed() {
       </div>
 
       <div className="mt-3 px-5 space-y-3 pb-4">
+        {banner && (
+          <div className="rounded-2xl overflow-hidden border border-border bg-gradient-brand text-white shadow-sm">
+            {banner.image_url && <img src={banner.image_url} alt="" className="w-full h-32 object-cover" />}
+            <div className="p-4">
+              <div className="text-sm font-semibold">{banner.title}</div>
+              {banner.body && <div className="text-xs opacity-90 mt-1">{banner.body}</div>}
+              {banner.event_id && (
+                <Link to="/events/$eventId" params={{ eventId: banner.event_id }} className="inline-block mt-2 text-xs font-medium underline">
+                  View event →
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+        {premium && (
+          <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
+            <div className="h-9 w-9 rounded-full bg-gradient-brand flex items-center justify-center text-white text-lg">✨</div>
+            <div className="flex-1">
+              <div className="text-sm font-semibold">Gathr Premium</div>
+              <div className="text-xs text-muted-foreground">Unlock priority events and more.</div>
+            </div>
+            <button className="rounded-full bg-foreground text-background text-xs font-medium px-3 py-1.5">Upgrade</button>
+          </div>
+        )}
         {loading && <FeedSkeleton />}
         {!loading && err && (
           <div className="text-center py-8 space-y-3">
