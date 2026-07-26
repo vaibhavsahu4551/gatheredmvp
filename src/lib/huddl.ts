@@ -16,6 +16,7 @@ export type ProfileRow = {
   photos: string[];
   selfie_url: string | null;
   onboarding_complete: boolean;
+  pride_opt_in: boolean;
 };
 
 export type VerificationRow = {
