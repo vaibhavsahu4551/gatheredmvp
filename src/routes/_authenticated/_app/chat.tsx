@@ -80,6 +80,9 @@ function Chat() {
         )}
         {threads.map((t) => {
           const n = names[t.other_id];
+          const u = unread[t.id];
+          const count = u?.unread ?? 0;
+          const preview = u?.last_body || "Say hi 👋";
           return (
             <Link
               key={t.id}
@@ -89,9 +92,14 @@ function Chat() {
             >
               <Avatar photo={n?.photo} name={n?.full_name} size={44} />
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold truncate">{n?.full_name ?? "Member"}</div>
-                <div className="text-[11px] text-muted-foreground">{new Date(t.updated_at).toLocaleString()}</div>
+                <div className={`text-sm truncate ${count > 0 ? "font-bold" : "font-semibold"}`}>{n?.full_name ?? "Member"}</div>
+                <div className={`text-[12px] truncate ${count > 0 ? "text-foreground font-semibold" : "text-muted-foreground"}`}>{preview}</div>
               </div>
+              {count > 0 && (
+                <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                  {count > 9 ? "9+" : count}
+                </span>
+              )}
             </Link>
           );
         })}
