@@ -55,6 +55,7 @@ function AppShell() {
 
 function BottomNav({ pride }: { pride: boolean }) {
   const { pathname } = useLocation();
+  const { totalUnread } = useDmUnread();
   type NavItem = { to: "/home" | "/events" | "/create" | "/chat" | "/profile" | "/pride"; label: string; icon: typeof Home; primary?: boolean };
   const items: NavItem[] = [
     { to: "/home", label: "Home", icon: Home },
