@@ -4,6 +4,7 @@ import { listMyThreads } from "@/lib/dm";
 import { getProfilesLite } from "@/lib/events";
 import { Avatar } from "@/components/Avatar";
 import { MessageCircle } from "lucide-react";
+import { useDmUnread } from "@/hooks/useDmUnread";
 
 export const Route = createFileRoute("/_authenticated/_app/messages/")({
   component: Messages,
