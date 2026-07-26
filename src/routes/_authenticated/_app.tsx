@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, useNavigate, Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { loadMe } from "@/lib/huddl";
-import { Home, Calendar, Plus, MessageCircle, User } from "lucide-react";
+import { Home, Calendar, Plus, MessageCircle, User, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/_app")({
   component: AppShell,
@@ -10,11 +10,13 @@ export const Route = createFileRoute("/_authenticated/_app")({
 function AppShell() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
+  const [pride, setPride] = useState(false);
 
   useEffect(() => {
     loadMe().then((me) => {
       if (!me) return;
       if (!me.profile?.onboarding_complete) { navigate({ to: "/onboarding" }); return; }
+      setPride(!!me.profile?.pride_opt_in);
       setReady(true);
     });
   }, [navigate]);
@@ -26,26 +28,33 @@ function AppShell() {
   return (
     <div className="min-h-screen bg-background pb-24">
       <Outlet />
-      <BottomNav />
+      <BottomNav pride={pride} />
     </div>
   );
 }
 
-function BottomNav() {
+function BottomNav({ pride }: { pride: boolean }) {
   const { pathname } = useLocation();
-  const items: { to: "/home" | "/events" | "/create" | "/chat" | "/profile"; label: string; icon: typeof Home; primary?: boolean }[] = [
+  type NavItem = { to: "/home" | "/events" | "/create" | "/chat" | "/profile" | "/pride"; label: string; icon: typeof Home; primary?: boolean };
+  const items: NavItem[] = [
     { to: "/home", label: "Home", icon: Home },
     { to: "/events", label: "Events", icon: Calendar },
     { to: "/create", label: "Create", icon: Plus, primary: true },
     { to: "/chat", label: "Chat", icon: MessageCircle },
     { to: "/profile", label: "Profile", icon: User },
   ];
+  if (pride) {
+    // Replace Events slot with Pride when opted in? No — keep Events, swap Chat for Pride would confuse.
+    // Add Pride between Events and Create by inserting; keep 5-slot layout by removing Chat from bar (Chat remains reachable from Profile / URLs).
+    items.splice(2, 0, { to: "/pride", label: "Pride", icon: Sparkles });
+  }
+  const cols = items.length === 6 ? "grid-cols-6" : "grid-cols-5";
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 bg-background/95 backdrop-blur border-t border-border">
-      <div className="max-w-md mx-auto grid grid-cols-5 h-16 px-2 safe-bottom">
+      <div className={`max-w-md mx-auto grid ${cols} h-16 px-2 safe-bottom`}>
         {items.map((it) => {
-          const active = pathname === it.to;
+          const active = pathname === it.to || (it.to === "/pride" && pathname.startsWith("/pride"));
           const Icon = it.icon;
           if (it.primary) {
             return (

@@ -237,6 +237,7 @@ export type Database = {
           exact_location: string | null
           host_id: string
           id: string
+          is_pride: boolean
           location_address: string
           location_lat: number | null
           location_lng: number | null
@@ -260,6 +261,7 @@ export type Database = {
           exact_location?: string | null
           host_id: string
           id?: string
+          is_pride?: boolean
           location_address: string
           location_lat?: number | null
           location_lng?: number | null
@@ -283,6 +285,7 @@ export type Database = {
           exact_location?: string | null
           host_id?: string
           id?: string
+          is_pride?: boolean
           location_address?: string
           location_lat?: number | null
           location_lng?: number | null
@@ -470,6 +473,7 @@ export type Database = {
           onboarding_complete: boolean
           phone: string | null
           photos: string[]
+          pride_opt_in: boolean
           selfie_url: string | null
           updated_at: string
         }
@@ -486,6 +490,7 @@ export type Database = {
           onboarding_complete?: boolean
           phone?: string | null
           photos?: string[]
+          pride_opt_in?: boolean
           selfie_url?: string | null
           updated_at?: string
         }
@@ -502,6 +507,7 @@ export type Database = {
           onboarding_complete?: boolean
           phone?: string | null
           photos?: string[]
+          pride_opt_in?: boolean
           selfie_url?: string | null
           updated_at?: string
         }
@@ -564,6 +570,7 @@ export type Database = {
     }
     Functions: {
       are_huddled: { Args: { _a: string; _b: string }; Returns: boolean }
+      has_pride_access: { Args: { _user: string }; Returns: boolean }
       is_blocked: { Args: { _a: string; _b: string }; Returns: boolean }
       is_dm_member: {
         Args: { _thread: string; _user: string }

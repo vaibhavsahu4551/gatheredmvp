@@ -21,6 +21,21 @@ export async function listEvents(_city?: string, opts?: { limit?: number; offset
   const { data, error } = await supabase
     .from("events")
     .select("*")
+    .eq("is_pride", false)
+    .in("status", ["pending","confirmed"])
+    .order("starts_at", { ascending: true })
+    .range(from, to);
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function listPrideEvents(opts?: { limit?: number; offset?: number }) {
+  const from = opts?.offset ?? 0;
+  const to = from + (opts?.limit ?? 200) - 1;
+  const { data, error } = await supabase
+    .from("events")
+    .select("*")
+    .eq("is_pride", true)
     .in("status", ["pending","confirmed"])
     .order("starts_at", { ascending: true })
     .range(from, to);
