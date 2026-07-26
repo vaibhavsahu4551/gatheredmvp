@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { loadMe } from "@/lib/huddl";
 import { supabase } from "@/integrations/supabase/client";
 import { Home, Calendar, Plus, MessageCircle, User, Sparkles } from "lucide-react";
+import { useDmUnread } from "@/hooks/useDmUnread";
 
 export const Route = createFileRoute("/_authenticated/_app")({
   component: AppShell,
