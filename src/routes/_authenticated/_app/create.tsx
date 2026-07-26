@@ -59,6 +59,7 @@ function Create() {
       setUserId(me.user.id);
       setDefaultCity(me.profile?.city ?? "");
       setCity(me.profile?.city ?? "");
+      setPrideOptIn(!!me.profile?.pride_opt_in);
     });
   }, []);
 
