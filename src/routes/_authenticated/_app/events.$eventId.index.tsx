@@ -188,7 +188,7 @@ function EventDetail() {
 
         <div className={`mt-3 rounded-2xl p-3 text-sm ${event.status === "confirmed" ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : event.status === "cancelled" ? "bg-red-50 text-red-800 border border-red-200" : "bg-amber-50 text-amber-800 border border-amber-200"}`}>
           {event.status === "confirmed" && "Confirmed — group chat unlocked."}
-          {event.status === "pending" && `Waiting for more people — ${counts.total}/${event.min_size} joined.`}
+          {event.status === "pending" && `Waiting for more people — ${approved.length}/${event.min_size} joined.`}
           {event.status === "cancelled" && "This Gathr was cancelled."}
         </div>
 
