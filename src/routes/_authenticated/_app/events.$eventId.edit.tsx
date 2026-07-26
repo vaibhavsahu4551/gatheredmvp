@@ -2,12 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  CATEGORIES,
   EVENT_TYPES,
   getEvent,
   looksResidential,
   updateEvent,
-  type Category,
   type EventType,
 } from "@/lib/events";
 import { toast } from "sonner";
