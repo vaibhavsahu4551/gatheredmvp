@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/reports")({
-  component: AdminReports;
+  component: AdminReports,
 });
 
 function AdminReports() {
