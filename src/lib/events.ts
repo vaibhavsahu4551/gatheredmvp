@@ -114,6 +114,14 @@ export async function requestJoin(eventId: string) {
   if (error) throw error;
 }
 
+export async function leaveEvent(eventId: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Sign in required");
+  const { error } = await supabase.from("event_participants")
+    .delete().eq("event_id", eventId).eq("user_id", user.id);
+  if (error) throw error;
+}
+
 export async function setParticipantStatus(id: string, status: "approved" | "rejected") {
   const { error } = await supabase.from("event_participants").update({ status }).eq("id", id);
   if (error) throw error;
