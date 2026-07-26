@@ -27,6 +27,7 @@ function UserProfile() {
   const [connIds, setConnIds] = useState<string[]>([]);
   const [connNames, setConnNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [busy, setBusy] = useState(false);
+  const [tab, setTab] = useState<"posts" | "hosting" | "joined">("posts");
 
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
