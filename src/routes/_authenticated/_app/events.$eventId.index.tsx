@@ -42,7 +42,14 @@ function EventDetail() {
     const { data: g } = await supabase.from("chat_groups").select("id").eq("event_id", eventId).maybeSingle();
     setGroupId(g?.id ?? null);
   };
-  useEffect(() => { load(); }, [eventId]);
+  useEffect(() => {
+    load();
+    const ch = supabase.channel(`event-parts-${eventId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "event_participants", filter: `event_id=eq.${eventId}` }, () => { load(); })
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${eventId}` }, () => { load(); })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [eventId]);
 
   const canDiscuss = !!event && (event.host_id === me || my?.status === "approved");
 
@@ -79,9 +86,18 @@ function EventDetail() {
 
   if (!event) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
   const isHost = event.host_id === me;
-  const counts = countByGender(parts);
   const approved = parts.filter((p) => p.status === "approved");
   const pending = parts.filter((p) => p.status === "pending");
+  const counts = approved.reduce(
+    (acc, p) => {
+      const g = (profiles[p.user_id]?.gender ?? p.gender ?? "").toLowerCase();
+      if (g === "man" || g === "male" || g === "boy") acc.boys++;
+      else if (g === "woman" || g === "female" || g === "girl") acc.girls++;
+      else acc.other++;
+      return acc;
+    },
+    { boys: 0, girls: 0, other: 0 },
+  );
 
   const sendComment = async () => {
     const body = commentText.trim();
@@ -179,7 +195,7 @@ function EventDetail() {
 
         <div className={`mt-3 rounded-2xl p-3 text-sm ${event.status === "confirmed" ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : event.status === "cancelled" ? "bg-red-50 text-red-800 border border-red-200" : "bg-amber-50 text-amber-800 border border-amber-200"}`}>
           {event.status === "confirmed" && "Confirmed — group chat unlocked."}
-          {event.status === "pending" && `Waiting for more people — ${counts.total}/${event.min_size} joined.`}
+          {event.status === "pending" && `Waiting for more people — ${approved.length}/${event.min_size} joined.`}
           {event.status === "cancelled" && "This Gathr was cancelled."}
         </div>
 
