@@ -49,7 +49,7 @@ function EditEvent() {
       if (!user || ev.host_id !== user.id) { toast.error("Only the host can edit"); navigate({ to: "/events/$eventId", params: { eventId } }); return; }
       setTitle(ev.title);
       setDesc(ev.description ?? "");
-      setCategory(ev.category as Category);
+      
       setEventType((ev.event_type as EventType) ?? "");
       setStartsAt(toLocalInput(ev.starts_at));
       setAddress(ev.location_address);
