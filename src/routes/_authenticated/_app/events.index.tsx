@@ -17,16 +17,27 @@ function Events() {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { data: h } = await supabase.from("events").select("*").eq("host_id", user.id).order("starts_at");
+      const { data: h } = await supabase
+        .from("events")
+        .select("*")
+        .eq("host_id", user.id)
+        .or("is_pride.is.null,is_pride.eq.false")
+        .order("starts_at");
       setHosting(h ?? []);
       const { data: parts } = await supabase.from("event_participants").select("event_id").eq("user_id", user.id);
       const ids = (parts ?? []).map((p) => p.event_id);
       if (ids.length) {
-        const { data: js } = await supabase.from("events").select("*").in("id", ids).order("starts_at");
+        const { data: js } = await supabase
+          .from("events")
+          .select("*")
+          .in("id", ids)
+          .or("is_pride.is.null,is_pride.eq.false")
+          .order("starts_at");
         setJoined(js ?? []);
       }
     })();
   }, []);
+
 
   const list = tab === "hosting" ? hosting : joined;
   return (

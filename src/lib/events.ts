@@ -43,17 +43,20 @@ export async function listPrideEvents(opts?: { limit?: number; offset?: number }
   return data ?? [];
 }
 
-export async function listHostedEvents(userId: string) {
+export async function listHostedEvents(userId: string, opts?: { pride?: boolean }) {
+  const pride = opts?.pride ?? false;
   const { data, error } = await supabase
     .from("events")
     .select("*")
     .eq("host_id", userId)
+    .eq("is_pride", pride)
     .order("starts_at", { ascending: false });
   if (error) throw error;
   return data ?? [];
 }
 
-export async function listJoinedEvents(userId: string) {
+export async function listJoinedEvents(userId: string, opts?: { pride?: boolean }) {
+  const pride = opts?.pride ?? false;
   const { data, error } = await supabase
     .from("event_participants")
     .select("event_id, status, events(*)")
@@ -61,9 +64,10 @@ export async function listJoinedEvents(userId: string) {
   if (error) throw error;
   return (data ?? [])
     .map((r: any) => r.events as EventRow)
-    .filter((e): e is EventRow => !!e)
+    .filter((e): e is EventRow => !!e && !!e.is_pride === pride)
     .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime());
 }
+
 
 
 export async function getEvent(id: string) {
