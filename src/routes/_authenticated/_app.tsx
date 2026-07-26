@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useNavigate, Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { loadMe } from "@/lib/huddl";
+import { supabase } from "@/integrations/supabase/client";
 import { Home, Calendar, Plus, MessageCircle, User, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/_app")({
@@ -9,6 +10,7 @@ export const Route = createFileRoute("/_authenticated/_app")({
 
 function AppShell() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [ready, setReady] = useState(false);
   const [pride, setPride] = useState(false);
 
@@ -20,6 +22,23 @@ function AppShell() {
       setReady(true);
     });
   }, [navigate]);
+
+  // Refresh pride opt-in on every navigation so toggling it in Edit Profile
+  // reflects in the bottom nav immediately, without a refresh/re-login.
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("pride_opt_in")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (alive && data) setPride(!!(data as any).pride_opt_in);
+    })();
+    return () => { alive = false; };
+  }, [pathname]);
 
   if (!ready) {
     return <div className="min-h-screen flex items-center justify-center"><div className="h-6 w-6 rounded-full border-2 border-muted border-t-primary animate-spin" /></div>;
