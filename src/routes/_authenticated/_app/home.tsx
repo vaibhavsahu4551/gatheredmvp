@@ -10,6 +10,7 @@ import { loadBlockedIds } from "@/lib/safety";
 import { EventCard } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
 import { CityPickerModal } from "@/components/CityPickerModal";
+import { getActiveBanner, getAppSettings, type HomeBanner } from "@/lib/admin";
 
 
 export const Route = createFileRoute("/_authenticated/_app/home")({
@@ -28,7 +29,13 @@ function HomeFeed() {
   const [girlsOnly, setGirlsOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [unread, setUnread] = useState(0);
+  const [banner, setBanner] = useState<HomeBanner | null>(null);
+  const [premium, setPremium] = useState(false);
   useEffect(() => { unreadCount().then(setUnread).catch(() => {}); }, []);
+  useEffect(() => {
+    getActiveBanner().then(setBanner).catch(() => {});
+    getAppSettings().then((s) => setPremium(s.subscription_enabled)).catch(() => {});
+  }, []);
 
   const [events, setEvents] = useState<EventRow[]>([]);
   const [counts, setCounts] = useState<Record<string, { boys: number; girls: number; total: number }>>({});
