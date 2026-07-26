@@ -4,7 +4,7 @@ import { Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { unreadCount } from "@/lib/notifications";
 import { loadMe } from "@/lib/huddl";
-import { CATEGORIES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipantsForEvents } from "@/lib/events";
+import { EVENT_TYPES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipantsForEvents } from "@/lib/events";
 import { listFeed, getLikes, toggleLike, signedFeedUrl, getEventsLite } from "@/lib/feed";
 import { loadBlockedIds } from "@/lib/safety";
 import { EventCard } from "@/components/EventCard";
