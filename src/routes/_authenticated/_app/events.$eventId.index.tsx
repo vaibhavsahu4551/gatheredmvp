@@ -10,7 +10,7 @@ import { SafetyMenu } from "@/components/SafetyMenu";
 import { Avatar } from "@/components/Avatar";
 
 
-export const Route = createFileRoute("/_authenticated/_app/events/$eventId")({
+export const Route = createFileRoute("/_authenticated/_app/events/$eventId/")({
   component: EventDetail,
 });
 
