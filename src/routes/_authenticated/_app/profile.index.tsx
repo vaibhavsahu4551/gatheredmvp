@@ -287,7 +287,8 @@ function EventsTab({ kind, userId, onCreate }: { kind: "hosting" | "joined"; use
   useEffect(() => {
     setLoading(true);
     (async () => {
-      const ev = kind === "hosting" ? await listHostedEvents(userId) : await listJoinedEvents(userId);
+      const raw = kind === "hosting" ? await listHostedEvents(userId) : await listJoinedEvents(userId);
+      const ev = raw.filter((e) => !e.is_pride);
       setEvents(ev);
       const cts: Record<string, EventCounts> = {};
       for (const e of ev) cts[e.id] = countByGender(await getParticipants(e.id));
