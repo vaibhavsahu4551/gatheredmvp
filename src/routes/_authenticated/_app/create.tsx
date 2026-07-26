@@ -84,6 +84,10 @@ function Create() {
     if (!city.trim()) return toast.error("Add city");
     if (minSize < 4) return toast.error("Minimum group size is 4");
     if (maxSize < minSize) return toast.error("Max must be ≥ min");
+    if (prideOptIn && isPride) {
+      if (prideSuspended) return toast.error("Your Pride access is suspended.");
+      if (!hasPrideIdentity) return toast.error("Set up your Pride identity first");
+    }
 
     setSaving(true);
     const { data, error } = await supabase.from("events").insert({
