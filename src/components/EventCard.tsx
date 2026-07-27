@@ -4,6 +4,7 @@ import type { EventRow } from "@/lib/events";
 import { SafetyMenu } from "@/components/SafetyMenu";
 import { ShareButton } from "@/components/ShareToConnection";
 import { eventTypeStyle } from "@/lib/event-style";
+import { PremiumBadge } from "@/components/PremiumBadge";
 
 export type EventCounts = { boys: number; girls: number; total: number };
 
@@ -11,11 +12,13 @@ export function EventCard({
   e,
   c,
   host,
+  hostPremium,
   prideHost,
 }: {
   e: EventRow;
   c?: EventCounts;
   host?: { full_name: string | null };
+  hostPremium?: boolean;
   /** When set (Pride surfaces), shown in place of the real host. */
   prideHost?: { display_name: string } | null;
 }) {
