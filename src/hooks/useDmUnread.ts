@@ -16,6 +16,8 @@ export function useDmUnread() {
   useEffect(() => {
     let alive = true;
     let channel: any;
+    const onLocal = () => { refresh(); };
+    if (typeof window !== "undefined") window.addEventListener("dm-unread-refresh", onLocal);
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!alive || !user) return;
@@ -26,7 +28,11 @@ export function useDmUnread() {
         .on("postgres_changes", { event: "UPDATE", schema: "public", table: "dm_threads" }, () => { refresh(); })
         .subscribe();
     })();
-    return () => { alive = false; if (channel) supabase.removeChannel(channel); };
+    return () => {
+      alive = false;
+      if (channel) supabase.removeChannel(channel);
+      if (typeof window !== "undefined") window.removeEventListener("dm-unread-refresh", onLocal);
+    };
   }, [refresh]);
 
   const totalUnread = Object.values(map).reduce((n, v) => n + (v.unread || 0), 0);
