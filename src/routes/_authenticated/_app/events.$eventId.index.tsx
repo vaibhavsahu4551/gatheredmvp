@@ -348,34 +348,57 @@ function EventDetail() {
 
         <div className="mt-6">
           <h3 className="text-sm font-semibold">Going ({approved.length})</h3>
-          <div className="mt-2 space-y-1.5">
-            {approved.map((p) => {
-              const d = attendeeDisplay(p);
-              const inner = (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  {isPride ? (
-                    <div className="h-7 w-7 rounded-full overflow-hidden bg-gradient-to-br from-rose-400 via-fuchsia-500 to-indigo-500 flex items-center justify-center text-white text-[11px] font-semibold shrink-0">
-                      {d.photoUrl
-                        ? <img src={d.photoUrl} alt="" className="h-full w-full object-cover" />
-                        : (d.name?.[0] ?? "?").toUpperCase()}
+          {(() => {
+            const isMember = event.host_id === me || my?.status === "approved";
+            const blindPreview = !isPride && !isMember && !hasPremium;
+            if (blindPreview) {
+              return (
+                <div className="mt-2 rounded-2xl border border-dashed border-border p-4 flex items-start gap-3">
+                  <Lock className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
+                  <div className="text-sm text-muted-foreground">
+                    <div><span className="font-medium text-foreground">{approved.length} {approved.length === 1 ? "person is" : "people are"} going.</span></div>
+                    <div className="mt-1">Names and photos of attendees are a Premium perk.{" "}
+                      <Link to="/premium" className="text-primary font-medium">Upgrade</Link> to preview who's coming before you join.
                     </div>
-                  ) : (
-                    <Avatar photo={(d as any).photoPath} name={d.name} size={28} />
-                  )}
-                  <span>{d.name}{!isPride && d.gender ? ` · ${d.gender}` : ""}</span>
+                  </div>
                 </div>
               );
-              return isPride ? (
-                <div key={p.id}>{inner}</div>
-              ) : (
-                <Link key={p.id} to="/u/$userId" params={{ userId: p.user_id }} className="block hover:text-foreground">
-                  {inner}
-                </Link>
-              );
-            })}
-            {approved.length === 0 && <div className="text-sm text-muted-foreground">No one yet.</div>}
-          </div>
+            }
+            return (
+              <div className="mt-2 space-y-1.5">
+                {approved.map((p) => {
+                  const d = attendeeDisplay(p);
+                  const inner = (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      {isPride ? (
+                        <div className="h-7 w-7 rounded-full overflow-hidden bg-gradient-to-br from-rose-400 via-fuchsia-500 to-indigo-500 flex items-center justify-center text-white text-[11px] font-semibold shrink-0">
+                          {d.photoUrl
+                            ? <img src={d.photoUrl} alt="" className="h-full w-full object-cover" />
+                            : (d.name?.[0] ?? "?").toUpperCase()}
+                        </div>
+                      ) : (
+                        <Avatar photo={(d as any).photoPath} name={d.name} size={28} />
+                      )}
+                      <span className="inline-flex items-center gap-1">
+                        {d.name}{!isPride && d.gender ? ` · ${d.gender}` : ""}
+                        {!isPride && tiers[p.user_id] === "premium" && <PremiumBadge />}
+                      </span>
+                    </div>
+                  );
+                  return isPride ? (
+                    <div key={p.id}>{inner}</div>
+                  ) : (
+                    <Link key={p.id} to="/u/$userId" params={{ userId: p.user_id }} className="block hover:text-foreground">
+                      {inner}
+                    </Link>
+                  );
+                })}
+                {approved.length === 0 && <div className="text-sm text-muted-foreground">No one yet.</div>}
+              </div>
+            );
+          })()}
         </div>
+
 
         {isHost && pending.length > 0 && (
           <div className="mt-6">
