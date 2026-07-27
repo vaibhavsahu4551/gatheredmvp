@@ -67,6 +67,7 @@ function EventDetail() {
     } else {
       const ids = Array.from(new Set([...(ev ? [ev.host_id] : []), ...ps.map((p) => p.user_id)]));
       setProfiles(await getProfilesLite(ids));
+      setTiers(await getUserTiers(ids));
     }
     setMy((await myParticipation(eventId, user.id)) as ParticipantRow | null);
     const { data: g } = await supabase.from("chat_groups").select("id").eq("event_id", eventId).maybeSingle();
