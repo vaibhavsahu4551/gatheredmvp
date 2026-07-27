@@ -262,6 +262,7 @@ function Create() {
           </button>
         </div>
       </div>
+      <UpgradePrompt open={upgradeOpen} onClose={() => setUpgradeOpen(false)} title="You've hit the free event limit" message={upgradeMsg} />
     </div>
   );
 }
