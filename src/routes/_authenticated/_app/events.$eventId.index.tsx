@@ -159,6 +159,12 @@ function EventDetail() {
   };
 
   const doJoin = async () => {
+    const gate = await canJoinEvent();
+    if (!gate.allowed) {
+      setUpgradeMsg(`Free members can join up to ${FREE_EVENT_JOIN_LIMIT} events every 30 days. You've used ${gate.used}. Upgrade to Premium for unlimited joins.`);
+      setUpgradeOpen(true);
+      return;
+    }
     try { await requestJoin(eventId); toast.success("Request sent"); await load(); }
     catch (e: any) {
       console.error("Join failed", e);
