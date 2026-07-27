@@ -11,6 +11,9 @@ import { EventCard } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
 import { CityPickerModal } from "@/components/CityPickerModal";
 import { getActiveBanner, getAppSettings, type HomeBanner } from "@/lib/admin";
+import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
+import { Lock } from "lucide-react";
 
 
 export const Route = createFileRoute("/_authenticated/_app/home")({
@@ -40,6 +43,10 @@ function HomeFeed() {
   const [events, setEvents] = useState<EventRow[]>([]);
   const [counts, setCounts] = useState<Record<string, { boys: number; girls: number; total: number }>>({});
   const [hosts, setHosts] = useState<Record<string, { full_name: string | null; gender: string | null }>>({});
+  const [hostTiers, setHostTiers] = useState<Record<string, "free" | "premium">>({});
+  const [hasPremium, setHasPremium] = useState(false);
+  const [advOpen, setAdvOpen] = useState(false);
+  useEffect(() => { getMyEntitlements().then((e) => setHasPremium(e.hasAccess)); }, []);
 
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [postsOffset, setPostsOffset] = useState(0);
