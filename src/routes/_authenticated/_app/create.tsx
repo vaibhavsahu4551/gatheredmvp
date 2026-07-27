@@ -58,8 +58,8 @@ function Create() {
 
   const [hasPrideIdentity, setHasPrideIdentity] = useState(false);
   const [prideSuspended, setPrideSuspendedState] = useState(false);
-
-  useEffect(() => {
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgradeMsg, setUpgradeMsg] = useState("");
     loadMe().then(async (me) => {
       if (!me) return;
       setUserId(me.user.id);
@@ -92,6 +92,16 @@ function Create() {
     }
 
     setSaving(true);
+
+    // Free-tier event creation limit.
+    const gate = await canCreateEvent();
+    if (!gate.allowed) {
+      setSaving(false);
+      setUpgradeMsg(`Free members can create up to ${FREE_EVENT_CREATE_LIMIT} events every 30 days. You've used ${gate.used}. Upgrade to Premium for unlimited hosting.`);
+      setUpgradeOpen(true);
+      return;
+    }
+
     const { data, error } = await supabase.from("events").insert({
       host_id: userId,
       title: title.trim(),
