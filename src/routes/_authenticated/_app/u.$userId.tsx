@@ -106,9 +106,9 @@ function UserProfile() {
             {avatar && <img src={avatar} className="h-full w-full object-cover" alt="" />}
           </div>
           <div className="pt-2 min-w-0 flex-1">
-            <h1 className="text-2xl font-semibold tracking-tight truncate">
-              {profile.full_name || "Member"}
-              {profile.dob && <span className="text-muted-foreground font-normal">, {ageFromDob(profile.dob)}</span>}
+            <h1 className="text-2xl font-semibold tracking-tight truncate inline-flex items-center gap-2 flex-wrap">
+              <span>{profile.full_name || "Member"}{profile.dob && <span className="text-muted-foreground font-normal">, {ageFromDob(profile.dob)}</span>}</span>
+              {targetPremium && <PremiumBadge />}
             </h1>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
               {profile.city && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{profile.city}</span>}
@@ -192,8 +192,8 @@ function UserProfile() {
 
         <div className="mt-6 border-b border-border">
           <div className="flex gap-6 text-sm">
-            {(isMe
-              ? ([["posts","Posts"],["hosting","Hosted"],["joined","Joined"]] as const)
+            {((isMe || targetPremium)
+              ? ([["posts","Posts"],["hosting","Host history"],["joined","Joined"]] as const).filter(([k]) => isMe || k !== "joined")
               : ([["posts","Posts"]] as const)
             ).map(([k,label]) => (
               <button key={k} onClick={() => setTab(k)}
