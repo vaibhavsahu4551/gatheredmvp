@@ -23,6 +23,7 @@ export async function listEvents(_city?: string, opts?: { limit?: number; offset
     .select("*")
     .eq("is_pride", false)
     .in("status", ["pending","confirmed"])
+    .order("boost_weight", { ascending: false })
     .order("starts_at", { ascending: true })
     .range(from, to);
   if (error) throw error;
