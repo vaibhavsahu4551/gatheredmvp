@@ -500,6 +500,7 @@ function EventDetail() {
           )}
         </div>
       </div>
+      <UpgradePrompt open={upgradeOpen} onClose={() => setUpgradeOpen(false)} title="You've hit the free join limit" message={upgradeMsg} />
     </div>
   );
 }
