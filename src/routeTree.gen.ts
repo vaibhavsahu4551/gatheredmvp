@@ -22,7 +22,10 @@ import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AuthenticatedPendingRouteImport } from './routes/_authenticated/pending'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/_app'
+import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
+import { Route as AuthenticatedAppSubscriptionRouteImport } from './routes/_authenticated/_app/subscription'
 import { Route as AuthenticatedAppRequestsRouteImport } from './routes/_authenticated/_app/requests'
+import { Route as AuthenticatedAppPremiumRouteImport } from './routes/_authenticated/_app/premium'
 import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/_app/notifications'
 import { Route as AuthenticatedAppHomeRouteImport } from './routes/_authenticated/_app/home'
 import { Route as AuthenticatedAppCreateRouteImport } from './routes/_authenticated/_app/create'
@@ -104,12 +107,29 @@ const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/_app',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicRazorpayWebhookRoute =
+  ApiPublicRazorpayWebhookRouteImport.update({
+    id: '/api/public/razorpay-webhook',
+    path: '/api/public/razorpay-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedAppSubscriptionRoute =
+  AuthenticatedAppSubscriptionRouteImport.update({
+    id: '/subscription',
+    path: '/subscription',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppRequestsRoute =
   AuthenticatedAppRequestsRouteImport.update({
     id: '/requests',
     path: '/requests',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppPremiumRoute = AuthenticatedAppPremiumRouteImport.update({
+  id: '/premium',
+  path: '/premium',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppNotificationsRoute =
   AuthenticatedAppNotificationsRouteImport.update({
     id: '/notifications',
@@ -225,7 +245,10 @@ export interface FileRoutesByFullPath {
   '/create': typeof AuthenticatedAppCreateRoute
   '/home': typeof AuthenticatedAppHomeRoute
   '/notifications': typeof AuthenticatedAppNotificationsRoute
+  '/premium': typeof AuthenticatedAppPremiumRoute
   '/requests': typeof AuthenticatedAppRequestsRoute
+  '/subscription': typeof AuthenticatedAppSubscriptionRoute
+  '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
@@ -255,7 +278,10 @@ export interface FileRoutesByTo {
   '/create': typeof AuthenticatedAppCreateRoute
   '/home': typeof AuthenticatedAppHomeRoute
   '/notifications': typeof AuthenticatedAppNotificationsRoute
+  '/premium': typeof AuthenticatedAppPremiumRoute
   '/requests': typeof AuthenticatedAppRequestsRoute
+  '/subscription': typeof AuthenticatedAppSubscriptionRoute
+  '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
@@ -289,7 +315,10 @@ export interface FileRoutesById {
   '/_authenticated/_app/create': typeof AuthenticatedAppCreateRoute
   '/_authenticated/_app/home': typeof AuthenticatedAppHomeRoute
   '/_authenticated/_app/notifications': typeof AuthenticatedAppNotificationsRoute
+  '/_authenticated/_app/premium': typeof AuthenticatedAppPremiumRoute
   '/_authenticated/_app/requests': typeof AuthenticatedAppRequestsRoute
+  '/_authenticated/_app/subscription': typeof AuthenticatedAppSubscriptionRoute
+  '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/_authenticated/_app/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/_authenticated/_app/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/_authenticated/_app/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
@@ -322,7 +351,10 @@ export interface FileRouteTypes {
     | '/create'
     | '/home'
     | '/notifications'
+    | '/premium'
     | '/requests'
+    | '/subscription'
+    | '/api/public/razorpay-webhook'
     | '/chat/$groupId'
     | '/messages/$threadId'
     | '/posts/$postId'
@@ -352,7 +384,10 @@ export interface FileRouteTypes {
     | '/create'
     | '/home'
     | '/notifications'
+    | '/premium'
     | '/requests'
+    | '/subscription'
+    | '/api/public/razorpay-webhook'
     | '/chat/$groupId'
     | '/messages/$threadId'
     | '/posts/$postId'
@@ -385,7 +420,10 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/create'
     | '/_authenticated/_app/home'
     | '/_authenticated/_app/notifications'
+    | '/_authenticated/_app/premium'
     | '/_authenticated/_app/requests'
+    | '/_authenticated/_app/subscription'
+    | '/api/public/razorpay-webhook'
     | '/_authenticated/_app/chat/$groupId'
     | '/_authenticated/_app/messages/$threadId'
     | '/_authenticated/_app/posts/$postId'
@@ -407,6 +445,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
   AuthRoute: typeof AuthRoute
+  ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -502,11 +541,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/razorpay-webhook': {
+      id: '/api/public/razorpay-webhook'
+      path: '/api/public/razorpay-webhook'
+      fullPath: '/api/public/razorpay-webhook'
+      preLoaderRoute: typeof ApiPublicRazorpayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/_app/subscription': {
+      id: '/_authenticated/_app/subscription'
+      path: '/subscription'
+      fullPath: '/subscription'
+      preLoaderRoute: typeof AuthenticatedAppSubscriptionRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/requests': {
       id: '/_authenticated/_app/requests'
       path: '/requests'
       fullPath: '/requests'
       preLoaderRoute: typeof AuthenticatedAppRequestsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/premium': {
+      id: '/_authenticated/_app/premium'
+      path: '/premium'
+      fullPath: '/premium'
+      preLoaderRoute: typeof AuthenticatedAppPremiumRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/notifications': {
@@ -647,7 +707,9 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppCreateRoute: typeof AuthenticatedAppCreateRoute
   AuthenticatedAppHomeRoute: typeof AuthenticatedAppHomeRoute
   AuthenticatedAppNotificationsRoute: typeof AuthenticatedAppNotificationsRoute
+  AuthenticatedAppPremiumRoute: typeof AuthenticatedAppPremiumRoute
   AuthenticatedAppRequestsRoute: typeof AuthenticatedAppRequestsRoute
+  AuthenticatedAppSubscriptionRoute: typeof AuthenticatedAppSubscriptionRoute
   AuthenticatedAppMessagesThreadIdRoute: typeof AuthenticatedAppMessagesThreadIdRoute
   AuthenticatedAppPostsPostIdRoute: typeof AuthenticatedAppPostsPostIdRoute
   AuthenticatedAppPrideNotificationsRoute: typeof AuthenticatedAppPrideNotificationsRoute
@@ -667,7 +729,9 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppCreateRoute: AuthenticatedAppCreateRoute,
   AuthenticatedAppHomeRoute: AuthenticatedAppHomeRoute,
   AuthenticatedAppNotificationsRoute: AuthenticatedAppNotificationsRoute,
+  AuthenticatedAppPremiumRoute: AuthenticatedAppPremiumRoute,
   AuthenticatedAppRequestsRoute: AuthenticatedAppRequestsRoute,
+  AuthenticatedAppSubscriptionRoute: AuthenticatedAppSubscriptionRoute,
   AuthenticatedAppMessagesThreadIdRoute: AuthenticatedAppMessagesThreadIdRoute,
   AuthenticatedAppPostsPostIdRoute: AuthenticatedAppPostsPostIdRoute,
   AuthenticatedAppPrideNotificationsRoute:
@@ -727,6 +791,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
   AuthRoute: AuthRoute,
+  ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
