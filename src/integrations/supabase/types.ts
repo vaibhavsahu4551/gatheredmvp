@@ -616,8 +616,12 @@ export type Database = {
           onboarding_complete: boolean
           phone: string | null
           photos: string[]
+          premium_expires_at: string | null
           pride_opt_in: boolean
+          razorpay_customer_id: string | null
+          razorpay_subscription_id: string | null
           selfie_url: string | null
+          subscription_tier: string
           suspended_until: string | null
           suspension_reason: string | null
           updated_at: string
@@ -635,8 +639,12 @@ export type Database = {
           onboarding_complete?: boolean
           phone?: string | null
           photos?: string[]
+          premium_expires_at?: string | null
           pride_opt_in?: boolean
+          razorpay_customer_id?: string | null
+          razorpay_subscription_id?: string | null
           selfie_url?: string | null
+          subscription_tier?: string
           suspended_until?: string | null
           suspension_reason?: string | null
           updated_at?: string
@@ -654,8 +662,12 @@ export type Database = {
           onboarding_complete?: boolean
           phone?: string | null
           photos?: string[]
+          premium_expires_at?: string | null
           pride_opt_in?: boolean
+          razorpay_customer_id?: string | null
+          razorpay_subscription_id?: string | null
           selfie_url?: string | null
+          subscription_tier?: string
           suspended_until?: string | null
           suspension_reason?: string | null
           updated_at?: string
@@ -701,6 +713,51 @@ export type Database = {
           status?: string
           target_id?: string
           target_type?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          cancelled_at: string | null
+          created_at: string
+          current_end: string | null
+          current_start: string | null
+          id: string
+          plan_id: string | null
+          raw: Json | null
+          razorpay_customer_id: string | null
+          razorpay_subscription_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          created_at?: string
+          current_end?: string | null
+          current_start?: string | null
+          id?: string
+          plan_id?: string | null
+          raw?: Json | null
+          razorpay_customer_id?: string | null
+          razorpay_subscription_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          created_at?: string
+          current_end?: string | null
+          current_start?: string | null
+          id?: string
+          plan_id?: string | null
+          raw?: Json | null
+          razorpay_customer_id?: string | null
+          razorpay_subscription_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
