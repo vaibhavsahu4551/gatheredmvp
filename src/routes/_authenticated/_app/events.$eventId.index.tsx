@@ -5,6 +5,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { countByGender, deleteEvent, getEvent, getParticipants, getProfilesLite, leaveEvent, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
 import { getPrideIdentities, signedPridePhotoUrl, type PrideIdentity } from "@/lib/pride";
+import { canJoinEvent, FREE_EVENT_JOIN_LIMIT, getMyEntitlements, getUserTiers } from "@/lib/entitlements";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
+import { PremiumBadge } from "@/components/PremiumBadge";
 import { toast } from "sonner";
 import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2, Sparkles } from "lucide-react";
 import { SafetyMenu } from "@/components/SafetyMenu";
@@ -30,8 +33,16 @@ function EventDetail() {
   const [commentText, setCommentText] = useState("");
   const [sending, setSending] = useState(false);
   const commentsEndRef = useRef<HTMLDivElement>(null);
+  const [tiers, setTiers] = useState<Record<string, "free" | "premium">>({});
+  const [hasPremium, setHasPremium] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgradeMsg, setUpgradeMsg] = useState("");
 
   const isPride = !!(event as any)?.is_pride;
+
+  useEffect(() => {
+    getMyEntitlements().then((e) => setHasPremium(e.hasAccess));
+  }, []);
 
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -56,6 +67,7 @@ function EventDetail() {
     } else {
       const ids = Array.from(new Set([...(ev ? [ev.host_id] : []), ...ps.map((p) => p.user_id)]));
       setProfiles(await getProfilesLite(ids));
+      setTiers(await getUserTiers(ids));
     }
     setMy((await myParticipation(eventId, user.id)) as ParticipantRow | null);
     const { data: g } = await supabase.from("chat_groups").select("id").eq("event_id", eventId).maybeSingle();
@@ -147,6 +159,12 @@ function EventDetail() {
   };
 
   const doJoin = async () => {
+    const gate = await canJoinEvent();
+    if (!gate.allowed) {
+      setUpgradeMsg(`Free members can join up to ${FREE_EVENT_JOIN_LIMIT} events every 30 days. You've used ${gate.used}. Upgrade to Premium for unlimited joins.`);
+      setUpgradeOpen(true);
+      return;
+    }
     try { await requestJoin(eventId); toast.success("Request sent"); await load(); }
     catch (e: any) {
       console.error("Join failed", e);
@@ -245,9 +263,10 @@ function EventDetail() {
             <Link
               to="/u/$userId"
               params={{ userId: event.host_id }}
-              className="font-medium text-foreground hover:underline"
+              className="font-medium text-foreground hover:underline inline-flex items-center gap-1"
             >
               {profiles[event.host_id]?.full_name ?? "Host"}
+              {tiers[event.host_id] === "premium" && <PremiumBadge />}
             </Link>
           )}
         </div>
@@ -329,34 +348,57 @@ function EventDetail() {
 
         <div className="mt-6">
           <h3 className="text-sm font-semibold">Going ({approved.length})</h3>
-          <div className="mt-2 space-y-1.5">
-            {approved.map((p) => {
-              const d = attendeeDisplay(p);
-              const inner = (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  {isPride ? (
-                    <div className="h-7 w-7 rounded-full overflow-hidden bg-gradient-to-br from-rose-400 via-fuchsia-500 to-indigo-500 flex items-center justify-center text-white text-[11px] font-semibold shrink-0">
-                      {d.photoUrl
-                        ? <img src={d.photoUrl} alt="" className="h-full w-full object-cover" />
-                        : (d.name?.[0] ?? "?").toUpperCase()}
+          {(() => {
+            const isMember = event.host_id === me || my?.status === "approved";
+            const blindPreview = !isPride && !isMember && !hasPremium;
+            if (blindPreview) {
+              return (
+                <div className="mt-2 rounded-2xl border border-dashed border-border p-4 flex items-start gap-3">
+                  <Lock className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
+                  <div className="text-sm text-muted-foreground">
+                    <div><span className="font-medium text-foreground">{approved.length} {approved.length === 1 ? "person is" : "people are"} going.</span></div>
+                    <div className="mt-1">Names and photos of attendees are a Premium perk.{" "}
+                      <Link to="/premium" className="text-primary font-medium">Upgrade</Link> to preview who's coming before you join.
                     </div>
-                  ) : (
-                    <Avatar photo={(d as any).photoPath} name={d.name} size={28} />
-                  )}
-                  <span>{d.name}{!isPride && d.gender ? ` · ${d.gender}` : ""}</span>
+                  </div>
                 </div>
               );
-              return isPride ? (
-                <div key={p.id}>{inner}</div>
-              ) : (
-                <Link key={p.id} to="/u/$userId" params={{ userId: p.user_id }} className="block hover:text-foreground">
-                  {inner}
-                </Link>
-              );
-            })}
-            {approved.length === 0 && <div className="text-sm text-muted-foreground">No one yet.</div>}
-          </div>
+            }
+            return (
+              <div className="mt-2 space-y-1.5">
+                {approved.map((p) => {
+                  const d = attendeeDisplay(p);
+                  const inner = (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      {isPride ? (
+                        <div className="h-7 w-7 rounded-full overflow-hidden bg-gradient-to-br from-rose-400 via-fuchsia-500 to-indigo-500 flex items-center justify-center text-white text-[11px] font-semibold shrink-0">
+                          {d.photoUrl
+                            ? <img src={d.photoUrl} alt="" className="h-full w-full object-cover" />
+                            : (d.name?.[0] ?? "?").toUpperCase()}
+                        </div>
+                      ) : (
+                        <Avatar photo={(d as any).photoPath} name={d.name} size={28} />
+                      )}
+                      <span className="inline-flex items-center gap-1">
+                        {d.name}{!isPride && d.gender ? ` · ${d.gender}` : ""}
+                        {!isPride && tiers[p.user_id] === "premium" && <PremiumBadge />}
+                      </span>
+                    </div>
+                  );
+                  return isPride ? (
+                    <div key={p.id}>{inner}</div>
+                  ) : (
+                    <Link key={p.id} to="/u/$userId" params={{ userId: p.user_id }} className="block hover:text-foreground">
+                      {inner}
+                    </Link>
+                  );
+                })}
+                {approved.length === 0 && <div className="text-sm text-muted-foreground">No one yet.</div>}
+              </div>
+            );
+          })()}
         </div>
+
 
         {isHost && pending.length > 0 && (
           <div className="mt-6">
@@ -458,6 +500,7 @@ function EventDetail() {
           )}
         </div>
       </div>
+      <UpgradePrompt open={upgradeOpen} onClose={() => setUpgradeOpen(false)} title="You've hit the free join limit" message={upgradeMsg} />
     </div>
   );
 }

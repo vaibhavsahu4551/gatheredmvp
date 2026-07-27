@@ -11,6 +11,8 @@ import { PostCard, type PostItem } from "@/components/PostCard";
 import { Avatar } from "@/components/Avatar";
 import { toast } from "sonner";
 import { ArrowLeft, MapPin, UserPlus, Check, X, MessageCircle, Clock } from "lucide-react";
+import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
+import { PremiumBadge } from "@/components/PremiumBadge";
 
 export const Route = createFileRoute("/_authenticated/_app/u/$userId")({
   component: UserProfile,
@@ -28,6 +30,8 @@ function UserProfile() {
   const [connNames, setConnNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<"posts" | "hosting" | "joined">("posts");
+  const [targetPremium, setTargetPremium] = useState(false);
+  const [myPremium, setMyPremium] = useState(false);
 
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -40,6 +44,9 @@ function UserProfile() {
     const ids = await listConnections(userId);
     setConnIds(ids);
     if (ids.length) setConnNames(await getProfilesLite(ids));
+    const [tiers, ent] = await Promise.all([getUserTiers([userId]), getMyEntitlements()]);
+    setTargetPremium(tiers[userId] === "premium");
+    setMyPremium(ent.hasAccess);
   };
   useEffect(() => { load(); }, [userId]);
 
@@ -99,9 +106,9 @@ function UserProfile() {
             {avatar && <img src={avatar} className="h-full w-full object-cover" alt="" />}
           </div>
           <div className="pt-2 min-w-0 flex-1">
-            <h1 className="text-2xl font-semibold tracking-tight truncate">
-              {profile.full_name || "Member"}
-              {profile.dob && <span className="text-muted-foreground font-normal">, {ageFromDob(profile.dob)}</span>}
+            <h1 className="text-2xl font-semibold tracking-tight truncate inline-flex items-center gap-2 flex-wrap">
+              <span>{profile.full_name || "Member"}{profile.dob && <span className="text-muted-foreground font-normal">, {ageFromDob(profile.dob)}</span>}</span>
+              {targetPremium && <PremiumBadge />}
             </h1>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
               {profile.city && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{profile.city}</span>}
@@ -152,6 +159,11 @@ function UserProfile() {
             )}
           </div>
         )}
+        {!isMe && myPremium && status !== "connected" && (
+          <button onClick={openDm} className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-full border border-border py-2.5 text-sm font-semibold">
+            <MessageCircle className="h-4 w-4" /> Message directly <PremiumBadge />
+          </button>
+        )}
 
         {profile.bio && <p className="mt-4 text-[15px] leading-relaxed">{profile.bio}</p>}
 
@@ -185,8 +197,8 @@ function UserProfile() {
 
         <div className="mt-6 border-b border-border">
           <div className="flex gap-6 text-sm">
-            {(isMe
-              ? ([["posts","Posts"],["hosting","Hosted"],["joined","Joined"]] as const)
+            {((isMe || targetPremium)
+              ? ([["posts","Posts"],["hosting","Host history"],["joined","Joined"]] as const).filter(([k]) => isMe || k !== "joined")
               : ([["posts","Posts"]] as const)
             ).map(([k,label]) => (
               <button key={k} onClick={() => setTab(k)}
@@ -198,7 +210,7 @@ function UserProfile() {
         </div>
         <div className="py-5">
           {tab === "posts" && <UserPosts userId={userId} name={profile.full_name} />}
-          {isMe && tab === "hosting" && <UserEvents kind="hosting" userId={userId} />}
+          {tab === "hosting" && (isMe || targetPremium) && <UserEvents kind="hosting" userId={userId} />}
           {isMe && tab === "joined" && <UserEvents kind="joined" userId={userId} />}
         </div>
       </div>

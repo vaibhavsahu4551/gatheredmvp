@@ -4,6 +4,7 @@ import type { EventRow } from "@/lib/events";
 import { SafetyMenu } from "@/components/SafetyMenu";
 import { ShareButton } from "@/components/ShareToConnection";
 import { eventTypeStyle } from "@/lib/event-style";
+import { PremiumBadge } from "@/components/PremiumBadge";
 
 export type EventCounts = { boys: number; girls: number; total: number };
 
@@ -11,11 +12,13 @@ export function EventCard({
   e,
   c,
   host,
+  hostPremium,
   prideHost,
 }: {
   e: EventRow;
   c?: EventCounts;
   host?: { full_name: string | null };
+  hostPremium?: boolean;
   /** When set (Pride surfaces), shown in place of the real host. */
   prideHost?: { display_name: string } | null;
 }) {
@@ -62,7 +65,7 @@ export function EventCard({
         <h3 className="mt-1.5 text-[17px] font-semibold leading-snug">{e.title}</h3>
         <div className="mt-1 text-[13px] text-muted-foreground">{e.location_address}</div>
         <div className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-          <span>{hostLabel}</span>
+          <span className="inline-flex items-center gap-1">{hostLabel}{!pride && hostPremium && <PremiumBadge />}</span>
           {e.status === "confirmed" && (
             <span className="ml-auto rounded-full bg-emerald-100 text-emerald-700 px-2 py-0.5 text-[10px] font-semibold">Confirmed</span>
           )}

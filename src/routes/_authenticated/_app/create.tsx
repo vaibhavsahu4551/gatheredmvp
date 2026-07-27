@@ -5,6 +5,8 @@ import { EVENT_TYPES, looksResidential, type EventType } from "@/lib/events";
 import { loadMe } from "@/lib/huddl";
 import { loadMyPrideProfile, isPrideSuspended } from "@/lib/pride";
 import { createPost, listMyEvents } from "@/lib/feed";
+import { canCreateEvent, FREE_EVENT_CREATE_LIMIT } from "@/lib/entitlements";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { toast } from "sonner";
 import { AlertTriangle, ImagePlus, ShieldAlert, Sparkles } from "lucide-react";
 
@@ -56,6 +58,8 @@ function Create() {
 
   const [hasPrideIdentity, setHasPrideIdentity] = useState(false);
   const [prideSuspended, setPrideSuspendedState] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgradeMsg, setUpgradeMsg] = useState("");
 
   useEffect(() => {
     loadMe().then(async (me) => {
@@ -90,6 +94,16 @@ function Create() {
     }
 
     setSaving(true);
+
+    // Free-tier event creation limit.
+    const gate = await canCreateEvent();
+    if (!gate.allowed) {
+      setSaving(false);
+      setUpgradeMsg(`Free members can create up to ${FREE_EVENT_CREATE_LIMIT} events every 30 days. You've used ${gate.used}. Upgrade to Premium for unlimited hosting.`);
+      setUpgradeOpen(true);
+      return;
+    }
+
     const { data, error } = await supabase.from("events").insert({
       host_id: userId,
       title: title.trim(),
@@ -248,6 +262,7 @@ function Create() {
           </button>
         </div>
       </div>
+      <UpgradePrompt open={upgradeOpen} onClose={() => setUpgradeOpen(false)} title="You've hit the free event limit" message={upgradeMsg} />
     </div>
   );
 }

@@ -261,6 +261,7 @@ export type Database = {
       events: {
         Row: {
           auto_cancel_hours: number
+          boost_weight: number
           category: Database["public"]["Enums"]["event_category"] | null
           city: string
           created_at: string
@@ -279,6 +280,7 @@ export type Database = {
           min_girls: number | null
           min_size: number
           pride_actor_id: string | null
+          pride_premium_only: boolean
           starts_at: string
           status: Database["public"]["Enums"]["event_status"]
           title: string
@@ -286,6 +288,7 @@ export type Database = {
         }
         Insert: {
           auto_cancel_hours?: number
+          boost_weight?: number
           category?: Database["public"]["Enums"]["event_category"] | null
           city: string
           created_at?: string
@@ -304,6 +307,7 @@ export type Database = {
           min_girls?: number | null
           min_size: number
           pride_actor_id?: string | null
+          pride_premium_only?: boolean
           starts_at: string
           status?: Database["public"]["Enums"]["event_status"]
           title: string
@@ -311,6 +315,7 @@ export type Database = {
         }
         Update: {
           auto_cancel_hours?: number
+          boost_weight?: number
           category?: Database["public"]["Enums"]["event_category"] | null
           city?: string
           created_at?: string
@@ -329,6 +334,7 @@ export type Database = {
           min_girls?: number | null
           min_size?: number
           pride_actor_id?: string | null
+          pride_premium_only?: boolean
           starts_at?: string
           status?: Database["public"]["Enums"]["event_status"]
           title?: string
@@ -608,6 +614,7 @@ export type Database = {
           city: string | null
           created_at: string
           dob: string | null
+          early_access: boolean
           firebase_uid: string | null
           full_name: string | null
           gender: string | null
@@ -631,6 +638,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           dob?: string | null
+          early_access?: boolean
           firebase_uid?: string | null
           full_name?: string | null
           gender?: string | null
@@ -654,6 +662,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           dob?: string | null
+          early_access?: boolean
           firebase_uid?: string | null
           full_name?: string | null
           gender?: string | null
@@ -785,18 +794,21 @@ export type Database = {
       verification_status: {
         Row: {
           notes: string | null
+          priority: boolean
           status: Database["public"]["Enums"]["verification_state"]
           updated_at: string
           user_id: string
         }
         Insert: {
           notes?: string | null
+          priority?: boolean
           status?: Database["public"]["Enums"]["verification_state"]
           updated_at?: string
           user_id: string
         }
         Update: {
           notes?: string | null
+          priority?: boolean
           status?: Database["public"]["Enums"]["verification_state"]
           updated_at?: string
           user_id?: string
@@ -809,6 +821,11 @@ export type Database = {
     }
     Functions: {
       are_huddled: { Args: { _a: string; _b: string }; Returns: boolean }
+      count_events_created_last_30d: {
+        Args: { _user: string }
+        Returns: number
+      }
+      count_events_joined_last_30d: { Args: { _user: string }; Returns: number }
       get_dm_unread: {
         Args: never
         Returns: {

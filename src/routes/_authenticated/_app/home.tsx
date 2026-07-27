@@ -11,6 +11,9 @@ import { EventCard } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
 import { CityPickerModal } from "@/components/CityPickerModal";
 import { getActiveBanner, getAppSettings, type HomeBanner } from "@/lib/admin";
+import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
+import { Lock } from "lucide-react";
 
 
 export const Route = createFileRoute("/_authenticated/_app/home")({
@@ -40,6 +43,10 @@ function HomeFeed() {
   const [events, setEvents] = useState<EventRow[]>([]);
   const [counts, setCounts] = useState<Record<string, { boys: number; girls: number; total: number }>>({});
   const [hosts, setHosts] = useState<Record<string, { full_name: string | null; gender: string | null }>>({});
+  const [hostTiers, setHostTiers] = useState<Record<string, "free" | "premium">>({});
+  const [hasPremium, setHasPremium] = useState(false);
+  const [advOpen, setAdvOpen] = useState(false);
+  useEffect(() => { getMyEntitlements().then((e) => setHasPremium(e.hasAccess)); }, []);
 
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [postsOffset, setPostsOffset] = useState(0);
@@ -128,6 +135,7 @@ function HomeFeed() {
       for (const e of evFiltered) cts[e.id] = countByGender(partsMap[e.id] ?? []);
       setCounts(cts);
       setHosts(hostsMap);
+      setHostTiers(await getUserTiers(evFiltered.map((e) => e.host_id)));
 
       const pItems: PostItem[] = (firstPosts as any[])
         .filter((p) => !blocked.has(p.user_id) && p.user_id !== meId)
@@ -252,7 +260,12 @@ function HomeFeed() {
         ))}
         <button onClick={() => setGirlsOnly((v) => !v)}
           className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border ${girlsOnly ? "bg-pink-500 text-white border-pink-500" : "border-border text-muted-foreground"}`}>♀ preferred</button>
+        <button onClick={() => { if (!hasPremium) setAdvOpen(true); }}
+          className="shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border border-border text-muted-foreground inline-flex items-center gap-1">
+          {!hasPremium && <Lock className="h-3 w-3" />} Age & distance
+        </button>
       </div>
+
 
       <div className="mt-3 px-5 space-y-3 pb-4">
         {banner && (
@@ -290,7 +303,7 @@ function HomeFeed() {
           <div className="text-sm text-muted-foreground text-center py-12">Nothing here yet in {city || "your city"}. Create the first event or post.</div>
         )}
         {items.map((it) => it.kind === "event" ? (
-          <EventCard key={"e" + it.id} e={it.ev} c={counts[it.id] ?? { boys: 0, girls: 0, total: 0 }} host={hosts[it.ev.host_id]} />
+          <EventCard key={"e" + it.id} e={it.ev} c={counts[it.id] ?? { boys: 0, girls: 0, total: 0 }} host={hosts[it.ev.host_id]} hostPremium={hostTiers[it.ev.host_id] === "premium"} />
         ) : (
           <PostCard key={"p" + it.id} p={it} img={imgs[it.id]} name={names[it.user_id]?.full_name ?? "Someone"}
             avatarPhoto={names[it.user_id]?.photo ?? null}
@@ -305,6 +318,7 @@ function HomeFeed() {
         )}
       </div>
       <CityPickerModal open={cityModal} onClose={() => setCityModal(false)} onSaved={(c) => { setCity(c); setLocState("idle"); }} />
+      <UpgradePrompt open={advOpen} onClose={() => setAdvOpen(false)} title="Advanced filters are Premium" message="Filter by age range, distance and interest tags with Gathr Premium." />
     </div>
   );
 }
