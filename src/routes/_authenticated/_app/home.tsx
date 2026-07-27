@@ -318,6 +318,7 @@ function HomeFeed() {
         )}
       </div>
       <CityPickerModal open={cityModal} onClose={() => setCityModal(false)} onSaved={(c) => { setCity(c); setLocState("idle"); }} />
+      <UpgradePrompt open={advOpen} onClose={() => setAdvOpen(false)} title="Advanced filters are Premium" message="Filter by age range, distance and interest tags with Gathr Premium." />
     </div>
   );
 }
