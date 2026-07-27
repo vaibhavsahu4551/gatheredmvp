@@ -60,6 +60,8 @@ function Create() {
   const [prideSuspended, setPrideSuspendedState] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [upgradeMsg, setUpgradeMsg] = useState("");
+
+  useEffect(() => {
     loadMe().then(async (me) => {
       if (!me) return;
       setUserId(me.user.id);
