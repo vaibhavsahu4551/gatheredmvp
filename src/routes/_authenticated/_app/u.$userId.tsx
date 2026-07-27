@@ -11,6 +11,8 @@ import { PostCard, type PostItem } from "@/components/PostCard";
 import { Avatar } from "@/components/Avatar";
 import { toast } from "sonner";
 import { ArrowLeft, MapPin, UserPlus, Check, X, MessageCircle, Clock } from "lucide-react";
+import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
+import { PremiumBadge } from "@/components/PremiumBadge";
 
 export const Route = createFileRoute("/_authenticated/_app/u/$userId")({
   component: UserProfile,
@@ -28,6 +30,8 @@ function UserProfile() {
   const [connNames, setConnNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<"posts" | "hosting" | "joined">("posts");
+  const [targetPremium, setTargetPremium] = useState(false);
+  const [myPremium, setMyPremium] = useState(false);
 
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -40,6 +44,9 @@ function UserProfile() {
     const ids = await listConnections(userId);
     setConnIds(ids);
     if (ids.length) setConnNames(await getProfilesLite(ids));
+    const [tiers, ent] = await Promise.all([getUserTiers([userId]), getMyEntitlements()]);
+    setTargetPremium(tiers[userId] === "premium");
+    setMyPremium(ent.hasAccess);
   };
   useEffect(() => { load(); }, [userId]);
 
