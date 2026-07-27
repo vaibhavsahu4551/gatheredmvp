@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { loadMe, signedPhotoUrl, ageFromDob } from "@/lib/huddl";
-import { LogOut, MapPin, Plus, CalendarPlus, Pencil, UserPlus, Users } from "lucide-react";
+import { LogOut, MapPin, Plus, CalendarPlus, Pencil, UserPlus, Users, Sparkles } from "lucide-react";
 import { listConnections } from "@/lib/huddle-connect";
 import { listIncomingRequests } from "@/lib/huddle-connect";
 import {
@@ -127,6 +127,22 @@ function Profile() {
             </div>
           </div>
         )}
+
+        <Link
+          to="/premium"
+          className="mt-5 flex items-center gap-3 rounded-2xl border border-border p-3 bg-gradient-to-r from-rose-50 to-indigo-50 hover:opacity-90 transition"
+        >
+          <div className="h-9 w-9 rounded-full bg-gradient-brand flex items-center justify-center shadow-glow shrink-0">
+            <Sparkles className="h-4 w-4 text-white" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-semibold">Gathr Premium</div>
+            <div className="text-[12px] text-muted-foreground truncate">
+              Unlock priority visibility, unlimited hosting, and more.
+            </div>
+          </div>
+          <span className="text-xs font-semibold text-primary shrink-0">₹199/mo</span>
+        </Link>
 
         {showConnections && (
           <ConnectionsModal ids={connIds} onClose={() => setShowConnections(false)} />
