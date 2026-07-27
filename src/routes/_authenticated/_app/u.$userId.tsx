@@ -205,7 +205,7 @@ function UserProfile() {
         </div>
         <div className="py-5">
           {tab === "posts" && <UserPosts userId={userId} name={profile.full_name} />}
-          {isMe && tab === "hosting" && <UserEvents kind="hosting" userId={userId} />}
+          {tab === "hosting" && (isMe || targetPremium) && <UserEvents kind="hosting" userId={userId} />}
           {isMe && tab === "joined" && <UserEvents kind="joined" userId={userId} />}
         </div>
       </div>
