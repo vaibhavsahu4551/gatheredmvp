@@ -263,9 +263,10 @@ function EventDetail() {
             <Link
               to="/u/$userId"
               params={{ userId: event.host_id }}
-              className="font-medium text-foreground hover:underline"
+              className="font-medium text-foreground hover:underline inline-flex items-center gap-1"
             >
               {profiles[event.host_id]?.full_name ?? "Host"}
+              {tiers[event.host_id] === "premium" && <PremiumBadge />}
             </Link>
           )}
         </div>
