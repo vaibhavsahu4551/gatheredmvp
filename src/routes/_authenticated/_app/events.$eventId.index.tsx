@@ -5,6 +5,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { countByGender, deleteEvent, getEvent, getParticipants, getProfilesLite, leaveEvent, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
 import { getPrideIdentities, signedPridePhotoUrl, type PrideIdentity } from "@/lib/pride";
+import { canJoinEvent, FREE_EVENT_JOIN_LIMIT, getMyEntitlements, getUserTiers } from "@/lib/entitlements";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
+import { PremiumBadge } from "@/components/PremiumBadge";
 import { toast } from "sonner";
 import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2, Sparkles } from "lucide-react";
 import { SafetyMenu } from "@/components/SafetyMenu";
@@ -30,8 +33,16 @@ function EventDetail() {
   const [commentText, setCommentText] = useState("");
   const [sending, setSending] = useState(false);
   const commentsEndRef = useRef<HTMLDivElement>(null);
+  const [tiers, setTiers] = useState<Record<string, "free" | "premium">>({});
+  const [hasPremium, setHasPremium] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgradeMsg, setUpgradeMsg] = useState("");
 
   const isPride = !!(event as any)?.is_pride;
+
+  useEffect(() => {
+    getMyEntitlements().then((e) => setHasPremium(e.hasAccess));
+  }, []);
 
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
