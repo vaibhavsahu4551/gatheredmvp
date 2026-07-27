@@ -48,6 +48,9 @@ export async function getDmUnread(): Promise<Record<string, { unread: number; la
 
 export async function markDmRead(threadId: string) {
   await sb.rpc("mark_dm_read", { _thread: threadId });
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("dm-unread-refresh"));
+  }
 }
 
 export async function listDm(threadId: string) {
