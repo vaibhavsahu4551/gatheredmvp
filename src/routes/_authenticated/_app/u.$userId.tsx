@@ -159,6 +159,11 @@ function UserProfile() {
             )}
           </div>
         )}
+        {!isMe && myPremium && status !== "connected" && (
+          <button onClick={openDm} className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-full border border-border py-2.5 text-sm font-semibold">
+            <MessageCircle className="h-4 w-4" /> Message directly <PremiumBadge />
+          </button>
+        )}
 
         {profile.bio && <p className="mt-4 text-[15px] leading-relaxed">{profile.bio}</p>}
 
