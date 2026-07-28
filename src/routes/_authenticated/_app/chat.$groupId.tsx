@@ -2,8 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { listMessages, sendMessage } from "@/lib/chat";
+import { sendGroupVoice } from "@/lib/voice";
 import { getProfilesLite } from "@/lib/events";
 import { getPrideIdentities } from "@/lib/pride";
+import { VoiceRecorder } from "@/components/VoiceRecorder";
+import { VoiceNoteBubble } from "@/components/VoiceNoteBubble";
 import { ArrowLeft, Send, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/_app/chat/$groupId")({
@@ -94,6 +97,9 @@ function ChatRoom() {
             <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${mine ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
                 {!mine && <div className="text-[10px] font-medium opacity-70 mb-0.5">{label}</div>}
+                {m.voice_url && (
+                  <VoiceNoteBubble path={m.voice_url} durationMs={m.voice_duration_ms} mine={mine} />
+                )}
                 {m.body}
               </div>
             </div>
@@ -102,9 +108,10 @@ function ChatRoom() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t border-border p-3 flex gap-2 pb-6">
+      <div className="border-t border-border p-3 flex gap-2 pb-6 items-center relative">
         <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()}
           placeholder="Message…" className="flex-1 rounded-full border border-border bg-background px-4 py-2.5 text-sm outline-none" />
+        <VoiceRecorder onSent={(path, dur) => sendGroupVoice(groupId, path, dur)} />
         <button onClick={send} className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
           <Send className="h-4 w-4" />
         </button>
