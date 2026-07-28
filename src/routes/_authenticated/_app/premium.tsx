@@ -68,11 +68,8 @@ function PremiumScreen() {
 
       const { subscription_id, key_id } = await createSub();
       const { data: { user } } = await supabase.auth.getUser();
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("full_name, phone")
-        .eq("id", user?.id ?? "")
-        .maybeSingle();
+      const { data: rows } = await (supabase as any).rpc("get_my_profile");
+      const profile = Array.isArray(rows) ? rows[0] : rows;
 
       const rzp = new window.Razorpay({
         key: key_id,
