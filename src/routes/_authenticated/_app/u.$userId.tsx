@@ -36,7 +36,7 @@ function UserProfile() {
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) setMe(user.id);
-    const { data: p } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+    const { data: p } = await supabase.from("profiles").select("id, full_name, dob, gender, city, bio, interests, photos, pride_opt_in, onboarding_complete, subscription_tier, premium_expires_at, created_at").eq("id", userId).maybeSingle();
     setProfile(p as any);
     if ((p as any)?.photos?.[0]) setAvatar(await signedPhotoUrl((p as any).photos[0]));
     const s = await huddleStatusWith(userId);
