@@ -114,11 +114,9 @@ export async function adminOverview() {
 }
 
 export async function adminListUsers(search = "") {
-  let q = supabase.from("profiles").select("id, full_name, phone, created_at, suspended_until, pride_opt_in").order("created_at", { ascending: false }).limit(500);
-  if (search.trim()) q = q.ilike("full_name", `%${search.trim()}%`);
-  const { data } = await q;
+  const { data, error } = await (supabase as any).rpc("admin_list_users", { _search: search.trim() });
+  if (error) throw error;
   const rows = ((data as any[]) ?? []);
-  // Fetch event + report counts in bulk for these users
   const ids = rows.map((r) => r.id);
   const [{ data: hosted }, { data: reports }] = await Promise.all([
     supabase.from("events").select("host_id").eq("is_pride", false).in("host_id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]),
@@ -136,7 +134,7 @@ export async function adminListUsers(search = "") {
 }
 
 export async function suspendUser(userId: string, until: string | null, reason: string | null) {
-  const { error } = await supabase.from("profiles").update({ suspended_until: until, suspension_reason: reason }).eq("id", userId);
+  const { error } = await (supabase as any).rpc("admin_suspend_user", { _user: userId, _until: until, _reason: reason });
   if (error) throw error;
 }
 

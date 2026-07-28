@@ -77,8 +77,8 @@ function ReportDrawer({ report, onClose, onChanged }: { report: AdminReport; onC
   useEffect(() => {
     (async () => {
       if (report.target_type === "user") {
-        const { data } = await supabase.from("profiles").select("id, full_name, bio, phone, created_at, suspended_until").eq("id", report.target_id).maybeSingle();
-        setContent(data);
+        const { data } = await (supabase as any).rpc("admin_get_user", { _user: report.target_id });
+        setContent(Array.isArray(data) ? data[0] : data);
       } else if (report.target_type === "event") {
         const { data } = await supabase.from("events").select("*").eq("id", report.target_id).eq("is_pride", false).maybeSingle();
         setContent(data);
