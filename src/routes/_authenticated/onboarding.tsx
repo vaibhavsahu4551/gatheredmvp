@@ -2,8 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { loadMe, signedPhotoUrl } from "@/lib/huddl";
+import { compressImage } from "@/lib/image-compress";
 import { toast } from "sonner";
-import { Camera } from "lucide-react";
+import { Camera, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   component: Onboarding,
@@ -13,36 +14,77 @@ function Onboarding() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [userId, setUserId] = useState<string>("");
   const [photoPath, setPhotoPath] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
 
   useEffect(() => {
-    loadMe().then(async (me) => {
-      if (!me) return;
-      setUserId(me.user.id);
-      if (me.profile?.onboarding_complete) {
-        navigate({ to: "/home" });
-        return;
-      }
-      const existing = me.profile?.photos?.[0];
-      if (existing) {
-        setPhotoPath(existing);
-        setPhotoPreview(await signedPhotoUrl(existing));
-      }
-      setLoading(false);
-    });
+    loadMe()
+      .then(async (me) => {
+        if (!me) {
+          setLoading(false);
+          return;
+        }
+        setUserId(me.user.id);
+        if (me.profile?.onboarding_complete) {
+          navigate({ to: "/home" });
+          return;
+        }
+        const existing = me.profile?.photos?.[0];
+        if (existing) {
+          setPhotoPath(existing);
+          try {
+            setPhotoPreview(await signedPhotoUrl(existing));
+          } catch (e) {
+            console.warn("Failed to load existing photo", e);
+          }
+        }
+        setLoading(false);
+      })
+      .catch((e) => {
+        console.error("Onboarding load failed", e);
+        toast.error("Couldn't load your account. Please refresh.");
+        setLoading(false);
+      });
   }, [navigate]);
 
   const uploadPhoto = async (file: File) => {
-    const { compressImage } = await import("@/lib/image-compress");
-    const compressed = await compressImage(file, { maxDim: 720, quality: 0.85 });
-    const path = `${userId}/${crypto.randomUUID()}.jpg`;
-    const { error } = await supabase.storage.from("profile-photos").upload(path, compressed, { upsert: false, contentType: compressed.type });
-    if (error) return toast.error(error.message);
-    if (photoPath) await supabase.storage.from("profile-photos").remove([photoPath]);
-    setPhotoPath(path);
-    setPhotoPreview(URL.createObjectURL(compressed));
+    if (!userId) {
+      toast.error("Session not ready — please refresh and try again.");
+      return;
+    }
+    setUploading(true);
+    try {
+      let toUpload: File = file;
+      try {
+        toUpload = await compressImage(file, { maxDim: 720, quality: 0.85 });
+      } catch (e) {
+        console.warn("Image compression failed, uploading original", e);
+      }
+      const ext = (toUpload.type.split("/")[1] || "jpg").replace("jpeg", "jpg");
+      const path = `${userId}/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage
+        .from("profile-photos")
+        .upload(path, toUpload, { upsert: false, contentType: toUpload.type });
+      if (error) {
+        console.error("Photo upload failed", error);
+        toast.error(error.message || "Upload failed. Please try again.");
+        return;
+      }
+      const prev = photoPath;
+      setPhotoPath(path);
+      setPhotoPreview(URL.createObjectURL(toUpload));
+      toast.success("Photo added");
+      if (prev) {
+        supabase.storage.from("profile-photos").remove([prev]).catch(() => {});
+      }
+    } catch (e: any) {
+      console.error("Unexpected upload error", e);
+      toast.error(e?.message || "Something went wrong. Please try again.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const submit = async () => {
