@@ -26,11 +26,12 @@ export type VerificationRow = {
 export async function loadMe() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
-  const [{ data: profile }, { data: verification }] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+  const [{ data: profileRows }, { data: verification }] = await Promise.all([
+    (supabase as any).rpc("get_my_profile"),
     supabase.from("verification_status").select("status").eq("user_id", user.id).maybeSingle(),
   ]);
-  return { user, profile: profile as ProfileRow | null, verification: verification as VerificationRow | null };
+  const profile = Array.isArray(profileRows) ? profileRows[0] : profileRows;
+  return { user, profile: (profile ?? null) as ProfileRow | null, verification: verification as VerificationRow | null };
 }
 
 export function ageFromDob(dob: string): number {
