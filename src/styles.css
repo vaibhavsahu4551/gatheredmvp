@@ -34,28 +34,29 @@
   --color-brand: var(--brand);
   --color-brand-2: var(--brand-2);
   --color-brand-3: var(--brand-3);
-  --font-display: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --shadow-card: 0 1px 2px 0 oklch(0 0 0 / 0.04), 0 8px 24px -8px color-mix(in oklab, var(--brand) 22%, transparent);
-  --shadow-glow: 0 12px 40px -10px color-mix(in oklab, var(--brand-2) 45%, transparent);
-  --shadow-elevated: 0 20px 50px -16px color-mix(in oklab, var(--brand-3) 28%, transparent), 0 8px 24px -10px oklch(0 0 0 / 0.12);
+  --font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --shadow-card: 0 1px 2px 0 oklch(0 0 0 / 0.04), 0 10px 30px -12px color-mix(in oklab, var(--brand-2) 28%, transparent);
+  --shadow-glow: 0 14px 44px -12px color-mix(in oklab, var(--brand-2) 55%, transparent);
+  --shadow-elevated: 0 24px 60px -18px color-mix(in oklab, var(--brand-3) 32%, transparent), 0 8px 24px -10px oklch(0 0 0 / 0.10);
   --shadow-nav: 0 -1px 0 0 var(--color-border);
 }
 
 :root {
-  --radius: 1rem;
+  --radius: 1.125rem;
 
-  /* Vibrant Gathr palette: coral → magenta → deep indigo */
-  --brand: oklch(0.68 0.20 22);        /* coral #FF5A5F-ish */
-  --brand-2: oklch(0.58 0.28 340);     /* hot pink/magenta */
-  --brand-3: oklch(0.45 0.22 290);     /* deep indigo/purple */
+  /* Gathr palette: deep purple → magenta/pink */
+  --brand: oklch(0.42 0.19 305);       /* deep purple #6B2C91-ish */
+  --brand-2: oklch(0.60 0.26 340);     /* magenta */
+  --brand-3: oklch(0.68 0.24 355);     /* pink #E91E8C-ish */
 
-  --gradient-brand: linear-gradient(135deg, #FF5A5F 0%, #FF2D95 50%, #6B46FF 100%);
-  --gradient-brand-soft: linear-gradient(135deg, #FFE4E1 0%, #FCE2F1 50%, #E9E3FF 100%);
+  --gradient-brand: linear-gradient(135deg, #6B2C91 0%, #A62BB1 50%, #E91E8C 100%);
+  --gradient-brand-soft: linear-gradient(135deg, #EFE4F7 0%, #F7DDEE 55%, #FCE0EC 100%);
 
-  --background: oklch(0.995 0.005 20);
-  --foreground: oklch(0.19 0.03 285);
-  --surface: oklch(0.97 0.012 20);
+  /* Lavender-tinted off-white */
+  --background: oklch(0.985 0.010 320);
+  --foreground: oklch(0.18 0.04 300);
+  --surface: oklch(0.965 0.016 320);
 
   --card: oklch(1 0 0);
   --card-foreground: var(--foreground);
@@ -69,16 +70,16 @@
   --secondary-foreground: var(--foreground);
 
   --muted: var(--surface);
-  --muted-foreground: oklch(0.5 0.03 285);
+  --muted-foreground: oklch(0.52 0.03 300);
 
-  --accent: oklch(0.94 0.05 340);
-  --accent-foreground: oklch(0.28 0.14 300);
+  --accent: oklch(0.94 0.055 335);
+  --accent-foreground: oklch(0.30 0.16 305);
 
   --destructive: oklch(0.6 0.22 27);
   --destructive-foreground: oklch(1 0 0);
 
-  --border: oklch(0.93 0.015 320);
-  --input: oklch(0.93 0.015 320);
+  --border: oklch(0.925 0.020 320);
+  --input: oklch(0.925 0.020 320);
   --ring: var(--brand-2);
 }
 
@@ -90,10 +91,11 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     background-image:
-      radial-gradient(1200px 500px at -10% -10%, color-mix(in oklab, #FF5A5F 12%, transparent), transparent 60%),
-      radial-gradient(900px 400px at 110% -5%, color-mix(in oklab, #6B46FF 12%, transparent), transparent 55%);
+      radial-gradient(1200px 520px at -10% -10%, color-mix(in oklab, #6B2C91 14%, transparent), transparent 60%),
+      radial-gradient(900px 420px at 110% -5%, color-mix(in oklab, #E91E8C 12%, transparent), transparent 55%);
     background-attachment: fixed;
   }
+  h1, h2, h3 { letter-spacing: -0.02em; }
 }
 
 @utility bg-gradient-brand {
@@ -107,4 +109,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+@utility ring-brand {
+  box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px color-mix(in oklab, var(--brand-2) 75%, var(--brand-3));
 }
