@@ -2,19 +2,37 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { listIncomingRequests, respondHuddleRequest } from "@/lib/huddle-connect";
 import { getProfilesLite } from "@/lib/events";
+import { supabase } from "@/integrations/supabase/client";
 import { Avatar } from "@/components/Avatar";
 import { ArrowLeft, Check, X, Users } from "lucide-react";
 import { toast } from "sonner";
+import { LinkupConfirmModal, type LinkupPeer } from "@/components/LinkupConfirmModal";
 
 export const Route = createFileRoute("/_authenticated/_app/requests")({
   component: Requests,
 });
+
+async function loadPeer(id: string): Promise<LinkupPeer> {
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, full_name, photos, interests")
+    .eq("id", id)
+    .maybeSingle();
+  const photos = ((data as any)?.photos as string[] | null) ?? [];
+  return {
+    id,
+    name: (data as any)?.full_name ?? null,
+    photo: photos[0] ?? null,
+    interests: ((data as any)?.interests as string[] | null) ?? [],
+  };
+}
 
 function Requests() {
   const navigate = useNavigate();
   const [rows, setRows] = useState<any[]>([]);
   const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [loading, setLoading] = useState(true);
+  const [celebrate, setCelebrate] = useState<{ me: LinkupPeer; other: LinkupPeer } | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -25,10 +43,18 @@ function Requests() {
   };
   useEffect(() => { load(); }, []);
 
-  const act = async (id: string, accept: boolean) => {
+  const act = async (id: string, otherId: string, accept: boolean) => {
     try {
       await respondHuddleRequest(id, accept);
-      toast.success(accept ? "Linked up!" : "Declined");
+      if (accept) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const [me, other] = await Promise.all([loadPeer(user.id), loadPeer(otherId)]);
+          setCelebrate({ me, other });
+        }
+      } else {
+        toast.success("Declined");
+      }
       await load();
     } catch (e: any) { toast.error(e.message ?? "Failed"); }
   };
@@ -60,15 +86,26 @@ function Requests() {
                 <div className="text-[11px] text-muted-foreground">wants to Linkup</div>
               </div>
             </Link>
-            <button onClick={() => act(r.id, true)} className="h-9 w-9 rounded-full bg-gradient-brand text-white flex items-center justify-center">
+            <button onClick={() => act(r.id, r.from_id, true)} className="h-9 w-9 rounded-full bg-gradient-brand text-white flex items-center justify-center">
               <Check className="h-4 w-4" />
             </button>
-            <button onClick={() => act(r.id, false)} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
+            <button onClick={() => act(r.id, r.from_id, false)} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
               <X className="h-4 w-4" />
             </button>
           </div>
         ))}
       </div>
+
+      {celebrate && (
+        <LinkupConfirmModal
+          me={celebrate.me}
+          other={celebrate.other}
+          open
+          onClose={() => {
+            setCelebrate(null);
+          }}
+        />
+      )}
     </div>
   );
 }
