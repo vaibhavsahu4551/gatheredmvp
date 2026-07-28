@@ -2,8 +2,11 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { listDm, sendDm, markDmRead } from "@/lib/dm";
+import { sendDmVoice } from "@/lib/voice";
 import { getProfilesLite } from "@/lib/events";
 import { Avatar } from "@/components/Avatar";
+import { VoiceRecorder } from "@/components/VoiceRecorder";
+import { VoiceNoteBubble } from "@/components/VoiceNoteBubble";
 import { ArrowLeft, Send, Link2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/_app/messages/$threadId")({
@@ -128,6 +131,9 @@ function DmRoom() {
                     </div>
                   </Link>
                 )}
+                {m.voice_url && (
+                  <VoiceNoteBubble path={m.voice_url} durationMs={m.voice_duration_ms} mine={mine} />
+                )}
                 {m.body}
               </div>
             </div>
@@ -136,9 +142,10 @@ function DmRoom() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t border-border p-3 flex gap-2 pb-6">
+      <div className="border-t border-border p-3 flex gap-2 pb-6 items-center relative">
         <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()}
           placeholder="Message…" className="flex-1 rounded-full border border-border bg-background px-4 py-2.5 text-sm outline-none" />
+        <VoiceRecorder onSent={(path, dur) => sendDmVoice(threadId, path, dur)} />
         <button onClick={send} className="h-10 w-10 rounded-full bg-gradient-brand text-white flex items-center justify-center">
           <Send className="h-4 w-4" />
         </button>
