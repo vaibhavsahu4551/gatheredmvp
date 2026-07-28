@@ -47,7 +47,8 @@ function AuthPage() {
   const submitPhone = async () => {
     const digits = normalizePhone(phone);
     if (digits.length < 6) return toast.error("Enter a valid phone number");
-    if (password.length < 8) return toast.error("Password must be at least 8 characters");
+    if (tab === "signup" && password.length < 8) return toast.error("Password must be at least 8 characters");
+    if (tab === "login" && password.length === 0) return toast.error("Enter your password");
     setLoading(true);
     try {
       const fakeEmail = phoneToEmail(digits);
