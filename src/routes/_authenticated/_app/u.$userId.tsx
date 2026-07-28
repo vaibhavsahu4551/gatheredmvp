@@ -129,6 +129,56 @@ function UserProfile() {
       <div className="px-5 pt-5">
         {!isMe && (
           <div className="flex gap-2">
+            {status === "none" && (
+              <button disabled={busy} onClick={doHuddle}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-brand text-white py-2.5 text-sm font-semibold disabled:opacity-50">
+                <UserPlus className="h-4 w-4" /> Linkup
+              </button>
+            )}
+            {status === "outgoing" && (
+              <button disabled={busy} onClick={doCancel}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full border border-border bg-muted py-2.5 text-sm font-semibold">
+                <Clock className="h-4 w-4" /> Request sent · Cancel
+              </button>
+            )}
+            {status === "incoming" && (
+              <>
+                <button disabled={busy} onClick={() => doRespond(true)}
+                  className="flex-1 rounded-full bg-gradient-brand text-white py-2.5 text-sm font-semibold inline-flex items-center justify-center gap-2">
+                  <Check className="h-4 w-4" /> Accept
+                </button>
+                <button disabled={busy} onClick={() => doRespond(false)}
+                  className="rounded-full bg-muted py-2.5 px-4 text-sm font-semibold inline-flex items-center gap-2">
+                  <X className="h-4 w-4" /> Decline
+                </button>
+              </>
+            )}
+            {status === "connected" && (
+              <>
+                <button disabled className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-brand-soft text-foreground py-2.5 text-sm font-semibold">
+                  <Check className="h-4 w-4" /> Linked
+                </button>
+                <button onClick={openDm} className="rounded-full bg-primary text-primary-foreground py-2.5 px-4 text-sm font-semibold inline-flex items-center gap-2">
+                  <MessageCircle className="h-4 w-4" /> Message
+                </button>
+              </>
+            )}
+            {status === "declined" && (
+              <button disabled className="flex-1 rounded-full bg-muted py-2.5 text-sm font-semibold text-muted-foreground">
+                Not connected
+              </button>
+            )}
+          </div>
+        )}
+        {!isMe && myPremium && status !== "connected" && (
+          <button onClick={openDm} className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-full border border-border py-2.5 text-sm font-semibold">
+            <MessageCircle className="h-4 w-4" /> Message directly <PremiumBadge />
+          </button>
+        )}
+
+        {profile.bio && <p className="mt-4 text-[15px] leading-relaxed">{profile.bio}</p>}
+
+
 
 
         {profile.interests?.length > 0 && (
