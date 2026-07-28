@@ -95,77 +95,41 @@ function UserProfile() {
 
   return (
     <div>
-      <header className="px-5 pt-8 pb-2 flex items-center gap-3">
-        <button onClick={() => history.back()} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
-          <ArrowLeft className="h-4 w-4" />
+      <div className="relative w-full h-[50vh] min-h-[340px] bg-muted overflow-hidden">
+        {avatar ? (
+          <img src={avatar} className="absolute inset-0 h-full w-full object-cover" alt="" />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-brand-soft" />
+        )}
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+        <button
+          onClick={() => history.back()}
+          className="absolute top-4 left-4 h-10 w-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white"
+          aria-label="Back"
+        >
+          <ArrowLeft className="h-5 w-5" />
         </button>
-      </header>
-      <div className="px-5">
-        <div className="flex items-start gap-4">
-          <div className="h-24 w-24 rounded-full ring-4 ring-background bg-muted overflow-hidden shrink-0 shadow-elevated">
-            {avatar && <img src={avatar} className="h-full w-full object-cover" alt="" />}
-          </div>
-          <div className="pt-2 min-w-0 flex-1">
-            <h1 className="text-2xl font-semibold tracking-tight truncate inline-flex items-center gap-2 flex-wrap">
-              <span>{profile.full_name || "Member"}{profile.dob && <span className="text-muted-foreground font-normal">, {ageFromDob(profile.dob)}</span>}</span>
-              {targetPremium && <PremiumBadge />}
+        <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-3xl font-extrabold tracking-tight drop-shadow-md">
+              {profile.full_name || "Member"}
+              {profile.dob && <span className="font-semibold text-white/90">, {ageFromDob(profile.dob)}</span>}
             </h1>
-            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-              {profile.city && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{profile.city}</span>}
+            {targetPremium && <PremiumBadge />}
+          </div>
+          {profile.city && (
+            <div className="mt-1 inline-flex items-center gap-1 text-[15px] text-white/85">
+              <MapPin className="h-4 w-4" />
+              {profile.city}
             </div>
-          </div>
+          )}
         </div>
+      </div>
 
+      <div className="px-5 pt-5">
         {!isMe && (
-          <div className="mt-4 flex gap-2">
-            {status === "none" && (
-              <button disabled={busy} onClick={doHuddle}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-brand text-white py-2.5 text-sm font-semibold disabled:opacity-50">
-                <UserPlus className="h-4 w-4" /> Linkup
-              </button>
-            )}
-            {status === "outgoing" && (
-              <button disabled={busy} onClick={doCancel}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full border border-border bg-muted py-2.5 text-sm font-semibold">
-                <Clock className="h-4 w-4" /> Request sent · Cancel
-              </button>
-            )}
-            {status === "incoming" && (
-              <>
-                <button disabled={busy} onClick={() => doRespond(true)}
-                  className="flex-1 rounded-full bg-gradient-brand text-white py-2.5 text-sm font-semibold inline-flex items-center justify-center gap-2">
-                  <Check className="h-4 w-4" /> Accept
-                </button>
-                <button disabled={busy} onClick={() => doRespond(false)}
-                  className="rounded-full bg-muted py-2.5 px-4 text-sm font-semibold inline-flex items-center gap-2">
-                  <X className="h-4 w-4" /> Decline
-                </button>
-              </>
-            )}
-            {status === "connected" && (
-              <>
-                <button disabled className="flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-brand-soft text-foreground py-2.5 text-sm font-semibold">
-                  <Check className="h-4 w-4" /> Linked
-                </button>
-                <button onClick={openDm} className="rounded-full bg-primary text-primary-foreground py-2.5 px-4 text-sm font-semibold inline-flex items-center gap-2">
-                  <MessageCircle className="h-4 w-4" /> Message
-                </button>
-              </>
-            )}
-            {status === "declined" && (
-              <button disabled className="flex-1 rounded-full bg-muted py-2.5 text-sm font-semibold text-muted-foreground">
-                Not connected
-              </button>
-            )}
-          </div>
-        )}
-        {!isMe && myPremium && status !== "connected" && (
-          <button onClick={openDm} className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-full border border-border py-2.5 text-sm font-semibold">
-            <MessageCircle className="h-4 w-4" /> Message directly <PremiumBadge />
-          </button>
-        )}
+          <div className="flex gap-2">
 
-        {profile.bio && <p className="mt-4 text-[15px] leading-relaxed">{profile.bio}</p>}
 
         {profile.interests?.length > 0 && (
           <div className="mt-5">
