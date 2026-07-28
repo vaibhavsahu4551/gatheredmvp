@@ -61,7 +61,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "Gathr — Meet verified strangers, plan real hangouts" },
       { name: "description", content: "Gathr is a group-only meetup app for verified 18+ users to plan gaming, coffee, dinner, movies, treks and evening hangouts together." },
-      { name: "theme-color", content: "#ffffff" },
+      { name: "theme-color", content: "#6B2C91" },
       { property: "og:title", content: "Gathr — Meet verified strangers, plan real hangouts" },
       { property: "og:description", content: "Gathr is a group-only meetup app for verified 18+ users to plan gaming, coffee, dinner, movies, treks and evening hangouts together." },
       { property: "og:type", content: "website" },
