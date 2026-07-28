@@ -28,6 +28,7 @@ import { Route as AuthenticatedAppRequestsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAppPremiumRouteImport } from './routes/_authenticated/_app/premium'
 import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/_app/notifications'
 import { Route as AuthenticatedAppHomeRouteImport } from './routes/_authenticated/_app/home'
+import { Route as AuthenticatedAppDiscoverRouteImport } from './routes/_authenticated/_app/discover'
 import { Route as AuthenticatedAppCreateRouteImport } from './routes/_authenticated/_app/create'
 import { Route as AuthenticatedAppChatRouteImport } from './routes/_authenticated/_app/chat'
 import { Route as AuthenticatedAppProfileIndexRouteImport } from './routes/_authenticated/_app/profile.index'
@@ -141,6 +142,12 @@ const AuthenticatedAppHomeRoute = AuthenticatedAppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppDiscoverRoute =
+  AuthenticatedAppDiscoverRouteImport.update({
+    id: '/discover',
+    path: '/discover',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppCreateRoute = AuthenticatedAppCreateRouteImport.update({
   id: '/create',
   path: '/create',
@@ -243,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/chat': typeof AuthenticatedAppChatRouteWithChildren
   '/create': typeof AuthenticatedAppCreateRoute
+  '/discover': typeof AuthenticatedAppDiscoverRoute
   '/home': typeof AuthenticatedAppHomeRoute
   '/notifications': typeof AuthenticatedAppNotificationsRoute
   '/premium': typeof AuthenticatedAppPremiumRoute
@@ -276,6 +284,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/chat': typeof AuthenticatedAppChatRouteWithChildren
   '/create': typeof AuthenticatedAppCreateRoute
+  '/discover': typeof AuthenticatedAppDiscoverRoute
   '/home': typeof AuthenticatedAppHomeRoute
   '/notifications': typeof AuthenticatedAppNotificationsRoute
   '/premium': typeof AuthenticatedAppPremiumRoute
@@ -313,6 +322,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/_authenticated/_app/chat': typeof AuthenticatedAppChatRouteWithChildren
   '/_authenticated/_app/create': typeof AuthenticatedAppCreateRoute
+  '/_authenticated/_app/discover': typeof AuthenticatedAppDiscoverRoute
   '/_authenticated/_app/home': typeof AuthenticatedAppHomeRoute
   '/_authenticated/_app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/_authenticated/_app/premium': typeof AuthenticatedAppPremiumRoute
@@ -349,6 +359,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/chat'
     | '/create'
+    | '/discover'
     | '/home'
     | '/notifications'
     | '/premium'
@@ -382,6 +393,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/chat'
     | '/create'
+    | '/discover'
     | '/home'
     | '/notifications'
     | '/premium'
@@ -418,6 +430,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/_authenticated/_app/chat'
     | '/_authenticated/_app/create'
+    | '/_authenticated/_app/discover'
     | '/_authenticated/_app/home'
     | '/_authenticated/_app/notifications'
     | '/_authenticated/_app/premium'
@@ -583,6 +596,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppHomeRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/discover': {
+      id: '/_authenticated/_app/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof AuthenticatedAppDiscoverRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/create': {
       id: '/_authenticated/_app/create'
       path: '/create'
@@ -705,6 +725,7 @@ const AuthenticatedAppChatRouteWithChildren =
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppChatRoute: typeof AuthenticatedAppChatRouteWithChildren
   AuthenticatedAppCreateRoute: typeof AuthenticatedAppCreateRoute
+  AuthenticatedAppDiscoverRoute: typeof AuthenticatedAppDiscoverRoute
   AuthenticatedAppHomeRoute: typeof AuthenticatedAppHomeRoute
   AuthenticatedAppNotificationsRoute: typeof AuthenticatedAppNotificationsRoute
   AuthenticatedAppPremiumRoute: typeof AuthenticatedAppPremiumRoute
@@ -727,6 +748,7 @@ interface AuthenticatedAppRouteChildren {
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppChatRoute: AuthenticatedAppChatRouteWithChildren,
   AuthenticatedAppCreateRoute: AuthenticatedAppCreateRoute,
+  AuthenticatedAppDiscoverRoute: AuthenticatedAppDiscoverRoute,
   AuthenticatedAppHomeRoute: AuthenticatedAppHomeRoute,
   AuthenticatedAppNotificationsRoute: AuthenticatedAppNotificationsRoute,
   AuthenticatedAppPremiumRoute: AuthenticatedAppPremiumRoute,

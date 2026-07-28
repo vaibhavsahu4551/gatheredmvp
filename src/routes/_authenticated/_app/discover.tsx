@@ -151,7 +151,7 @@ function Discover() {
             <div key={r.id} className="rounded-2xl border border-border bg-card p-3 shadow-sm">
               <div className="flex gap-3">
                 <Link to="/u/$userId" params={{ userId: r.id }} className="shrink-0">
-                  <Avatar src={r._photo} name={r.full_name ?? ""} size={64} />
+                  <Avatar photo={r._photo} name={r.full_name ?? ""} size={64} />
                 </Link>
                 <div className="flex-1 min-w-0">
                   <Link to="/u/$userId" params={{ userId: r.id }} className="block">
