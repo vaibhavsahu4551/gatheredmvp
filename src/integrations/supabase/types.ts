@@ -81,28 +81,34 @@ export type Database = {
       }
       chat_messages: {
         Row: {
-          body: string
+          body: string | null
           created_at: string
           group_id: string
           id: string
           pride_actor_id: string | null
           user_id: string
+          voice_duration_ms: number | null
+          voice_url: string | null
         }
         Insert: {
-          body: string
+          body?: string | null
           created_at?: string
           group_id: string
           id?: string
           pride_actor_id?: string | null
           user_id: string
+          voice_duration_ms?: number | null
+          voice_url?: string | null
         }
         Update: {
-          body?: string
+          body?: string | null
           created_at?: string
           group_id?: string
           id?: string
           pride_actor_id?: string | null
           user_id?: string
+          voice_duration_ms?: number | null
+          voice_url?: string | null
         }
         Relationships: [
           {
@@ -123,6 +129,8 @@ export type Database = {
           share_id: string | null
           share_kind: string | null
           thread_id: string
+          voice_duration_ms: number | null
+          voice_url: string | null
         }
         Insert: {
           body?: string | null
@@ -132,6 +140,8 @@ export type Database = {
           share_id?: string | null
           share_kind?: string | null
           thread_id: string
+          voice_duration_ms?: number | null
+          voice_url?: string | null
         }
         Update: {
           body?: string | null
@@ -141,6 +151,8 @@ export type Database = {
           share_id?: string | null
           share_kind?: string | null
           thread_id?: string
+          voice_duration_ms?: number | null
+          voice_url?: string | null
         }
         Relationships: [
           {
