@@ -66,27 +66,30 @@ function Profile() {
 
   return (
     <div>
-      <div className="px-5 pt-8">
-        <div className="flex items-start gap-4">
-          <div className="h-24 w-24 rounded-full ring-4 ring-background bg-muted overflow-hidden shrink-0 shadow-elevated">
-            {avatar && <img src={avatar} className="h-full w-full object-cover" alt="" />}
-          </div>
-          <div className="pt-2 min-w-0 flex-1">
-            <h1 className="text-2xl font-semibold tracking-tight truncate">
-              {p.full_name || "Add your name"}
-              {p.dob && <span className="text-muted-foreground font-normal">, {ageFromDob(p.dob)}</span>}
-            </h1>
-            {p.bio && <p className="mt-1 text-[15px] leading-relaxed">{p.bio}</p>}
-            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-              {p.city && (
-                <span className="inline-flex items-center gap-1">
-                  <MapPin className="h-3.5 w-3.5" />
-                  {p.city}
-                </span>
-              )}
+      <div className="relative w-full h-[50vh] min-h-[340px] bg-muted overflow-hidden">
+        {avatar ? (
+          <img src={avatar} className="absolute inset-0 h-full w-full object-cover" alt="" />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-brand-soft" />
+        )}
+        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+          <h1 className="text-3xl font-extrabold tracking-tight drop-shadow-md">
+            {p.full_name || "Add your name"}
+            {p.dob && <span className="font-semibold text-white/90">, {ageFromDob(p.dob)}</span>}
+          </h1>
+          {p.city && (
+            <div className="mt-1 inline-flex items-center gap-1 text-[15px] text-white/85">
+              <MapPin className="h-4 w-4" />
+              {p.city}
             </div>
-          </div>
+          )}
         </div>
+      </div>
+
+      <div className="px-5 pt-5">
+        {p.bio && <p className="mb-4 text-[15px] leading-relaxed">{p.bio}</p>}
+
 
         <div className="mt-4 flex gap-2">
           <button
