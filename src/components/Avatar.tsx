@@ -32,14 +32,21 @@ export function Avatar({
 
   return (
     <div
-      className={`rounded-full overflow-hidden bg-gradient-brand shrink-0 flex items-center justify-center text-white font-semibold ${className}`}
-      style={{ width: size, height: size, fontSize: Math.max(10, size * 0.36) }}
+      className={`rounded-full p-[2px] bg-gradient-brand shrink-0 ${className}`}
+      style={{ width: size, height: size }}
     >
-      {url ? (
-        <img src={url} alt="" className="h-full w-full object-cover" />
-      ) : (
-        <span>{initials || "·"}</span>
-      )}
+      <div
+        className="rounded-full overflow-hidden bg-background flex items-center justify-center text-foreground/70 font-semibold h-full w-full"
+        style={{ fontSize: Math.max(10, size * 0.36) }}
+      >
+        {url ? (
+          <img src={url} alt="" className="h-full w-full object-cover rounded-full" />
+        ) : (
+          <div className="h-full w-full rounded-full bg-gradient-brand-soft flex items-center justify-center text-[color:var(--brand)]">
+            <span>{initials || "·"}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
