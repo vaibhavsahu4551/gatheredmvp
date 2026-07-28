@@ -357,12 +357,12 @@ function ConnectionsModal({ ids, onClose }: { ids: string[]; onClose: () => void
   const [photos, setPhotos] = useState<Record<string, string>>({});
   useEffect(() => {
     if (!ids.length) return;
-    getProfilesLite(ids).then(setNames);
-    (async () => {
+    getProfilesLite(ids).then(async (fetched) => {
+      setNames(fetched);
       const map: Record<string, string> = {};
       await Promise.all(
-        ids.map(async (uid) => {
-          const path = names[uid]?.photo;
+        Object.entries(fetched).map(async ([uid, profile]) => {
+          const path = profile?.photo;
           if (path) {
             const url = await signedPhotoUrl(path);
             if (url) map[uid] = url;
@@ -370,7 +370,7 @@ function ConnectionsModal({ ids, onClose }: { ids: string[]; onClose: () => void
         })
       );
       setPhotos(map);
-    })();
+    });
   }, [ids]);
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4" onClick={onClose}>
