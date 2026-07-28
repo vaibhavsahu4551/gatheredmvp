@@ -282,6 +282,16 @@ function HomeFeed() {
             </div>
           </div>
         )}
+        <Link to="/discover" className="block rounded-2xl border border-border bg-card p-4 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-gradient-brand flex items-center justify-center text-white">✨</div>
+            <div className="flex-1">
+              <div className="text-sm font-semibold">Discover by Interest</div>
+              <div className="text-xs text-muted-foreground">Find people who share your vibe</div>
+            </div>
+            <span className="text-gradient-brand text-lg">→</span>
+          </div>
+        </Link>
         {premium && (
           <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
             <div className="h-9 w-9 rounded-full bg-gradient-brand flex items-center justify-center text-white text-lg">✨</div>
