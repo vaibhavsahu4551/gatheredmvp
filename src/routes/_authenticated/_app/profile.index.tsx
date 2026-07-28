@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { loadMe, signedPhotoUrl, ageFromDob } from "@/lib/huddl";
-import { LogOut, MapPin, Plus, CalendarPlus, Pencil, UserPlus, Users, Sparkles } from "lucide-react";
+import { LogOut, MapPin, Plus, CalendarPlus, Pencil, UserPlus, Users, Sparkles, X } from "lucide-react";
 import { listConnections } from "@/lib/huddle-connect";
 import { listIncomingRequests } from "@/lib/huddle-connect";
 import {
@@ -25,7 +25,7 @@ import { toast } from "sonner";
 
 import { EventCard, type EventCounts } from "@/components/EventCard";
 import { PostCard, type PostItem } from "@/components/PostCard";
-import { Avatar } from "@/components/Avatar";
+
 
 export const Route = createFileRoute("/_authenticated/_app/profile/")({
   component: Profile,
@@ -354,29 +354,68 @@ function EmptyState({ icon, title, cta, onClick }: { icon: React.ReactNode; titl
 
 function ConnectionsModal({ ids, onClose }: { ids: string[]; onClose: () => void }) {
   const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
+  const [photos, setPhotos] = useState<Record<string, string>>({});
   useEffect(() => {
-    if (ids.length) getProfilesLite(ids).then(setNames);
+    if (!ids.length) return;
+    getProfilesLite(ids).then(async (fetched) => {
+      setNames(fetched);
+      const map: Record<string, string> = {};
+      await Promise.all(
+        Object.entries(fetched).map(async ([uid, profile]) => {
+          const path = profile?.photo;
+          if (path) {
+            const url = await signedPhotoUrl(path);
+            if (url) map[uid] = url;
+          }
+        })
+      );
+      setPhotos(map);
+    });
   }, [ids]);
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-4" onClick={onClose}>
-      <div className="w-full max-w-md rounded-2xl bg-card p-4 shadow-elevated max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="text-base font-semibold mb-3">Linked with</div>
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4" onClick={onClose}>
+      <div className="w-full max-w-md rounded-3xl bg-card p-5 shadow-elevated max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="text-lg font-bold">Linkups</div>
+          <button onClick={onClose} aria-label="Close" className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
         {ids.length === 0 ? (
-          <div className="text-sm text-muted-foreground py-8 text-center">No connections yet.</div>
+          <div className="py-10 text-center">
+            <div className="mx-auto h-14 w-14 rounded-full bg-gradient-brand-soft flex items-center justify-center mb-3">
+              <Users className="h-6 w-6 text-[color:var(--brand)]" />
+            </div>
+            <div className="text-sm font-semibold">No Linkups yet</div>
+            <div className="text-sm text-muted-foreground mt-1">Start connecting at events!</div>
+          </div>
         ) : (
-          <div className="space-y-1">
-            {ids.map((uid) => (
-              <Link
-                key={uid}
-                to="/u/$userId"
-                params={{ userId: uid }}
-                onClick={onClose}
-                className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted transition"
-              >
-                <Avatar photo={names[uid]?.photo} name={names[uid]?.full_name} size={40} />
-                <div className="text-sm font-medium truncate">{names[uid]?.full_name ?? "Member"}</div>
-              </Link>
-            ))}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {ids.map((uid) => {
+              const name = names[uid]?.full_name ?? "Member";
+              const initials = name.trim().split(/\s+/).map((s) => s[0]).slice(0, 2).join("").toUpperCase();
+              return (
+                <Link
+                  key={uid}
+                  to="/u/$userId"
+                  params={{ userId: uid }}
+                  onClick={onClose}
+                  className="group relative aspect-square rounded-2xl overflow-hidden bg-muted shadow-sm"
+                >
+                  {photos[uid] ? (
+                    <img src={photos[uid]} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-brand-soft flex items-center justify-center">
+                      <span className="text-2xl font-bold text-[color:var(--brand)]">{initials || "·"}</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                  <div className="absolute bottom-0 inset-x-0 p-3">
+                    <div className="text-sm font-semibold text-white truncate drop-shadow">{name}</div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
