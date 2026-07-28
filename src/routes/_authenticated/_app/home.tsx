@@ -289,7 +289,7 @@ function HomeFeed() {
               <div className="text-sm font-semibold">Gathr Premium</div>
               <div className="text-xs text-muted-foreground">Unlock priority events and more.</div>
             </div>
-            <button className="rounded-full bg-foreground text-background text-xs font-medium px-3 py-1.5">Upgrade</button>
+            <Link to="/premium" className="rounded-full bg-foreground text-background text-xs font-medium px-3 py-1.5">Upgrade</Link>
           </div>
         )}
         {loading && <FeedSkeleton />}
