@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { loadMe, signedPhotoUrl, ageFromDob } from "@/lib/huddl";
-import { LogOut, MapPin, Plus, CalendarPlus, Pencil, UserPlus, Users, Sparkles } from "lucide-react";
+import { LogOut, MapPin, Plus, CalendarPlus, Pencil, UserPlus, Users, Sparkles, X } from "lucide-react";
 import { listConnections } from "@/lib/huddle-connect";
 import { listIncomingRequests } from "@/lib/huddle-connect";
 import {
