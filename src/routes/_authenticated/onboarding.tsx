@@ -116,7 +116,7 @@ function Onboarding() {
       </header>
 
       <div className="mt-8 px-6 max-w-md mx-auto flex flex-col items-center">
-        <label className="relative h-40 w-40 rounded-full bg-muted overflow-hidden cursor-pointer flex items-center justify-center shadow-elevated">
+        <label className={`relative h-40 w-40 rounded-full bg-muted overflow-hidden flex items-center justify-center shadow-elevated ${uploading ? "cursor-wait opacity-70" : "cursor-pointer"}`}>
           {photoPreview ? (
             <img src={photoPreview} className="h-full w-full object-cover" alt="" />
           ) : (
@@ -125,16 +125,32 @@ function Onboarding() {
               <span className="text-xs">Tap to add</span>
             </div>
           )}
-          <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadPhoto(e.target.files[0])} />
+          {uploading && (
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <Loader2 className="h-8 w-8 text-white animate-spin" />
+            </div>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            disabled={uploading}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              e.target.value = "";
+              if (f) uploadPhoto(f);
+            }}
+          />
         </label>
-        {photoPreview && <div className="mt-4 text-xs text-muted-foreground">Tap the photo to replace</div>}
+        {photoPreview && !uploading && <div className="mt-4 text-xs text-muted-foreground">Tap the photo to replace</div>}
+        {uploading && <div className="mt-4 text-xs text-muted-foreground">Uploading photo…</div>}
 
         <button
           onClick={submit}
-          disabled={saving || !photoPath}
+          disabled={saving || uploading || !photoPath}
           className="mt-8 w-full rounded-full bg-gradient-brand py-3.5 text-[15px] font-semibold text-white shadow-elevated disabled:opacity-50"
         >
-          {saving ? "Saving…" : photoPath ? "Continue" : "Add a photo to continue"}
+          {saving ? "Saving…" : uploading ? "Uploading…" : photoPath ? "Continue" : "Add a photo to continue"}
         </button>
       </div>
 
@@ -142,10 +158,10 @@ function Onboarding() {
         <div className="max-w-md mx-auto">
           <button
             onClick={submit}
-            disabled={saving || !photoPath}
+            disabled={saving || uploading || !photoPath}
             className="w-full rounded-full bg-gradient-brand py-3.5 text-[15px] font-medium text-white disabled:opacity-50"
           >
-            {saving ? "Saving…" : "Continue"}
+            {saving ? "Saving…" : uploading ? "Uploading…" : "Continue"}
           </button>
         </div>
       </div>
