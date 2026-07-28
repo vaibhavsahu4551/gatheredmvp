@@ -38,8 +38,9 @@ function Discover() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { setLoading(false); return; }
-        const { data: myP } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
-        const mine = myP as ProfileRow | null;
+        const { data: myRows } = await (supabase as any).rpc("get_my_profile");
+        const myP = Array.isArray(myRows) ? myRows[0] : myRows;
+        const mine = (myP ?? null) as ProfileRow | null;
         setMe(mine);
         const myInterests = mine?.interests ?? [];
         if (!myInterests.length) { setRows([]); setLoading(false); return; }
