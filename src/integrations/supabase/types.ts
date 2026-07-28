@@ -832,6 +832,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_get_user: {
+        Args: { _user: string }
+        Returns: {
+          bio: string
+          created_at: string
+          full_name: string
+          id: string
+          phone: string
+          suspended_until: string
+        }[]
+      }
+      admin_list_users: {
+        Args: { _search?: string }
+        Returns: {
+          created_at: string
+          full_name: string
+          id: string
+          phone: string
+          pride_opt_in: boolean
+          suspended_until: string
+        }[]
+      }
+      admin_suspend_user: {
+        Args: { _reason: string; _until: string; _user: string }
+        Returns: undefined
+      }
       are_huddled: { Args: { _a: string; _b: string }; Returns: boolean }
       count_events_created_last_30d: {
         Args: { _user: string }
@@ -847,6 +873,39 @@ export type Database = {
           thread_id: string
           unread: number
         }[]
+      }
+      get_my_profile: {
+        Args: never
+        Returns: {
+          bio: string | null
+          city: string | null
+          created_at: string
+          dob: string | null
+          early_access: boolean
+          firebase_uid: string | null
+          full_name: string | null
+          gender: string | null
+          id: string
+          interests: string[]
+          onboarding_complete: boolean
+          phone: string | null
+          photos: string[]
+          premium_expires_at: string | null
+          pride_opt_in: boolean
+          razorpay_customer_id: string | null
+          razorpay_subscription_id: string | null
+          selfie_url: string | null
+          subscription_tier: string
+          suspended_until: string | null
+          suspension_reason: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       get_pride_identities: {
         Args: { _pride_ids: string[] }
