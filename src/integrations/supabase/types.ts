@@ -858,7 +858,6 @@ export type Database = {
         Args: { _reason: string; _until: string; _user: string }
         Returns: undefined
       }
-      are_huddled: { Args: { _a: string; _b: string }; Returns: boolean }
       count_events_created_last_30d: {
         Args: { _user: string }
         Returns: number
@@ -916,32 +915,6 @@ export type Database = {
           pride_id: string
         }[]
       }
-      has_pride_access: { Args: { _user: string }; Returns: boolean }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      is_blocked: { Args: { _a: string; _b: string }; Returns: boolean }
-      is_dm_member: {
-        Args: { _thread: string; _user: string }
-        Returns: boolean
-      }
-      is_event_host: {
-        Args: { _event: string; _user: string }
-        Returns: boolean
-      }
-      is_event_member: {
-        Args: { _event: string; _user: string }
-        Returns: boolean
-      }
-      is_group_member: {
-        Args: { _group: string; _user: string }
-        Returns: boolean
-      }
-      is_verified: { Args: { _user: string }; Returns: boolean }
       mark_dm_read: { Args: { _thread: string }; Returns: undefined }
       pride_suspended: { Args: { _user: string }; Returns: boolean }
     }
