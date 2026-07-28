@@ -47,20 +47,45 @@ function AuthPage() {
   const submitPhone = async () => {
     const digits = normalizePhone(phone);
     if (digits.length < 6) return toast.error("Enter a valid phone number");
-    if (password.length < 6) return toast.error("Password must be 6+ characters");
+    if (password.length < 8) return toast.error("Password must be at least 8 characters");
     setLoading(true);
     try {
       const fakeEmail = phoneToEmail(digits);
       if (tab === "signup") {
-        const { error } = await supabase.auth.signUp({ email: fakeEmail, password });
-        if (error) throw error;
+        const { data, error } = await supabase.auth.signUp({ email: fakeEmail, password });
+        if (error) {
+          const msg = error.message.toLowerCase();
+          if (msg.includes("already") || msg.includes("registered") || msg.includes("exists")) {
+            throw new Error("This phone number is already registered. Try logging in instead.");
+          }
+          throw error;
+        }
+        // If email confirmation is required, no session is returned — sign in explicitly.
+        if (!data.session) {
+          const { error: signInErr } = await supabase.auth.signInWithPassword({ email: fakeEmail, password });
+          if (signInErr) {
+            const m = signInErr.message.toLowerCase();
+            if (m.includes("not confirmed")) {
+              throw new Error("Account created but not yet active. Please try logging in again in a moment.");
+            }
+            throw signInErr;
+          }
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email: fakeEmail, password });
-        if (error) throw error;
+        if (error) {
+          const msg = error.message.toLowerCase();
+          if (msg.includes("invalid") && msg.includes("credentials")) {
+            throw new Error("Wrong phone number or password.");
+          }
+          throw error;
+        }
       }
       navigate({ to: "/home" });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Something went wrong");
+      const message = e instanceof Error ? e.message : "Something went wrong";
+      toast.error(message);
+      console.error("[auth] submitPhone failed:", e);
     } finally {
       setLoading(false);
     }
