@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { isCurrentUserAdmin } from "@/lib/admin";
 import { LayoutDashboard, Users, Calendar, Flag, Settings, LogOut } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -13,13 +14,35 @@ function AdminLayout() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [ready, setReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    isCurrentUserAdmin().then((ok) => {
-      if (!ok) navigate({ to: "/admin-login" });
-      else setReady(true);
-    });
+    isCurrentUserAdmin()
+      .then((ok) => {
+        if (!ok) navigate({ to: "/admin-login" });
+        else setReady(true);
+      })
+      .catch((err) => {
+        console.error("Admin access check failed", err);
+        const message = err instanceof Error ? err.message : "Couldn't verify admin access.";
+        setError(message);
+        toast.error(message);
+      });
   }, [navigate]);
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6">
+        <div className="max-w-sm text-center">
+          <h1 className="text-lg font-semibold">Admin panel unavailable</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{error}</p>
+          <button className="mt-5 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background" onClick={() => window.location.reload()}>
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!ready) {
     return <div className="min-h-screen flex items-center justify-center"><div className="h-6 w-6 rounded-full border-2 border-muted border-t-primary animate-spin" /></div>;

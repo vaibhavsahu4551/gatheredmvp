@@ -24,12 +24,18 @@ export type VerificationRow = {
 };
 
 export async function loadMe() {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw new Error(`Couldn't verify your session: ${userError.message}`);
   if (!user) return null;
-  const [{ data: profileRows }, { data: verification }] = await Promise.all([
+  const [profileResult, verificationResult] = await Promise.all([
     (supabase as any).rpc("get_my_profile"),
     supabase.from("verification_status").select("status").eq("user_id", user.id).maybeSingle(),
   ]);
+  if (profileResult.error) {
+    throw new Error(`Couldn't load your profile: ${profileResult.error.message}`);
+  }
+  const profileRows = profileResult.data;
+  const verification = verificationResult.data;
   const profile = Array.isArray(profileRows) ? profileRows[0] : profileRows;
   return { user, profile: (profile ?? null) as ProfileRow | null, verification: verification as VerificationRow | null };
 }

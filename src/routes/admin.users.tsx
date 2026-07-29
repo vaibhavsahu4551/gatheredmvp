@@ -17,8 +17,14 @@ function AdminUsers() {
 
   async function refresh() {
     setLoading(true);
-    setRows(await adminListUsers(q));
-    setLoading(false);
+    try {
+      setRows(await adminListUsers(q));
+    } catch (error) {
+      console.error("Admin users load failed", error);
+      toast.error(error instanceof Error ? error.message : "Couldn't load users");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function loadStats() {
@@ -27,12 +33,19 @@ function AdminUsers() {
     const now = Date.now();
     const d7 = new Date(now - 7 * 86400000).toISOString();
     const d30 = new Date(now - 30 * 86400000).toISOString();
-    const [total, new7, new30] = await Promise.all([
-      supabase.from("profiles").select("id", { count: "exact", head: true }),
-      supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", d7),
-      supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", d30),
-    ]);
-    setStats({ total: total.count ?? 0, new7: new7.count ?? 0, new30: new30.count ?? 0 });
+    try {
+      const [total, new7, new30] = await Promise.all([
+        supabase.from("profiles").select("id", { count: "exact", head: true }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", d7),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", d30),
+      ]);
+      const failed = [total, new7, new30].find((result) => result.error);
+      if (failed?.error) throw failed.error;
+      setStats({ total: total.count ?? 0, new7: new7.count ?? 0, new30: new30.count ?? 0 });
+    } catch (error) {
+      console.error("Admin user stats load failed", error);
+      toast.error(error instanceof Error ? error.message : "Couldn't load user statistics");
+    }
   }
 
   useEffect(() => { refresh(); loadStats(); /* eslint-disable-next-line */ }, []);

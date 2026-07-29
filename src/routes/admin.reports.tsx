@@ -16,8 +16,14 @@ function AdminReports() {
 
   async function refresh() {
     setLoading(true);
-    setRows(await adminListReports());
-    setLoading(false);
+    try {
+      setRows(await adminListReports());
+    } catch (error) {
+      console.error("Admin reports load failed", error);
+      toast.error(error instanceof Error ? error.message : "Couldn't load reports");
+    } finally {
+      setLoading(false);
+    }
   }
   useEffect(() => { refresh(); }, []);
 
