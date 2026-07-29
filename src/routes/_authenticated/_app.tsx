@@ -14,14 +14,20 @@ function AppShell() {
   const { pathname } = useLocation();
   const [ready, setReady] = useState(false);
   const [pride, setPride] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadMe().then((me) => {
-      if (!me) return;
-      if (!me.profile?.onboarding_complete) { navigate({ to: "/onboarding" }); return; }
-      setPride(!!me.profile?.pride_opt_in);
-      setReady(true);
-    });
+    loadMe()
+      .then((me) => {
+        if (!me) { navigate({ to: "/auth" }); return; }
+        if (!me.profile?.onboarding_complete) { navigate({ to: "/onboarding" }); return; }
+        setPride(!!me.profile?.pride_opt_in);
+        setReady(true);
+      })
+      .catch((error) => {
+        console.error("App profile load failed", error);
+        setLoadError(error instanceof Error ? error.message : "Couldn't load your profile.");
+      });
   }, [navigate]);
 
   // Refresh pride opt-in on every navigation so toggling it in Edit Profile
@@ -40,6 +46,20 @@ function AppShell() {
     })();
     return () => { alive = false; };
   }, [pathname]);
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6">
+        <div className="max-w-sm text-center">
+          <h1 className="text-lg font-semibold">We couldn't open Gathr</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{loadError}</p>
+          <button className="mt-5 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background" onClick={() => window.location.reload()}>
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!ready) {
     return <div className="min-h-screen flex items-center justify-center"><div className="h-6 w-6 rounded-full border-2 border-muted border-t-primary animate-spin" /></div>;

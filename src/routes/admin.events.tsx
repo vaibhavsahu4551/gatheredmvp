@@ -14,8 +14,14 @@ function AdminEvents() {
 
   async function refresh() {
     setLoading(true);
-    setRows(await adminListEvents(q));
-    setLoading(false);
+    try {
+      setRows(await adminListEvents(q));
+    } catch (error) {
+      console.error("Admin events load failed", error);
+      toast.error(error instanceof Error ? error.message : "Couldn't load events");
+    } finally {
+      setLoading(false);
+    }
   }
   useEffect(() => { refresh(); /* eslint-disable-next-line */ }, []);
 

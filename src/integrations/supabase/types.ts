@@ -876,35 +876,23 @@ export type Database = {
       get_my_profile: {
         Args: never
         Returns: {
-          bio: string | null
-          city: string | null
+          bio: string
+          city: string
           created_at: string
-          dob: string | null
+          dob: string
           early_access: boolean
-          firebase_uid: string | null
-          full_name: string | null
-          gender: string | null
+          full_name: string
+          gender: string
           id: string
           interests: string[]
           onboarding_complete: boolean
-          phone: string | null
           photos: string[]
-          premium_expires_at: string | null
+          premium_expires_at: string
           pride_opt_in: boolean
-          razorpay_customer_id: string | null
-          razorpay_subscription_id: string | null
-          selfie_url: string | null
+          selfie_url: string
           subscription_tier: string
-          suspended_until: string | null
-          suspension_reason: string | null
           updated_at: string
         }[]
-        SetofOptions: {
-          from: "*"
-          to: "profiles"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       get_pride_identities: {
         Args: { _pride_ids: string[] }

@@ -1,14 +1,16 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export async function isCurrentUserAdmin(): Promise<boolean> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError) throw userError;
   if (!user) return false;
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("user_roles" as any)
     .select("role")
     .eq("user_id", user.id)
     .eq("role", "admin")
     .maybeSingle();
+  if (error) throw error;
   return !!data;
 }
 

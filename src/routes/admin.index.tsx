@@ -17,6 +17,7 @@ type Overview = {
 
 function AdminOverview() {
   const [data, setData] = useState<Overview | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -47,6 +48,9 @@ function AdminOverview() {
       }
       const types = Object.entries(typeMap).map(([type, count]) => ({ type, count })).sort((a, b) => b.count - a.count);
 
+      const failed = [users, events, active, completed, signupsRes, typesRes].find((result) => result.error);
+      if (failed?.error) throw failed.error;
+
       setData({
         users: users.count ?? 0,
         events: events.count ?? 0,
@@ -54,9 +58,13 @@ function AdminOverview() {
         completed: completed.count ?? 0,
         signups, types,
       });
-    })();
+    })().catch((err) => {
+      console.error("Admin overview load failed", err);
+      setError(err instanceof Error ? err.message : "Couldn't load the admin overview.");
+    });
   }, []);
 
+  if (error) return <div className="text-sm text-destructive">{error}</div>;
   if (!data) return <div className="text-sm text-muted-foreground">Loading…</div>;
 
   const maxSignup = Math.max(1, ...data.signups.map((s) => s.count));
