@@ -20,7 +20,6 @@ function EditProfile() {
   const [originalInterests, setOriginalInterests] = useState<string[]>([]);
   const [photoPath, setPhotoPath] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
-  const [prideOptIn, setPrideOptIn] = useState(false);
 
   useEffect(() => {
     loadMe().then(async (me) => {
@@ -31,7 +30,6 @@ function EditProfile() {
       const loadedInterests = me.profile.interests ?? [];
       setInterests(loadedInterests);
       setOriginalInterests(loadedInterests);
-      setPrideOptIn(!!me.profile.pride_opt_in);
       const existing = me.profile.photos?.[0];
       if (existing) {
         setPhotoPath(existing);
@@ -74,7 +72,6 @@ function EditProfile() {
       bio: bio.trim() || null,
       interests: finalInterests,
       photos: photoPath ? [photoPath] : [],
-      pride_opt_in: prideOptIn,
     } as any).eq("id", userId);
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -149,25 +146,8 @@ function EditProfile() {
           </div>
         </Field>
 
-        <div className="rounded-2xl border border-border p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="text-sm font-semibold">Show Pride section</div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Private LGBTQ+ space for organizing house parties &amp; social events.
-                This choice is private — never shown on your profile or to other users.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setPrideOptIn((v) => !v)}
-              aria-pressed={prideOptIn}
-              className={`relative shrink-0 h-6 w-11 rounded-full transition ${prideOptIn ? "bg-gradient-brand" : "bg-muted"}`}
-            >
-              <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${prideOptIn ? "left-[22px]" : "left-0.5"}`} />
-            </button>
-          </div>
-        </div>
+
+
 
 
         <div className="flex gap-3 pt-2">
