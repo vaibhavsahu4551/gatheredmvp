@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/_app/settings/phone")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: ChangePhone;
+  component: ChangePhone,
 });
 
 const inputCls =
