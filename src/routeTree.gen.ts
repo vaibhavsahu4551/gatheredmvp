@@ -37,9 +37,12 @@ import { Route as AuthenticatedAppPrideIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedAppMessagesIndexRouteImport } from './routes/_authenticated/_app/messages.index'
 import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/_app/events.index'
 import { Route as AuthenticatedAppUUserIdRouteImport } from './routes/_authenticated/_app/u.$userId'
+import { Route as AuthenticatedAppSettingsTermsRouteImport } from './routes/_authenticated/_app/settings.terms'
 import { Route as AuthenticatedAppSettingsReportRouteImport } from './routes/_authenticated/_app/settings.report'
+import { Route as AuthenticatedAppSettingsPrivacyRouteImport } from './routes/_authenticated/_app/settings.privacy'
 import { Route as AuthenticatedAppSettingsPhoneRouteImport } from './routes/_authenticated/_app/settings.phone'
 import { Route as AuthenticatedAppSettingsPasswordRouteImport } from './routes/_authenticated/_app/settings.password'
+import { Route as AuthenticatedAppSettingsHelpRouteImport } from './routes/_authenticated/_app/settings.help'
 import { Route as AuthenticatedAppSettingsBlockedRouteImport } from './routes/_authenticated/_app/settings.blocked'
 import { Route as AuthenticatedAppProfileEditRouteImport } from './routes/_authenticated/_app/profile.edit'
 import { Route as AuthenticatedAppPrideSetupRouteImport } from './routes/_authenticated/_app/pride.setup'
@@ -198,10 +201,22 @@ const AuthenticatedAppUUserIdRoute = AuthenticatedAppUUserIdRouteImport.update({
   path: '/u/$userId',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppSettingsTermsRoute =
+  AuthenticatedAppSettingsTermsRouteImport.update({
+    id: '/settings/terms',
+    path: '/settings/terms',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppSettingsReportRoute =
   AuthenticatedAppSettingsReportRouteImport.update({
     id: '/settings/report',
     path: '/settings/report',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppSettingsPrivacyRoute =
+  AuthenticatedAppSettingsPrivacyRouteImport.update({
+    id: '/settings/privacy',
+    path: '/settings/privacy',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppSettingsPhoneRoute =
@@ -214,6 +229,12 @@ const AuthenticatedAppSettingsPasswordRoute =
   AuthenticatedAppSettingsPasswordRouteImport.update({
     id: '/settings/password',
     path: '/settings/password',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppSettingsHelpRoute =
+  AuthenticatedAppSettingsHelpRouteImport.update({
+    id: '/settings/help',
+    path: '/settings/help',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppSettingsBlockedRoute =
@@ -299,9 +320,12 @@ export interface FileRoutesByFullPath {
   '/pride/setup': typeof AuthenticatedAppPrideSetupRoute
   '/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/settings/blocked': typeof AuthenticatedAppSettingsBlockedRoute
+  '/settings/help': typeof AuthenticatedAppSettingsHelpRoute
   '/settings/password': typeof AuthenticatedAppSettingsPasswordRoute
   '/settings/phone': typeof AuthenticatedAppSettingsPhoneRoute
+  '/settings/privacy': typeof AuthenticatedAppSettingsPrivacyRoute
   '/settings/report': typeof AuthenticatedAppSettingsReportRoute
+  '/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/events/': typeof AuthenticatedAppEventsIndexRoute
   '/messages/': typeof AuthenticatedAppMessagesIndexRoute
@@ -338,9 +362,12 @@ export interface FileRoutesByTo {
   '/pride/setup': typeof AuthenticatedAppPrideSetupRoute
   '/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/settings/blocked': typeof AuthenticatedAppSettingsBlockedRoute
+  '/settings/help': typeof AuthenticatedAppSettingsHelpRoute
   '/settings/password': typeof AuthenticatedAppSettingsPasswordRoute
   '/settings/phone': typeof AuthenticatedAppSettingsPhoneRoute
+  '/settings/privacy': typeof AuthenticatedAppSettingsPrivacyRoute
   '/settings/report': typeof AuthenticatedAppSettingsReportRoute
+  '/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/events': typeof AuthenticatedAppEventsIndexRoute
   '/messages': typeof AuthenticatedAppMessagesIndexRoute
@@ -381,9 +408,12 @@ export interface FileRoutesById {
   '/_authenticated/_app/pride/setup': typeof AuthenticatedAppPrideSetupRoute
   '/_authenticated/_app/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/_authenticated/_app/settings/blocked': typeof AuthenticatedAppSettingsBlockedRoute
+  '/_authenticated/_app/settings/help': typeof AuthenticatedAppSettingsHelpRoute
   '/_authenticated/_app/settings/password': typeof AuthenticatedAppSettingsPasswordRoute
   '/_authenticated/_app/settings/phone': typeof AuthenticatedAppSettingsPhoneRoute
+  '/_authenticated/_app/settings/privacy': typeof AuthenticatedAppSettingsPrivacyRoute
   '/_authenticated/_app/settings/report': typeof AuthenticatedAppSettingsReportRoute
+  '/_authenticated/_app/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/_authenticated/_app/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/_authenticated/_app/events/': typeof AuthenticatedAppEventsIndexRoute
   '/_authenticated/_app/messages/': typeof AuthenticatedAppMessagesIndexRoute
@@ -423,9 +453,12 @@ export interface FileRouteTypes {
     | '/pride/setup'
     | '/profile/edit'
     | '/settings/blocked'
+    | '/settings/help'
     | '/settings/password'
     | '/settings/phone'
+    | '/settings/privacy'
     | '/settings/report'
+    | '/settings/terms'
     | '/u/$userId'
     | '/events/'
     | '/messages/'
@@ -462,9 +495,12 @@ export interface FileRouteTypes {
     | '/pride/setup'
     | '/profile/edit'
     | '/settings/blocked'
+    | '/settings/help'
     | '/settings/password'
     | '/settings/phone'
+    | '/settings/privacy'
     | '/settings/report'
+    | '/settings/terms'
     | '/u/$userId'
     | '/events'
     | '/messages'
@@ -504,9 +540,12 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/pride/setup'
     | '/_authenticated/_app/profile/edit'
     | '/_authenticated/_app/settings/blocked'
+    | '/_authenticated/_app/settings/help'
     | '/_authenticated/_app/settings/password'
     | '/_authenticated/_app/settings/phone'
+    | '/_authenticated/_app/settings/privacy'
     | '/_authenticated/_app/settings/report'
+    | '/_authenticated/_app/settings/terms'
     | '/_authenticated/_app/u/$userId'
     | '/_authenticated/_app/events/'
     | '/_authenticated/_app/messages/'
@@ -724,11 +763,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppUUserIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/settings/terms': {
+      id: '/_authenticated/_app/settings/terms'
+      path: '/settings/terms'
+      fullPath: '/settings/terms'
+      preLoaderRoute: typeof AuthenticatedAppSettingsTermsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/settings/report': {
       id: '/_authenticated/_app/settings/report'
       path: '/settings/report'
       fullPath: '/settings/report'
       preLoaderRoute: typeof AuthenticatedAppSettingsReportRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/settings/privacy': {
+      id: '/_authenticated/_app/settings/privacy'
+      path: '/settings/privacy'
+      fullPath: '/settings/privacy'
+      preLoaderRoute: typeof AuthenticatedAppSettingsPrivacyRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/settings/phone': {
@@ -743,6 +796,13 @@ declare module '@tanstack/react-router' {
       path: '/settings/password'
       fullPath: '/settings/password'
       preLoaderRoute: typeof AuthenticatedAppSettingsPasswordRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/settings/help': {
+      id: '/_authenticated/_app/settings/help'
+      path: '/settings/help'
+      fullPath: '/settings/help'
+      preLoaderRoute: typeof AuthenticatedAppSettingsHelpRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/settings/blocked': {
@@ -837,9 +897,12 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppPrideSetupRoute: typeof AuthenticatedAppPrideSetupRoute
   AuthenticatedAppProfileEditRoute: typeof AuthenticatedAppProfileEditRoute
   AuthenticatedAppSettingsBlockedRoute: typeof AuthenticatedAppSettingsBlockedRoute
+  AuthenticatedAppSettingsHelpRoute: typeof AuthenticatedAppSettingsHelpRoute
   AuthenticatedAppSettingsPasswordRoute: typeof AuthenticatedAppSettingsPasswordRoute
   AuthenticatedAppSettingsPhoneRoute: typeof AuthenticatedAppSettingsPhoneRoute
+  AuthenticatedAppSettingsPrivacyRoute: typeof AuthenticatedAppSettingsPrivacyRoute
   AuthenticatedAppSettingsReportRoute: typeof AuthenticatedAppSettingsReportRoute
+  AuthenticatedAppSettingsTermsRoute: typeof AuthenticatedAppSettingsTermsRoute
   AuthenticatedAppUUserIdRoute: typeof AuthenticatedAppUUserIdRoute
   AuthenticatedAppEventsIndexRoute: typeof AuthenticatedAppEventsIndexRoute
   AuthenticatedAppMessagesIndexRoute: typeof AuthenticatedAppMessagesIndexRoute
@@ -866,9 +929,12 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppPrideSetupRoute: AuthenticatedAppPrideSetupRoute,
   AuthenticatedAppProfileEditRoute: AuthenticatedAppProfileEditRoute,
   AuthenticatedAppSettingsBlockedRoute: AuthenticatedAppSettingsBlockedRoute,
+  AuthenticatedAppSettingsHelpRoute: AuthenticatedAppSettingsHelpRoute,
   AuthenticatedAppSettingsPasswordRoute: AuthenticatedAppSettingsPasswordRoute,
   AuthenticatedAppSettingsPhoneRoute: AuthenticatedAppSettingsPhoneRoute,
+  AuthenticatedAppSettingsPrivacyRoute: AuthenticatedAppSettingsPrivacyRoute,
   AuthenticatedAppSettingsReportRoute: AuthenticatedAppSettingsReportRoute,
+  AuthenticatedAppSettingsTermsRoute: AuthenticatedAppSettingsTermsRoute,
   AuthenticatedAppUUserIdRoute: AuthenticatedAppUUserIdRoute,
   AuthenticatedAppEventsIndexRoute: AuthenticatedAppEventsIndexRoute,
   AuthenticatedAppMessagesIndexRoute: AuthenticatedAppMessagesIndexRoute,

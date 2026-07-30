@@ -73,6 +73,13 @@ function Profile() {
           <div className="absolute inset-0 bg-gradient-brand-soft" />
         )}
         <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+        <Link
+          to="/settings"
+          aria-label="Settings"
+          className="absolute top-4 right-4 h-10 w-10 rounded-full bg-black/35 backdrop-blur flex items-center justify-center text-white hover:bg-black/50 transition"
+        >
+          <SettingsIcon className="h-5 w-5" />
+        </Link>
         <div className="absolute inset-x-0 bottom-0 p-5 text-white">
           <h1 className="text-3xl font-extrabold tracking-tight drop-shadow-md">
             {p.full_name || "Add your name"}
