@@ -22,6 +22,13 @@ function AppShell() {
         if (!me) { navigate({ to: "/auth" }); return; }
         if (!me.profile?.onboarding_complete) { navigate({ to: "/onboarding" }); return; }
         setPride(!!me.profile?.pride_opt_in);
+        // Logging back in reactivates a temporarily deactivated account.
+        (supabase as any)
+          .from("user_settings")
+          .update({ deactivated_at: null })
+          .eq("user_id", me.user.id)
+          .not("deactivated_at", "is", null)
+          .then(() => {}, () => {});
         setReady(true);
       })
       .catch((error) => {
