@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.enforce_linkup_privacy() FROM PUBLIC, anon, authenticated;
