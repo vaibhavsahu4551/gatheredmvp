@@ -22,6 +22,7 @@ import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AuthenticatedPendingRouteImport } from './routes/_authenticated/pending'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/_app'
+import { Route as ApiPublicSendPushRouteImport } from './routes/api/public/send-push'
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
 import { Route as AuthenticatedAppSubscriptionRouteImport } from './routes/_authenticated/_app/subscription'
 import { Route as AuthenticatedAppRequestsRouteImport } from './routes/_authenticated/_app/requests'
@@ -115,6 +116,11 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/_app',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicSendPushRoute = ApiPublicSendPushRouteImport.update({
+  id: '/api/public/send-push',
+  path: '/api/public/send-push',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicRazorpayWebhookRoute =
   ApiPublicRazorpayWebhookRouteImport.update({
@@ -313,6 +319,7 @@ export interface FileRoutesByFullPath {
   '/requests': typeof AuthenticatedAppRequestsRoute
   '/subscription': typeof AuthenticatedAppSubscriptionRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
+  '/api/public/send-push': typeof ApiPublicSendPushRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
@@ -355,6 +362,7 @@ export interface FileRoutesByTo {
   '/requests': typeof AuthenticatedAppRequestsRoute
   '/subscription': typeof AuthenticatedAppSubscriptionRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
+  '/api/public/send-push': typeof ApiPublicSendPushRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
@@ -401,6 +409,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/requests': typeof AuthenticatedAppRequestsRoute
   '/_authenticated/_app/subscription': typeof AuthenticatedAppSubscriptionRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
+  '/api/public/send-push': typeof ApiPublicSendPushRoute
   '/_authenticated/_app/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/_authenticated/_app/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/_authenticated/_app/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
@@ -446,6 +455,7 @@ export interface FileRouteTypes {
     | '/requests'
     | '/subscription'
     | '/api/public/razorpay-webhook'
+    | '/api/public/send-push'
     | '/chat/$groupId'
     | '/messages/$threadId'
     | '/posts/$postId'
@@ -488,6 +498,7 @@ export interface FileRouteTypes {
     | '/requests'
     | '/subscription'
     | '/api/public/razorpay-webhook'
+    | '/api/public/send-push'
     | '/chat/$groupId'
     | '/messages/$threadId'
     | '/posts/$postId'
@@ -533,6 +544,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/requests'
     | '/_authenticated/_app/subscription'
     | '/api/public/razorpay-webhook'
+    | '/api/public/send-push'
     | '/_authenticated/_app/chat/$groupId'
     | '/_authenticated/_app/messages/$threadId'
     | '/_authenticated/_app/posts/$postId'
@@ -563,6 +575,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AuthRoute: typeof AuthRoute
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
+  ApiPublicSendPushRoute: typeof ApiPublicSendPushRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -657,6 +670,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/send-push': {
+      id: '/api/public/send-push'
+      path: '/api/public/send-push'
+      fullPath: '/api/public/send-push'
+      preLoaderRoute: typeof ApiPublicSendPushRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/razorpay-webhook': {
       id: '/api/public/razorpay-webhook'
@@ -990,6 +1010,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AuthRoute: AuthRoute,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
+  ApiPublicSendPushRoute: ApiPublicSendPushRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
