@@ -13,6 +13,7 @@ import {
 import { loadMe } from "@/lib/huddl";
 import { SettingsShell, SectionTitle, Toggle, Card, Row } from "@/components/SettingsUI";
 import { deleteMyAccount } from "@/lib/account.functions";
+import { enablePush, disablePushForThisDevice } from "@/lib/push";
 import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/_authenticated/_app/settings/")({
@@ -65,7 +66,22 @@ function Settings() {
     }
   };
 
+  const togglePush = async (v: boolean) => {
+    await patch({ push_enabled: v });
+    if (v) {
+      const ok = await enablePush((url) => navigate({ to: url as any }));
+      if (!ok) {
+        toast.message("In-app notifications only", {
+          description: "Your device hasn't allowed notifications, so we won't send them to your notification tray.",
+        });
+      }
+    } else {
+      await disablePushForThisDevice();
+    }
+  };
+
   const signOut = async () => {
+    await disablePushForThisDevice();
     await supabase.auth.signOut();
     navigate({ to: "/" });
   };
@@ -138,7 +154,7 @@ function Settings() {
         <Row
           title="Push notifications"
           subtitle="Turn off to mute everything below"
-          right={<Toggle label="Push notifications" checked={push} onChange={(v) => patch({ push_enabled: v })} />}
+          right={<Toggle label="Push notifications" checked={push} onChange={(v) => togglePush(v)} />}
         />
         {([
           ["notify_likes", "Likes"],

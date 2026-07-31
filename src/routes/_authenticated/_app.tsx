@@ -4,6 +4,7 @@ import { loadMe } from "@/lib/huddl";
 import { supabase } from "@/integrations/supabase/client";
 import { Home, Calendar, Plus, MessageCircle, User, Sparkles } from "lucide-react";
 import { useDmUnread } from "@/hooks/useDmUnread";
+import { enablePush, pushAsked, pushDeclined } from "@/lib/push";
 
 export const Route = createFileRoute("/_authenticated/_app")({
   component: AppShell,
@@ -30,6 +31,15 @@ function AppShell() {
           .not("deactivated_at", "is", null)
           .then(() => {}, () => {});
         setReady(true);
+        // Ask for notification permission once, shortly after the app opens.
+        // Declines are remembered so we never nag.
+        if (!pushDeclined() && !pushAsked()) {
+          setTimeout(() => {
+            void enablePush((url) => navigate({ to: url as any }));
+          }, 2500);
+        } else if (!pushDeclined()) {
+          void enablePush((url) => navigate({ to: url as any }));
+        }
       })
       .catch((error) => {
         console.error("App profile load failed", error);
