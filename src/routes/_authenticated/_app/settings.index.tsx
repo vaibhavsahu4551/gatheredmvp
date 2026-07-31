@@ -138,7 +138,7 @@ function Settings() {
         <Row
           title="Push notifications"
           subtitle="Turn off to mute everything below"
-          right={<Toggle label="Push notifications" checked={push} onChange={(v) => patch({ push_enabled: v })} />}
+          right={<Toggle label="Push notifications" checked={push} onChange={(v) => togglePush(v)} />}
         />
         {([
           ["notify_likes", "Likes"],
