@@ -201,6 +201,13 @@ function AuthPage() {
                 onChange={setPassword}
                 onEnter={submitPhone}
               />
+              {tab === "login" && (
+                <div className="text-right -mt-1">
+                  <Link to="/forgot-password" className="text-[12px] font-semibold text-gradient-brand">
+                    Forgot password?
+                  </Link>
+                </div>
+              )}
               <button
                 onClick={submitPhone}
                 disabled={loading}
