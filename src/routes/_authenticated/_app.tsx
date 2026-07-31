@@ -30,6 +30,15 @@ function AppShell() {
           .not("deactivated_at", "is", null)
           .then(() => {}, () => {});
         setReady(true);
+        // Ask for notification permission once, shortly after the app opens.
+        // Declines are remembered so we never nag.
+        if (!pushDeclined() && !pushAsked()) {
+          setTimeout(() => {
+            void enablePush((url) => navigate({ to: url as any }));
+          }, 2500);
+        } else if (!pushDeclined()) {
+          void enablePush((url) => navigate({ to: url as any }));
+        }
       })
       .catch((error) => {
         console.error("App profile load failed", error);
