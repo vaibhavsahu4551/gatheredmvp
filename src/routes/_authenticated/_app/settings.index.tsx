@@ -13,6 +13,7 @@ import {
 import { loadMe } from "@/lib/huddl";
 import { SettingsShell, SectionTitle, Toggle, Card, Row } from "@/components/SettingsUI";
 import { deleteMyAccount } from "@/lib/account.functions";
+import { enablePush, disablePushForThisDevice } from "@/lib/push";
 import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/_authenticated/_app/settings/")({
