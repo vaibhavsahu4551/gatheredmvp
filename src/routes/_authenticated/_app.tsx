@@ -4,6 +4,7 @@ import { loadMe } from "@/lib/huddl";
 import { supabase } from "@/integrations/supabase/client";
 import { Home, Calendar, Plus, MessageCircle, User, Sparkles } from "lucide-react";
 import { useDmUnread } from "@/hooks/useDmUnread";
+import { enablePush, pushAsked, pushDeclined } from "@/lib/push";
 
 export const Route = createFileRoute("/_authenticated/_app")({
   component: AppShell,
