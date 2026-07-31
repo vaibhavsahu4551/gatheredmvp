@@ -65,7 +65,22 @@ function Settings() {
     }
   };
 
+  const togglePush = async (v: boolean) => {
+    await patch({ push_enabled: v });
+    if (v) {
+      const ok = await enablePush((url) => navigate({ to: url as any }));
+      if (!ok) {
+        toast.message("In-app notifications only", {
+          description: "Your device hasn't allowed notifications, so we won't send them to your notification tray.",
+        });
+      }
+    } else {
+      await disablePushForThisDevice();
+    }
+  };
+
   const signOut = async () => {
+    await disablePushForThisDevice();
     await supabase.auth.signOut();
     navigate({ to: "/" });
   };
