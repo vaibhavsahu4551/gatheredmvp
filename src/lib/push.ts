@@ -42,10 +42,15 @@ export function pushAsked(): boolean {
 
 async function saveToken(token: string, platform: string) {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
-  await (supabase as any)
+  if (!user) { console.warn("[push] no session — token not saved"); return; }
+  const { error } = await (supabase as any)
     .from("push_tokens")
-    .upsert({ user_id: user.id, token, platform, updated_at: new Date().toISOString() }, { onConflict: "token" });
+    .upsert(
+      { user_id: user.id, token, platform, updated_at: new Date().toISOString() },
+      { onConflict: "token" },
+    );
+  if (error) console.error("[push] could not save device token:", error.message);
+  else console.info("[push] device token registered");
 }
 
 function isNative(): boolean {
