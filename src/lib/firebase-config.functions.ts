@@ -12,6 +12,6 @@ export const getFirebaseConfig = createServerFn({ method: "GET" }).handler(async
     storageBucket: process.env.FIREBASE_STORAGE_BUCKET ?? "",
     messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID ?? "",
     appId: process.env.FIREBASE_APP_ID ?? "",
-    vapidKey: process.env.FIREBASE_VAPID_KEY ?? "",
+    vapidKey: process.env.FIREBASE_VAPID_KEY ?? process.env.FIREBASE_VAVID_KEY ?? "",
   };
 });
