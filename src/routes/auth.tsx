@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
-import { ArrowLeft, ShieldCheck, Phone, Mail, Apple } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Phone, Apple } from "lucide-react";
 import heroImage from "@/assets/auth-hero.jpg";
 
 export const Route = createFileRoute("/auth")({
