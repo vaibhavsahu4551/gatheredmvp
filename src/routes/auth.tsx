@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
-import { ArrowLeft, ShieldCheck, Phone, Mail, Sparkles } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Phone, Mail, Apple } from "lucide-react";
+import heroImage from "@/assets/auth-hero.jpg";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
@@ -19,7 +21,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 type Tab = "signup" | "login";
-type Method = "phone" | "email";
+type Mode = "choose" | "phone" | "email";
 
 function normalizePhone(input: string): string {
   return input.replace(/\D+/g, "");
@@ -31,18 +33,43 @@ function phoneToEmail(phone: string): string {
 function AuthPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("signup");
-  const [method, setMethod] = useState<Method>("phone");
+  const [mode, setMode] = useState<Mode>("choose");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [magicSent, setMagicSent] = useState(false);
+  const [showApple, setShowApple] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/home" });
     });
   }, [navigate]);
+
+  useEffect(() => {
+    const ua = navigator.userAgent || "";
+    setShowApple(/iPhone|iPad|iPod|Macintosh/i.test(ua));
+  }, []);
+
+  const submitApple = async () => {
+    setLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("apple", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error(result.error.message || "Apple sign-in failed");
+        return;
+      }
+      if (result.redirected) return;
+      navigate({ to: "/home" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Apple sign-in failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const submitPhone = async () => {
     const digits = normalizePhone(phone);
@@ -110,177 +137,179 @@ function AuthPage() {
     }
   };
 
-  const ctaLabel =
-    method === "email"
-      ? loading ? "Sending…" : "Send magic link"
-      : loading
-        ? "Please wait…"
-        : tab === "signup" ? "Create my account" : "Log in";
-
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden">
-      {/* vibrant hero backdrop */}
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 h-[52vh] -z-10"
-        style={{ backgroundImage: "var(--gradient-brand)" }}
-      />
-      <div aria-hidden className="absolute inset-x-0 top-[46vh] h-40 -z-10 bg-gradient-to-b from-transparent to-background" />
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Hero */}
+      <div className="relative h-[46vh] min-h-[280px] w-full overflow-hidden">
+        <img
+          src={heroImage}
+          alt="Friends laughing together at an evening rooftop gathering"
+          width={1024}
+          height={1280}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/85" />
 
-      <div className="px-4 pt-4">
-        <Link
-          to="/"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+          {mode === "choose" ? (
+            <Link to="/" className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          ) : (
+            <button
+              onClick={() => setMode("choose")}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          )}
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur px-3 py-1 text-[11px] font-medium text-white/90">
+            <ShieldCheck className="h-3.5 w-3.5" /> 18+ only
+          </span>
+        </div>
+
+        <div className="absolute inset-x-0 bottom-0 px-6 pb-6">
+          <div className="text-[13px] font-black uppercase tracking-[0.3em] text-white/70">Gathr</div>
+          <h1 className="mt-2 text-[30px] font-bold leading-[1.08] tracking-tight text-white drop-shadow-sm">
+            Never miss a moment.<br />Discover real hangouts.
+          </h1>
+        </div>
       </div>
 
-      <main className="flex-1 px-6 pt-6 pb-10 max-w-md mx-auto w-full">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur px-3 py-1 text-[11px] font-semibold text-white">
-          <ShieldCheck className="h-3.5 w-3.5" /> Verified · 18+ only
-        </div>
-        <h1 className="mt-4 text-[34px] font-bold tracking-tight leading-[1.05] text-white drop-shadow-sm">
-          Your next<br />night out<br />starts here.
-        </h1>
-        <p className="mt-3 text-[14px] text-white/85 max-w-xs">
-          Coffee, dinner, drinks, gaming — plan real hangouts with people who actually show up.
-        </p>
+      {/* Panel */}
+      <main className="flex-1 w-full max-w-md mx-auto px-6 pt-6 pb-10">
+        {mode === "choose" ? (
+          <div className="space-y-3">
+            <p className="text-[13px] text-muted-foreground">
+              {tab === "signup" ? "Create your account with" : "Log in with"}
+            </p>
 
-        {/* Tabs */}
-        <div className="mt-8 grid grid-cols-2 rounded-full bg-white/95 p-1 shadow-glow">
-          <button
-            onClick={() => setTab("signup")}
-            className={`h-11 rounded-full text-[14px] font-semibold transition ${
-              tab === "signup" ? "text-white shadow-md" : "text-foreground/70"
-            }`}
-            style={tab === "signup" ? { backgroundImage: "var(--gradient-brand)" } : undefined}
-          >
-            <span className="inline-flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> Sign up</span>
-          </button>
-          <button
-            onClick={() => setTab("login")}
-            className={`h-11 rounded-full text-[14px] font-semibold transition ${
-              tab === "login" ? "text-white shadow-md" : "text-foreground/70"
-            }`}
-            style={tab === "login" ? { backgroundImage: "var(--gradient-brand)" } : undefined}
-          >
-            Log in
-          </button>
-        </div>
+            <button
+              onClick={() => { setMode("email"); setMagicSent(false); }}
+              className="w-full py-4 rounded-full text-white text-[15px] font-semibold shadow-glow active:scale-[0.99] transition inline-flex items-center justify-center gap-2"
+              style={{ backgroundImage: "var(--gradient-brand)" }}
+            >
+              <Mail className="h-4 w-4" /> Continue with Email
+            </button>
 
-        {/* Card */}
-        <div className="mt-4 rounded-3xl bg-card shadow-card ring-1 ring-black/5 p-5">
-          <div className="text-[13px] font-medium text-muted-foreground">
-            {tab === "signup" ? "Create your account with:" : "Log in with:"}
-          </div>
-
-          {/* Method selector */}
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            <MethodPill active={method === "phone"} onClick={() => setMethod("phone")} icon={<Phone className="h-4 w-4" />} label="Phone + password" />
-            <MethodPill active={method === "email"} onClick={() => setMethod("email")} icon={<Mail className="h-4 w-4" />} label="Email magic link" />
-          </div>
-
-          {method === "phone" ? (
-            <div className="mt-4 space-y-3">
-              <LabeledInput
-                label="Phone number"
-                type="tel"
-                inputMode="numeric"
-                autoComplete="tel"
-                placeholder="Just digits, e.g. 9876543210"
-                value={phone}
-                onChange={setPhone}
-              />
-              <LabeledInput
-                label="Password"
-                type="password"
-                autoComplete={tab === "signup" ? "new-password" : "current-password"}
-                placeholder="At least 6 characters"
-                value={password}
-                onChange={setPassword}
-                onEnter={submitPhone}
-              />
-              {tab === "login" && (
-                <div className="text-right -mt-1">
-                  <Link to="/forgot-password" className="text-[12px] font-semibold text-gradient-brand">
-                    Forgot password?
-                  </Link>
-                </div>
-              )}
+            {showApple && (
               <button
-                onClick={submitPhone}
+                onClick={submitApple}
                 disabled={loading}
-                className="w-full h-12 rounded-full text-white text-[15px] font-semibold shadow-glow disabled:opacity-60 active:scale-[0.99] transition"
-                style={{ backgroundImage: "var(--gradient-brand)" }}
+                className="w-full py-4 rounded-full bg-foreground text-background text-[15px] font-semibold active:scale-[0.99] transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
               >
-                {ctaLabel}
+                <Apple className="h-4 w-4" /> Continue with Apple
               </button>
-            </div>
-          ) : (
-            <div className="mt-4 space-y-3">
-              <LabeledInput
-                label="Email"
-                type="email"
-                autoComplete="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={setEmail}
-                onEnter={submitEmail}
-              />
-              <button
-                onClick={submitEmail}
-                disabled={loading}
-                className="w-full h-12 rounded-full text-white text-[15px] font-semibold shadow-glow disabled:opacity-60 active:scale-[0.99] transition"
-                style={{ backgroundImage: "var(--gradient-brand)" }}
-              >
-                {ctaLabel}
-              </button>
-              {magicSent && (
-                <p className="text-center text-xs text-muted-foreground">
-                  Link sent. Open it on this device to sign in.
-                </p>
+            )}
+
+            <button
+              onClick={() => setMode("phone")}
+              className="w-full py-4 rounded-full bg-card ring-1 ring-border text-[15px] font-semibold shadow-card active:scale-[0.99] transition inline-flex items-center justify-center gap-2"
+            >
+              <Phone className="h-4 w-4" /> Continue with Phone
+            </button>
+
+            <div className="pt-2 text-center text-[13px] text-muted-foreground">
+              {tab === "signup" ? (
+                <>Already have an account?{" "}
+                  <button onClick={() => setTab("login")} className="font-semibold text-gradient-brand">Log in</button>
+                </>
+              ) : (
+                <>New to Gathr?{" "}
+                  <button onClick={() => setTab("signup")} className="font-semibold text-gradient-brand">Sign up</button>
+                </>
               )}
             </div>
-          )}
+          </div>
+        ) : (
+          <div className="rounded-3xl bg-card shadow-card ring-1 ring-black/5 p-5">
+            <div className="grid grid-cols-2 rounded-full bg-muted p-1">
+              <button
+                onClick={() => setTab("signup")}
+                className={`h-10 rounded-full text-[13px] font-semibold transition ${tab === "signup" ? "text-white shadow-sm" : "text-foreground/70"}`}
+                style={tab === "signup" ? { backgroundImage: "var(--gradient-brand)" } : undefined}
+              >
+                Sign up
+              </button>
+              <button
+                onClick={() => setTab("login")}
+                className={`h-10 rounded-full text-[13px] font-semibold transition ${tab === "login" ? "text-white shadow-sm" : "text-foreground/70"}`}
+                style={tab === "login" ? { backgroundImage: "var(--gradient-brand)" } : undefined}
+              >
+                Log in
+              </button>
+            </div>
 
-          <div className="mt-4 text-center text-[12px] text-muted-foreground">
-            {tab === "signup" ? (
-              <>Already have an account?{" "}
-                <button onClick={() => setTab("login")} className="font-semibold text-gradient-brand">Log in</button>
-              </>
+            {mode === "phone" ? (
+              <div className="mt-4 space-y-3">
+                <LabeledInput
+                  label="Phone number"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  placeholder="Just digits, e.g. 9876543210"
+                  value={phone}
+                  onChange={setPhone}
+                />
+                <LabeledInput
+                  label="Password"
+                  type="password"
+                  autoComplete={tab === "signup" ? "new-password" : "current-password"}
+                  placeholder="At least 8 characters"
+                  value={password}
+                  onChange={setPassword}
+                  onEnter={submitPhone}
+                />
+                {tab === "login" && (
+                  <div className="text-right -mt-1">
+                    <Link to="/forgot-password" className="text-[12px] font-semibold text-gradient-brand">
+                      Forgot password?
+                    </Link>
+                  </div>
+                )}
+                <button
+                  onClick={submitPhone}
+                  disabled={loading}
+                  className="w-full h-12 rounded-full text-white text-[15px] font-semibold shadow-glow disabled:opacity-60 active:scale-[0.99] transition"
+                  style={{ backgroundImage: "var(--gradient-brand)" }}
+                >
+                  {loading ? "Please wait…" : tab === "signup" ? "Create my account" : "Log in"}
+                </button>
+              </div>
             ) : (
-              <>New to Gathr?{" "}
-                <button onClick={() => setTab("signup")} className="font-semibold text-gradient-brand">Create account</button>
-              </>
+              <div className="mt-4 space-y-3">
+                <LabeledInput
+                  label="Email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={setEmail}
+                  onEnter={submitEmail}
+                />
+                <button
+                  onClick={submitEmail}
+                  disabled={loading}
+                  className="w-full h-12 rounded-full text-white text-[15px] font-semibold shadow-glow disabled:opacity-60 active:scale-[0.99] transition"
+                  style={{ backgroundImage: "var(--gradient-brand)" }}
+                >
+                  {loading ? "Sending…" : "Send magic link"}
+                </button>
+                {magicSent && (
+                  <p className="text-center text-xs text-muted-foreground">
+                    Link sent. Open it on this device to sign in.
+                  </p>
+                )}
+              </div>
             )}
           </div>
-        </div>
+        )}
 
         <p className="mt-6 text-center text-[11px] text-muted-foreground">
           By continuing you confirm you're 18+ and agree to our Terms.
         </p>
       </main>
     </div>
-  );
-}
-
-function MethodPill({
-  active, onClick, icon, label,
-}: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex items-center justify-center gap-2 h-11 rounded-2xl text-[13px] font-semibold transition ${
-        active
-          ? "text-white shadow-sm"
-          : "bg-muted text-foreground/70"
-      }`}
-      style={active ? { backgroundImage: "var(--gradient-brand)" } : undefined}
-    >
-      {icon}
-      {label}
-    </button>
   );
 }
 
