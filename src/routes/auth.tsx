@@ -251,68 +251,41 @@ function AuthPage() {
               </button>
             </div>
 
-            {mode === "phone" ? (
-              <div className="mt-4 space-y-3">
-                <LabeledInput
-                  label="Phone number"
-                  type="tel"
-                  inputMode="numeric"
-                  autoComplete="tel"
-                  placeholder="Just digits, e.g. 9876543210"
-                  value={phone}
-                  onChange={setPhone}
-                />
-                <LabeledInput
-                  label="Password"
-                  type="password"
-                  autoComplete={tab === "signup" ? "new-password" : "current-password"}
-                  placeholder="At least 8 characters"
-                  value={password}
-                  onChange={setPassword}
-                  onEnter={submitPhone}
-                />
-                {tab === "login" && (
-                  <div className="text-right -mt-1">
-                    <Link to="/forgot-password" className="text-[12px] font-semibold text-gradient-brand">
-                      Forgot password?
-                    </Link>
-                  </div>
-                )}
-                <button
-                  onClick={submitPhone}
-                  disabled={loading}
-                  className="w-full h-12 rounded-full text-white text-[15px] font-semibold shadow-glow disabled:opacity-60 active:scale-[0.99] transition"
-                  style={{ backgroundImage: "var(--gradient-brand)" }}
-                >
-                  {loading ? "Please wait…" : tab === "signup" ? "Create my account" : "Log in"}
-                </button>
-              </div>
-            ) : (
-              <div className="mt-4 space-y-3">
-                <LabeledInput
-                  label="Email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={setEmail}
-                  onEnter={submitEmail}
-                />
-                <button
-                  onClick={submitEmail}
-                  disabled={loading}
-                  className="w-full h-12 rounded-full text-white text-[15px] font-semibold shadow-glow disabled:opacity-60 active:scale-[0.99] transition"
-                  style={{ backgroundImage: "var(--gradient-brand)" }}
-                >
-                  {loading ? "Sending…" : "Send magic link"}
-                </button>
-                {magicSent && (
-                  <p className="text-center text-xs text-muted-foreground">
-                    Link sent. Open it on this device to sign in.
-                  </p>
-                )}
-              </div>
-            )}
+            <div className="mt-4 space-y-3">
+              <LabeledInput
+                label="Phone number"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                placeholder="Just digits, e.g. 9876543210"
+                value={phone}
+                onChange={setPhone}
+              />
+              <LabeledInput
+                label="Password"
+                type="password"
+                autoComplete={tab === "signup" ? "new-password" : "current-password"}
+                placeholder="At least 8 characters"
+                value={password}
+                onChange={setPassword}
+                onEnter={submitPhone}
+              />
+              {tab === "login" && (
+                <div className="text-right -mt-1">
+                  <Link to="/forgot-password" className="text-[12px] font-semibold text-gradient-brand">
+                    Forgot password?
+                  </Link>
+                </div>
+              )}
+              <button
+                onClick={submitPhone}
+                disabled={loading}
+                className="w-full h-12 rounded-full text-white text-[15px] font-semibold shadow-glow disabled:opacity-60 active:scale-[0.99] transition"
+                style={{ backgroundImage: "var(--gradient-brand)" }}
+              >
+                {loading ? "Please wait…" : tab === "signup" ? "Create my account" : "Log in"}
+              </button>
+            </div>
           </div>
         )}
 
