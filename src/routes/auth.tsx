@@ -196,11 +196,11 @@ function AuthPage() {
             </p>
 
             <button
-              onClick={() => { setMode("email"); setMagicSent(false); }}
-              className="w-full py-4 rounded-full text-white text-[15px] font-semibold shadow-glow active:scale-[0.99] transition inline-flex items-center justify-center gap-2"
-              style={{ backgroundImage: "var(--gradient-brand)" }}
+              onClick={submitGoogle}
+              disabled={loading}
+              className="w-full py-4 rounded-full bg-white text-[#1f1f1f] text-[15px] font-semibold ring-1 ring-black/10 shadow-card active:scale-[0.99] transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
             >
-              <Mail className="h-4 w-4" /> Continue with Email
+              <GoogleIcon /> Sign in with Google
             </button>
 
             {showApple && (
