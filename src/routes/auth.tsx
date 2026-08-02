@@ -128,19 +128,21 @@ function AuthPage() {
     }
   };
 
-  const submitEmail = async () => {
-    if (!/^\S+@\S+\.\S+$/.test(email)) return toast.error("Enter a valid email");
+  const submitGoogle = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: window.location.origin + "/home" },
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+        extraParams: { prompt: "select_account" },
       });
-      if (error) throw error;
-      setMagicSent(true);
-      toast.success("Check your email for the login link");
+      if (result.error) {
+        toast.error(result.error.message || "Google sign-in failed");
+        return;
+      }
+      if (result.redirected) return;
+      navigate({ to: "/home" });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to send link");
+      toast.error(e instanceof Error ? e.message : "Google sign-in failed");
     } finally {
       setLoading(false);
     }
