@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
-import { ArrowLeft, ShieldCheck, Phone, Mail, Apple } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Phone, Apple } from "lucide-react";
 import heroImage from "@/assets/auth-hero.jpg";
 
 export const Route = createFileRoute("/auth")({
@@ -21,7 +21,18 @@ export const Route = createFileRoute("/auth")({
 });
 
 type Tab = "signup" | "login";
-type Mode = "choose" | "phone" | "email";
+type Mode = "choose" | "phone";
+
+function GoogleIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 48 48" aria-hidden>
+      <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.2 17.6 9.5 24 9.5z" />
+      <path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.1 5.3-4.6 7l7.1 5.5c4.2-3.8 6.6-9.5 6.6-17z" />
+      <path fill="#FBBC05" d="M10.4 28.7a14.5 14.5 0 0 1 0-9.4l-7.8-6.1a24 24 0 0 0 0 21.6l7.8-6.1z" />
+      <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.9l-7.1-5.5c-2 1.3-4.6 2.1-8.8 2.1-6.4 0-11.7-3.7-13.6-9.8l-7.8 6.1C6.5 42.6 14.6 48 24 48z" />
+    </svg>
+  );
+}
 
 function normalizePhone(input: string): string {
   return input.replace(/\D+/g, "");
@@ -35,10 +46,8 @@ function AuthPage() {
   const [tab, setTab] = useState<Tab>("signup");
   const [mode, setMode] = useState<Mode>("choose");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [magicSent, setMagicSent] = useState(false);
   const [showApple, setShowApple] = useState(false);
 
   useEffect(() => {
@@ -119,19 +128,21 @@ function AuthPage() {
     }
   };
 
-  const submitEmail = async () => {
-    if (!/^\S+@\S+\.\S+$/.test(email)) return toast.error("Enter a valid email");
+  const submitGoogle = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: window.location.origin + "/home" },
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+        extraParams: { prompt: "select_account" },
       });
-      if (error) throw error;
-      setMagicSent(true);
-      toast.success("Check your email for the login link");
+      if (result.error) {
+        toast.error(result.error.message || "Google sign-in failed");
+        return;
+      }
+      if (result.redirected) return;
+      navigate({ to: "/home" });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to send link");
+      toast.error(e instanceof Error ? e.message : "Google sign-in failed");
     } finally {
       setLoading(false);
     }
@@ -185,11 +196,11 @@ function AuthPage() {
             </p>
 
             <button
-              onClick={() => { setMode("email"); setMagicSent(false); }}
-              className="w-full py-4 rounded-full text-white text-[15px] font-semibold shadow-glow active:scale-[0.99] transition inline-flex items-center justify-center gap-2"
-              style={{ backgroundImage: "var(--gradient-brand)" }}
+              onClick={submitGoogle}
+              disabled={loading}
+              className="w-full py-4 rounded-full bg-white text-[#1f1f1f] text-[15px] font-semibold ring-1 ring-black/10 shadow-card active:scale-[0.99] transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
             >
-              <Mail className="h-4 w-4" /> Continue with Email
+              <GoogleIcon /> Sign in with Google
             </button>
 
             {showApple && (
@@ -240,68 +251,41 @@ function AuthPage() {
               </button>
             </div>
 
-            {mode === "phone" ? (
-              <div className="mt-4 space-y-3">
-                <LabeledInput
-                  label="Phone number"
-                  type="tel"
-                  inputMode="numeric"
-                  autoComplete="tel"
-                  placeholder="Just digits, e.g. 9876543210"
-                  value={phone}
-                  onChange={setPhone}
-                />
-                <LabeledInput
-                  label="Password"
-                  type="password"
-                  autoComplete={tab === "signup" ? "new-password" : "current-password"}
-                  placeholder="At least 8 characters"
-                  value={password}
-                  onChange={setPassword}
-                  onEnter={submitPhone}
-                />
-                {tab === "login" && (
-                  <div className="text-right -mt-1">
-                    <Link to="/forgot-password" className="text-[12px] font-semibold text-gradient-brand">
-                      Forgot password?
-                    </Link>
-                  </div>
-                )}
-                <button
-                  onClick={submitPhone}
-                  disabled={loading}
-                  className="w-full h-12 rounded-full text-white text-[15px] font-semibold shadow-glow disabled:opacity-60 active:scale-[0.99] transition"
-                  style={{ backgroundImage: "var(--gradient-brand)" }}
-                >
-                  {loading ? "Please wait…" : tab === "signup" ? "Create my account" : "Log in"}
-                </button>
-              </div>
-            ) : (
-              <div className="mt-4 space-y-3">
-                <LabeledInput
-                  label="Email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={setEmail}
-                  onEnter={submitEmail}
-                />
-                <button
-                  onClick={submitEmail}
-                  disabled={loading}
-                  className="w-full h-12 rounded-full text-white text-[15px] font-semibold shadow-glow disabled:opacity-60 active:scale-[0.99] transition"
-                  style={{ backgroundImage: "var(--gradient-brand)" }}
-                >
-                  {loading ? "Sending…" : "Send magic link"}
-                </button>
-                {magicSent && (
-                  <p className="text-center text-xs text-muted-foreground">
-                    Link sent. Open it on this device to sign in.
-                  </p>
-                )}
-              </div>
-            )}
+            <div className="mt-4 space-y-3">
+              <LabeledInput
+                label="Phone number"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                placeholder="Just digits, e.g. 9876543210"
+                value={phone}
+                onChange={setPhone}
+              />
+              <LabeledInput
+                label="Password"
+                type="password"
+                autoComplete={tab === "signup" ? "new-password" : "current-password"}
+                placeholder="At least 8 characters"
+                value={password}
+                onChange={setPassword}
+                onEnter={submitPhone}
+              />
+              {tab === "login" && (
+                <div className="text-right -mt-1">
+                  <Link to="/forgot-password" className="text-[12px] font-semibold text-gradient-brand">
+                    Forgot password?
+                  </Link>
+                </div>
+              )}
+              <button
+                onClick={submitPhone}
+                disabled={loading}
+                className="w-full h-12 rounded-full text-white text-[15px] font-semibold shadow-glow disabled:opacity-60 active:scale-[0.99] transition"
+                style={{ backgroundImage: "var(--gradient-brand)" }}
+              >
+                {loading ? "Please wait…" : tab === "signup" ? "Create my account" : "Log in"}
+              </button>
+            </div>
           </div>
         )}
 
