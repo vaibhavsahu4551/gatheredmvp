@@ -46,10 +46,8 @@ function AuthPage() {
   const [tab, setTab] = useState<Tab>("signup");
   const [mode, setMode] = useState<Mode>("choose");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [magicSent, setMagicSent] = useState(false);
   const [showApple, setShowApple] = useState(false);
 
   useEffect(() => {
