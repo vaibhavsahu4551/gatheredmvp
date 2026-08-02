@@ -186,7 +186,7 @@ function AuthPage() {
 
             <button
               onClick={() => { setMode("email"); setMagicSent(false); }}
-              className="w-full h-13 py-4 rounded-full text-white text-[15px] font-semibold shadow-glow active:scale-[0.99] transition inline-flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-full text-white text-[15px] font-semibold shadow-glow active:scale-[0.99] transition inline-flex items-center justify-center gap-2"
               style={{ backgroundImage: "var(--gradient-brand)" }}
             >
               <Mail className="h-4 w-4" /> Continue with Email
