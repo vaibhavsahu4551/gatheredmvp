@@ -178,6 +178,14 @@ function UserProfile() {
 
         {profile.bio && <p className="mt-4 text-[15px] leading-relaxed">{profile.bio}</p>}
 
+        <SocialLinks
+          className="mt-4"
+          instagram={(profile as any).instagram_handle}
+          spotify={(profile as any).spotify_url}
+          x={(profile as any).x_handle}
+        />
+
+
 
 
 
