@@ -17,7 +17,11 @@ export type ProfileRow = {
   selfie_url: string | null;
   onboarding_complete: boolean;
   pride_opt_in: boolean;
+  instagram_handle?: string | null;
+  spotify_url?: string | null;
+  x_handle?: string | null;
 };
+
 
 export type VerificationRow = {
   status: "unverified" | "pending" | "verified";
