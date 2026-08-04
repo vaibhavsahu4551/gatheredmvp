@@ -74,13 +74,27 @@ function EditProfile() {
     }
     const finalInterests = interests.length > 0 ? interests : originalInterests;
 
+    let ig: string | null = null;
+    if (instagram.trim()) {
+      ig = normalizeHandle(instagram);
+      if (!ig) return toast.error("That Instagram handle doesn't look right");
+    }
+    let sp: string | null = null;
+    if (spotify.trim()) {
+      sp = normalizeSpotify(spotify);
+      if (!sp) return toast.error("Enter a valid Spotify link");
+    }
+
     setSaving(true);
     const { error } = await supabase.from("profiles").update({
       full_name: name || null,
       bio: bio.trim() || null,
       interests: finalInterests,
+      instagram_handle: ig,
+      spotify_url: sp,
       photos: photoPath ? [photoPath] : [],
     } as any).eq("id", userId);
+
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Profile updated");
