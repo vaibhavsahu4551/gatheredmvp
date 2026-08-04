@@ -631,6 +631,7 @@ export type Database = {
           full_name: string | null
           gender: string | null
           id: string
+          instagram_handle: string | null
           interests: string[]
           onboarding_complete: boolean
           phone: string | null
@@ -640,10 +641,12 @@ export type Database = {
           razorpay_customer_id: string | null
           razorpay_subscription_id: string | null
           selfie_url: string | null
+          spotify_url: string | null
           subscription_tier: string
           suspended_until: string | null
           suspension_reason: string | null
           updated_at: string
+          x_handle: string | null
         }
         Insert: {
           bio?: string | null
@@ -655,6 +658,7 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id: string
+          instagram_handle?: string | null
           interests?: string[]
           onboarding_complete?: boolean
           phone?: string | null
@@ -664,10 +668,12 @@ export type Database = {
           razorpay_customer_id?: string | null
           razorpay_subscription_id?: string | null
           selfie_url?: string | null
+          spotify_url?: string | null
           subscription_tier?: string
           suspended_until?: string | null
           suspension_reason?: string | null
           updated_at?: string
+          x_handle?: string | null
         }
         Update: {
           bio?: string | null
@@ -679,6 +685,7 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id?: string
+          instagram_handle?: string | null
           interests?: string[]
           onboarding_complete?: boolean
           phone?: string | null
@@ -688,10 +695,12 @@ export type Database = {
           razorpay_customer_id?: string | null
           razorpay_subscription_id?: string | null
           selfie_url?: string | null
+          spotify_url?: string | null
           subscription_tier?: string
           suspended_until?: string | null
           suspension_reason?: string | null
           updated_at?: string
+          x_handle?: string | null
         }
         Relationships: []
       }
@@ -983,14 +992,17 @@ export type Database = {
           full_name: string
           gender: string
           id: string
+          instagram_handle: string
           interests: string[]
           onboarding_complete: boolean
           photos: string[]
           premium_expires_at: string
           pride_opt_in: boolean
           selfie_url: string
+          spotify_url: string
           subscription_tier: string
           updated_at: string
+          x_handle: string
         }[]
       }
       get_pride_identities: {
