@@ -24,6 +24,8 @@ import {
 import { toast } from "sonner";
 
 import { EventCard, type EventCounts } from "@/components/EventCard";
+import { SocialLinks } from "@/components/SocialLinks";
+
 import { PostCard, type PostItem } from "@/components/PostCard";
 
 
@@ -96,6 +98,9 @@ function Profile() {
 
       <div className="px-5 pt-5">
         {p.bio && <p className="mb-4 text-[15px] leading-relaxed">{p.bio}</p>}
+
+        <SocialLinks instagram={p.instagram_handle} spotify={p.spotify_url} x={p.x_handle} />
+
 
 
         <div className="mt-4 flex gap-2">
