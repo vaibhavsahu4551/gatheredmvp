@@ -107,6 +107,17 @@ function EditProfile() {
 
   return (
     <div className="min-h-screen bg-background pb-32">
+      {pendingFile && (
+        <PhotoCropModal
+          file={pendingFile}
+          onCancel={() => setPendingFile(null)}
+          onConfirm={(cropped) => {
+            setPendingFile(null);
+            uploadPhoto(cropped);
+          }}
+        />
+      )}
+
       <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-5 py-3 flex items-center gap-3">
         <button onClick={() => navigate({ to: "/profile" })} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
           <ArrowLeft className="h-4 w-4" />
@@ -132,7 +143,17 @@ function EditProfile() {
                 <span className="text-xs">Add</span>
               </div>
             )}
-            <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadPhoto(e.target.files[0])} />
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                if (f) setPendingFile(f);
+              }}
+            />
+
           </label>
           <div className="mt-2 text-xs text-muted-foreground">Tap to change</div>
         </div>
@@ -167,6 +188,31 @@ function EditProfile() {
             })}
           </div>
         </Field>
+
+        <Field label="Instagram" hint="optional">
+          <div className="flex items-center rounded-2xl border border-input bg-background px-4 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+            <span className="text-muted-foreground">@</span>
+            <input
+              value={instagram}
+              onChange={(e) => setInstagram(e.target.value)}
+              maxLength={40}
+              placeholder="yourhandle"
+              className="w-full bg-transparent py-3 pl-1 text-[15px] outline-none"
+            />
+          </div>
+        </Field>
+
+        <Field label="Spotify" hint="optional">
+          <input
+            value={spotify}
+            onChange={(e) => setSpotify(e.target.value)}
+            maxLength={200}
+            placeholder="https://open.spotify.com/user/…"
+            className={inputCls}
+          />
+        </Field>
+
+
 
 
 
