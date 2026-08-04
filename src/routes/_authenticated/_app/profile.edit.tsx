@@ -2,6 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { INTERESTS, loadMe, signedPhotoUrl } from "@/lib/huddl";
+import { normalizeHandle, normalizeSpotify } from "@/lib/socials";
+import { PhotoCropModal } from "@/components/PhotoCropModal";
 import { toast } from "sonner";
 import { ArrowLeft, Camera } from "lucide-react";
 
@@ -20,6 +22,9 @@ function EditProfile() {
   const [originalInterests, setOriginalInterests] = useState<string[]>([]);
   const [photoPath, setPhotoPath] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [instagram, setInstagram] = useState("");
+  const [spotify, setSpotify] = useState("");
 
   useEffect(() => {
     loadMe().then(async (me) => {
@@ -27,6 +32,8 @@ function EditProfile() {
       setUserId(me.user.id);
       setFullName(me.profile.full_name ?? "");
       setBio(me.profile.bio ?? "");
+      setInstagram(me.profile.instagram_handle ?? "");
+      setSpotify(me.profile.spotify_url ?? "");
       const loadedInterests = me.profile.interests ?? [];
       setInterests(loadedInterests);
       setOriginalInterests(loadedInterests);
@@ -38,6 +45,7 @@ function EditProfile() {
       setLoading(false);
     });
   }, []);
+
 
   const toggleInterest = (i: string) => {
     setInterests((s) => (s.includes(i) ? s.filter((x) => x !== i) : [...s, i]));
