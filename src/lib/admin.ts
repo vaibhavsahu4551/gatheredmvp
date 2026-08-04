@@ -1,18 +1,21 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export async function isCurrentUserAdmin(): Promise<boolean> {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError) throw userError;
-  if (!user) return false;
+  // getSession restores from storage without throwing when signed out
+  // (getUser throws AuthSessionMissingError, which used to break the panel).
+  const { data: { session } } = await supabase.auth.getSession();
+  const userId = session?.user?.id;
+  if (!userId) return false;
   const { data, error } = await supabase
     .from("user_roles" as any)
     .select("role")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("role", "admin")
-    .maybeSingle();
+    .limit(1);
   if (error) throw error;
-  return !!data;
+  return Array.isArray(data) && data.length > 0;
 }
+
 
 export type AppSettings = { subscription_enabled: boolean };
 

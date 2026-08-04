@@ -2,6 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { INTERESTS, loadMe, signedPhotoUrl } from "@/lib/huddl";
+import { normalizeHandle, normalizeSpotify } from "@/lib/socials";
+import { PhotoCropModal } from "@/components/PhotoCropModal";
 import { toast } from "sonner";
 import { ArrowLeft, Camera } from "lucide-react";
 
@@ -20,6 +22,9 @@ function EditProfile() {
   const [originalInterests, setOriginalInterests] = useState<string[]>([]);
   const [photoPath, setPhotoPath] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [instagram, setInstagram] = useState("");
+  const [spotify, setSpotify] = useState("");
 
   useEffect(() => {
     loadMe().then(async (me) => {
@@ -27,6 +32,8 @@ function EditProfile() {
       setUserId(me.user.id);
       setFullName(me.profile.full_name ?? "");
       setBio(me.profile.bio ?? "");
+      setInstagram(me.profile.instagram_handle ?? "");
+      setSpotify(me.profile.spotify_url ?? "");
       const loadedInterests = me.profile.interests ?? [];
       setInterests(loadedInterests);
       setOriginalInterests(loadedInterests);
@@ -38,6 +45,7 @@ function EditProfile() {
       setLoading(false);
     });
   }, []);
+
 
   const toggleInterest = (i: string) => {
     setInterests((s) => (s.includes(i) ? s.filter((x) => x !== i) : [...s, i]));
@@ -66,13 +74,27 @@ function EditProfile() {
     }
     const finalInterests = interests.length > 0 ? interests : originalInterests;
 
+    let ig: string | null = null;
+    if (instagram.trim()) {
+      ig = normalizeHandle(instagram);
+      if (!ig) return toast.error("That Instagram handle doesn't look right");
+    }
+    let sp: string | null = null;
+    if (spotify.trim()) {
+      sp = normalizeSpotify(spotify);
+      if (!sp) return toast.error("Enter a valid Spotify link");
+    }
+
     setSaving(true);
     const { error } = await supabase.from("profiles").update({
       full_name: name || null,
       bio: bio.trim() || null,
       interests: finalInterests,
+      instagram_handle: ig,
+      spotify_url: sp,
       photos: photoPath ? [photoPath] : [],
     } as any).eq("id", userId);
+
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Profile updated");
@@ -85,6 +107,17 @@ function EditProfile() {
 
   return (
     <div className="min-h-screen bg-background pb-32">
+      {pendingFile && (
+        <PhotoCropModal
+          file={pendingFile}
+          onCancel={() => setPendingFile(null)}
+          onConfirm={(cropped) => {
+            setPendingFile(null);
+            uploadPhoto(cropped);
+          }}
+        />
+      )}
+
       <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-5 py-3 flex items-center gap-3">
         <button onClick={() => navigate({ to: "/profile" })} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
           <ArrowLeft className="h-4 w-4" />
@@ -110,7 +143,17 @@ function EditProfile() {
                 <span className="text-xs">Add</span>
               </div>
             )}
-            <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadPhoto(e.target.files[0])} />
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                if (f) setPendingFile(f);
+              }}
+            />
+
           </label>
           <div className="mt-2 text-xs text-muted-foreground">Tap to change</div>
         </div>
@@ -145,6 +188,31 @@ function EditProfile() {
             })}
           </div>
         </Field>
+
+        <Field label="Instagram" hint="optional">
+          <div className="flex items-center rounded-2xl border border-input bg-background px-4 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+            <span className="text-muted-foreground">@</span>
+            <input
+              value={instagram}
+              onChange={(e) => setInstagram(e.target.value)}
+              maxLength={40}
+              placeholder="yourhandle"
+              className="w-full bg-transparent py-3 pl-1 text-[15px] outline-none"
+            />
+          </div>
+        </Field>
+
+        <Field label="Spotify" hint="optional">
+          <input
+            value={spotify}
+            onChange={(e) => setSpotify(e.target.value)}
+            maxLength={200}
+            placeholder="https://open.spotify.com/user/…"
+            className={inputCls}
+          />
+        </Field>
+
+
 
 
 

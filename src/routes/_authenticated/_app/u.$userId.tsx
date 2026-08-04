@@ -1,3 +1,4 @@
+import { SocialLinks } from "@/components/SocialLinks";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,7 +37,7 @@ function UserProfile() {
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) setMe(user.id);
-    const { data: p } = await supabase.from("profiles").select("id, full_name, dob, gender, city, bio, interests, photos, pride_opt_in, onboarding_complete, subscription_tier, premium_expires_at, created_at").eq("id", userId).maybeSingle();
+    const { data: p } = await supabase.from("profiles").select("id, full_name, dob, gender, city, bio, interests, photos, pride_opt_in, onboarding_complete, subscription_tier, premium_expires_at, created_at, instagram_handle, spotify_url, x_handle").eq("id", userId).maybeSingle();
     setProfile(p as any);
     if ((p as any)?.photos?.[0]) setAvatar(await signedPhotoUrl((p as any).photos[0]));
     const s = await huddleStatusWith(userId);
@@ -177,6 +178,14 @@ function UserProfile() {
         )}
 
         {profile.bio && <p className="mt-4 text-[15px] leading-relaxed">{profile.bio}</p>}
+
+        <SocialLinks
+          className="mt-4"
+          instagram={(profile as any).instagram_handle}
+          spotify={(profile as any).spotify_url}
+          x={(profile as any).x_handle}
+        />
+
 
 
 
