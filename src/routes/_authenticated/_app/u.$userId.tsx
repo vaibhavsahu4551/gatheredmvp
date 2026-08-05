@@ -1,4 +1,5 @@
 import { SocialLinks } from "@/components/SocialLinks";
+import { ProfileDetails } from "@/components/ProfileDetails";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
