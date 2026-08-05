@@ -25,19 +25,34 @@ function EditProfile() {
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [instagram, setInstagram] = useState("");
   const [spotify, setSpotify] = useState("");
+  const [dob, setDob] = useState("");
+  const [gender, setGender] = useState("");
+  const [city, setCity] = useState("");
+  const [heightCm, setHeightCm] = useState<string>("");
+  const [profession, setProfession] = useState("");
+  const [smoking, setSmoking] = useState("");
+  const [drinking, setDrinking] = useState("");
 
   useEffect(() => {
     loadMe().then(async (me) => {
       if (!me?.profile) return;
+      const p: any = me.profile;
       setUserId(me.user.id);
-      setFullName(me.profile.full_name ?? "");
-      setBio(me.profile.bio ?? "");
-      setInstagram(me.profile.instagram_handle ?? "");
-      setSpotify(me.profile.spotify_url ?? "");
-      const loadedInterests = me.profile.interests ?? [];
+      setFullName(p.full_name ?? "");
+      setBio(p.bio ?? "");
+      setInstagram(p.instagram_handle ?? "");
+      setSpotify(p.spotify_url ?? "");
+      setDob(p.dob ?? "");
+      setGender(p.gender ?? "");
+      setCity(p.city ?? "");
+      setHeightCm(p.height_cm ? String(p.height_cm) : "");
+      setProfession(p.profession ?? "");
+      setSmoking(p.smoking ?? "");
+      setDrinking(p.drinking ?? "");
+      const loadedInterests = p.interests ?? [];
       setInterests(loadedInterests);
       setOriginalInterests(loadedInterests);
-      const existing = me.profile.photos?.[0];
+      const existing = p.photos?.[0];
       if (existing) {
         setPhotoPath(existing);
         setPhotoPreview(await signedPhotoUrl(existing));
