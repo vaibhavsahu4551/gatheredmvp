@@ -186,6 +186,13 @@ function UserProfile() {
           x={(profile as any).x_handle}
         />
 
+        <ProfileDetails
+          heightCm={(profile as any).height_cm}
+          profession={(profile as any).profession}
+          smoking={(profile as any).smoking}
+          drinking={(profile as any).drinking}
+        />
+
 
 
 
