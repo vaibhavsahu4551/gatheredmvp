@@ -328,3 +328,14 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
     </div>
   );
 }
+
+function SelectField({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: string[] }) {
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value)} className={inputCls}>
+      <option value="">Not set</option>
+      {options.map((o) => (
+        <option key={o} value={o}>{o}</option>
+      ))}
+    </select>
+  );
+}
