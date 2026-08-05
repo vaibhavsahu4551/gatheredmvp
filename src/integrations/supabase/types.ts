@@ -626,10 +626,12 @@ export type Database = {
           city: string | null
           created_at: string
           dob: string | null
+          drinking: string | null
           early_access: boolean
           firebase_uid: string | null
           full_name: string | null
           gender: string | null
+          height_cm: number | null
           id: string
           instagram_handle: string | null
           interests: string[]
@@ -638,9 +640,11 @@ export type Database = {
           photos: string[]
           premium_expires_at: string | null
           pride_opt_in: boolean
+          profession: string | null
           razorpay_customer_id: string | null
           razorpay_subscription_id: string | null
           selfie_url: string | null
+          smoking: string | null
           spotify_url: string | null
           subscription_tier: string
           suspended_until: string | null
@@ -653,10 +657,12 @@ export type Database = {
           city?: string | null
           created_at?: string
           dob?: string | null
+          drinking?: string | null
           early_access?: boolean
           firebase_uid?: string | null
           full_name?: string | null
           gender?: string | null
+          height_cm?: number | null
           id: string
           instagram_handle?: string | null
           interests?: string[]
@@ -665,9 +671,11 @@ export type Database = {
           photos?: string[]
           premium_expires_at?: string | null
           pride_opt_in?: boolean
+          profession?: string | null
           razorpay_customer_id?: string | null
           razorpay_subscription_id?: string | null
           selfie_url?: string | null
+          smoking?: string | null
           spotify_url?: string | null
           subscription_tier?: string
           suspended_until?: string | null
@@ -680,10 +688,12 @@ export type Database = {
           city?: string | null
           created_at?: string
           dob?: string | null
+          drinking?: string | null
           early_access?: boolean
           firebase_uid?: string | null
           full_name?: string | null
           gender?: string | null
+          height_cm?: number | null
           id?: string
           instagram_handle?: string | null
           interests?: string[]
@@ -692,9 +702,11 @@ export type Database = {
           photos?: string[]
           premium_expires_at?: string | null
           pride_opt_in?: boolean
+          profession?: string | null
           razorpay_customer_id?: string | null
           razorpay_subscription_id?: string | null
           selfie_url?: string | null
+          smoking?: string | null
           spotify_url?: string | null
           subscription_tier?: string
           suspended_until?: string | null
@@ -988,9 +1000,11 @@ export type Database = {
           city: string
           created_at: string
           dob: string
+          drinking: string
           early_access: boolean
           full_name: string
           gender: string
+          height_cm: number
           id: string
           instagram_handle: string
           interests: string[]
@@ -998,7 +1012,9 @@ export type Database = {
           photos: string[]
           premium_expires_at: string
           pride_opt_in: boolean
+          profession: string
           selfie_url: string
+          smoking: string
           spotify_url: string
           subscription_tier: string
           updated_at: string

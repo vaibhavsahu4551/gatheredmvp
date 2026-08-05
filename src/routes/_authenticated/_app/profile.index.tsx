@@ -25,6 +25,7 @@ import { toast } from "sonner";
 
 import { EventCard, type EventCounts } from "@/components/EventCard";
 import { SocialLinks } from "@/components/SocialLinks";
+import { ProfileDetails } from "@/components/ProfileDetails";
 
 import { PostCard, type PostItem } from "@/components/PostCard";
 
@@ -100,6 +101,9 @@ function Profile() {
         {p.bio && <p className="mb-4 text-[15px] leading-relaxed">{p.bio}</p>}
 
         <SocialLinks instagram={p.instagram_handle} spotify={p.spotify_url} x={p.x_handle} />
+
+        <ProfileDetails heightCm={p.height_cm} profession={p.profession} smoking={p.smoking} drinking={p.drinking} />
+
 
 
 

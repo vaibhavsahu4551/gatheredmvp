@@ -25,19 +25,34 @@ function EditProfile() {
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [instagram, setInstagram] = useState("");
   const [spotify, setSpotify] = useState("");
+  const [dob, setDob] = useState("");
+  const [gender, setGender] = useState("");
+  const [city, setCity] = useState("");
+  const [heightCm, setHeightCm] = useState<string>("");
+  const [profession, setProfession] = useState("");
+  const [smoking, setSmoking] = useState("");
+  const [drinking, setDrinking] = useState("");
 
   useEffect(() => {
     loadMe().then(async (me) => {
       if (!me?.profile) return;
+      const p: any = me.profile;
       setUserId(me.user.id);
-      setFullName(me.profile.full_name ?? "");
-      setBio(me.profile.bio ?? "");
-      setInstagram(me.profile.instagram_handle ?? "");
-      setSpotify(me.profile.spotify_url ?? "");
-      const loadedInterests = me.profile.interests ?? [];
+      setFullName(p.full_name ?? "");
+      setBio(p.bio ?? "");
+      setInstagram(p.instagram_handle ?? "");
+      setSpotify(p.spotify_url ?? "");
+      setDob(p.dob ?? "");
+      setGender(p.gender ?? "");
+      setCity(p.city ?? "");
+      setHeightCm(p.height_cm ? String(p.height_cm) : "");
+      setProfession(p.profession ?? "");
+      setSmoking(p.smoking ?? "");
+      setDrinking(p.drinking ?? "");
+      const loadedInterests = p.interests ?? [];
       setInterests(loadedInterests);
       setOriginalInterests(loadedInterests);
-      const existing = me.profile.photos?.[0];
+      const existing = p.photos?.[0];
       if (existing) {
         setPhotoPath(existing);
         setPhotoPreview(await signedPhotoUrl(existing));
@@ -85,6 +100,19 @@ function EditProfile() {
       if (!sp) return toast.error("Enter a valid Spotify link");
     }
 
+    const h = heightCm.trim() ? Number(heightCm) : null;
+    if (h !== null && (Number.isNaN(h) || h < 120 || h > 220)) {
+      return toast.error("Enter a height between 120 and 220 cm");
+    }
+    if (dob) {
+      const d = new Date(dob);
+      const now = new Date();
+      let age = now.getFullYear() - d.getFullYear();
+      const m = now.getMonth() - d.getMonth();
+      if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
+      if (age < 18) return toast.error("You must be 18 or older");
+    }
+
     setSaving(true);
     const { error } = await supabase.from("profiles").update({
       full_name: name || null,
@@ -92,6 +120,13 @@ function EditProfile() {
       interests: finalInterests,
       instagram_handle: ig,
       spotify_url: sp,
+      dob: dob || null,
+      gender: gender || null,
+      city: city.trim() || null,
+      height_cm: h,
+      profession: profession.trim() || null,
+      smoking: smoking || null,
+      drinking: drinking || null,
       photos: photoPath ? [photoPath] : [],
     } as any).eq("id", userId);
 
@@ -172,6 +207,36 @@ function EditProfile() {
             placeholder="Coffee snob. Weekend trekker."
           />
         </Field>
+
+        <Field label="Date of birth">
+          <input type="date" value={dob} onChange={(e) => setDob(e.target.value)} className={inputCls} />
+        </Field>
+
+        <Field label="Gender">
+          <SelectField value={gender} onChange={setGender} options={["Male", "Female", "Non-binary", "Prefer not to say"]} />
+        </Field>
+
+        <Field label="City">
+          <input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} placeholder="Bengaluru" />
+        </Field>
+
+        <Field label="Height (cm)" hint="optional">
+          <input value={heightCm} onChange={(e) => setHeightCm(e.target.value.replace(/\D/g, ""))} inputMode="numeric" maxLength={3} className={inputCls} placeholder="170" />
+        </Field>
+
+        <Field label="Profession" hint="optional">
+          <input value={profession} onChange={(e) => setProfession(e.target.value)} maxLength={60} className={inputCls} placeholder="Product designer" />
+        </Field>
+
+        <Field label="Smoking" hint="optional">
+          <SelectField value={smoking} onChange={setSmoking} options={["Never", "Occasionally", "Regularly", "Prefer not to say"]} />
+        </Field>
+
+        <Field label="Drinking" hint="optional">
+          <SelectField value={drinking} onChange={setDrinking} options={["Never", "Socially", "Regularly", "Prefer not to say"]} />
+        </Field>
+
+
 
         <Field label="Interests">
           <div className="flex flex-wrap gap-2">
@@ -261,5 +326,16 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
       </div>
       {children}
     </div>
+  );
+}
+
+function SelectField({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: string[] }) {
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value)} className={inputCls}>
+      <option value="">Not set</option>
+      {options.map((o) => (
+        <option key={o} value={o}>{o}</option>
+      ))}
+    </select>
   );
 }

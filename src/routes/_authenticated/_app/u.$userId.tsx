@@ -1,4 +1,5 @@
 import { SocialLinks } from "@/components/SocialLinks";
+import { ProfileDetails } from "@/components/ProfileDetails";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,7 +38,7 @@ function UserProfile() {
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) setMe(user.id);
-    const { data: p } = await supabase.from("profiles").select("id, full_name, dob, gender, city, bio, interests, photos, pride_opt_in, onboarding_complete, subscription_tier, premium_expires_at, created_at, instagram_handle, spotify_url, x_handle").eq("id", userId).maybeSingle();
+    const { data: p } = await supabase.from("profiles").select("id, full_name, dob, gender, city, bio, interests, photos, pride_opt_in, onboarding_complete, subscription_tier, premium_expires_at, created_at, instagram_handle, spotify_url, x_handle, height_cm, profession, smoking, drinking").eq("id", userId).maybeSingle();
     setProfile(p as any);
     if ((p as any)?.photos?.[0]) setAvatar(await signedPhotoUrl((p as any).photos[0]));
     const s = await huddleStatusWith(userId);
@@ -184,6 +185,13 @@ function UserProfile() {
           instagram={(profile as any).instagram_handle}
           spotify={(profile as any).spotify_url}
           x={(profile as any).x_handle}
+        />
+
+        <ProfileDetails
+          heightCm={(profile as any).height_cm}
+          profession={(profile as any).profession}
+          smoking={(profile as any).smoking}
+          drinking={(profile as any).drinking}
         />
 
 
