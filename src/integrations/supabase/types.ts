@@ -1000,9 +1000,11 @@ export type Database = {
           city: string
           created_at: string
           dob: string
+          drinking: string
           early_access: boolean
           full_name: string
           gender: string
+          height_cm: number
           id: string
           instagram_handle: string
           interests: string[]
@@ -1010,7 +1012,9 @@ export type Database = {
           photos: string[]
           premium_expires_at: string
           pride_opt_in: boolean
+          profession: string
           selfie_url: string
+          smoking: string
           spotify_url: string
           subscription_tier: string
           updated_at: string
