@@ -100,6 +100,19 @@ function EditProfile() {
       if (!sp) return toast.error("Enter a valid Spotify link");
     }
 
+    const h = heightCm.trim() ? Number(heightCm) : null;
+    if (h !== null && (Number.isNaN(h) || h < 120 || h > 220)) {
+      return toast.error("Enter a height between 120 and 220 cm");
+    }
+    if (dob) {
+      const d = new Date(dob);
+      const now = new Date();
+      let age = now.getFullYear() - d.getFullYear();
+      const m = now.getMonth() - d.getMonth();
+      if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
+      if (age < 18) return toast.error("You must be 18 or older");
+    }
+
     setSaving(true);
     const { error } = await supabase.from("profiles").update({
       full_name: name || null,
@@ -107,6 +120,13 @@ function EditProfile() {
       interests: finalInterests,
       instagram_handle: ig,
       spotify_url: sp,
+      dob: dob || null,
+      gender: gender || null,
+      city: city.trim() || null,
+      height_cm: h,
+      profession: profession.trim() || null,
+      smoking: smoking || null,
+      drinking: drinking || null,
       photos: photoPath ? [photoPath] : [],
     } as any).eq("id", userId);
 
