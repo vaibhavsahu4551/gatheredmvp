@@ -208,6 +208,36 @@ function EditProfile() {
           />
         </Field>
 
+        <Field label="Date of birth">
+          <input type="date" value={dob} onChange={(e) => setDob(e.target.value)} className={inputCls} />
+        </Field>
+
+        <Field label="Gender">
+          <SelectField value={gender} onChange={setGender} options={["Male", "Female", "Non-binary", "Prefer not to say"]} />
+        </Field>
+
+        <Field label="City">
+          <input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} placeholder="Bengaluru" />
+        </Field>
+
+        <Field label="Height (cm)" hint="optional">
+          <input value={heightCm} onChange={(e) => setHeightCm(e.target.value.replace(/\D/g, ""))} inputMode="numeric" maxLength={3} className={inputCls} placeholder="170" />
+        </Field>
+
+        <Field label="Profession" hint="optional">
+          <input value={profession} onChange={(e) => setProfession(e.target.value)} maxLength={60} className={inputCls} placeholder="Product designer" />
+        </Field>
+
+        <Field label="Smoking" hint="optional">
+          <SelectField value={smoking} onChange={setSmoking} options={["Never", "Occasionally", "Regularly", "Prefer not to say"]} />
+        </Field>
+
+        <Field label="Drinking" hint="optional">
+          <SelectField value={drinking} onChange={setDrinking} options={["Never", "Socially", "Regularly", "Prefer not to say"]} />
+        </Field>
+
+
+
         <Field label="Interests">
           <div className="flex flex-wrap gap-2">
             {INTERESTS.map((i) => {
