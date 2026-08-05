@@ -101,6 +101,9 @@ function Profile() {
 
         <SocialLinks instagram={p.instagram_handle} spotify={p.spotify_url} x={p.x_handle} />
 
+        <ProfileDetails heightCm={p.height_cm} profession={p.profession} smoking={p.smoking} drinking={p.drinking} />
+
+
 
 
         <div className="mt-4 flex gap-2">
