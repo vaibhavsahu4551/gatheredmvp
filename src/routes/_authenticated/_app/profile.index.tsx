@@ -25,6 +25,7 @@ import { toast } from "sonner";
 
 import { EventCard, type EventCounts } from "@/components/EventCard";
 import { SocialLinks } from "@/components/SocialLinks";
+import { ProfileDetails } from "@/components/ProfileDetails";
 
 import { PostCard, type PostItem } from "@/components/PostCard";
 
