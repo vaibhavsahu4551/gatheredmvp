@@ -20,6 +20,10 @@ export type ProfileRow = {
   instagram_handle?: string | null;
   spotify_url?: string | null;
   x_handle?: string | null;
+  height_cm?: number | null;
+  profession?: string | null;
+  smoking?: string | null;
+  drinking?: string | null;
 };
 
 
