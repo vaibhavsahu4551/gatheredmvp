@@ -13,6 +13,7 @@ import { CityPickerModal } from "@/components/CityPickerModal";
 import { getActiveBanner, getAppSettings, type HomeBanner } from "@/lib/admin";
 import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
+import { StoryRail } from "@/components/StoryRail";
 import { Lock } from "lucide-react";
 
 
@@ -248,8 +249,10 @@ function HomeFeed() {
           {unread > 0 && <span className="absolute -top-0.5 -right-0.5 h-5 min-w-5 px-1 rounded-full bg-gradient-brand text-white text-[10px] font-bold flex items-center justify-center">{unread}</span>}
         </Link>
       </header>
+      <StoryRail />
 
-      <div className="px-5">
+      <div className="px-5 mt-3">
+
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search events and posts…"
           className="w-full rounded-full border border-border bg-muted/40 px-4 py-2 text-sm" />
       </div>
