@@ -13,6 +13,7 @@ import { CityPickerModal } from "@/components/CityPickerModal";
 import { getActiveBanner, getAppSettings, type HomeBanner } from "@/lib/admin";
 import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
+import { StoryRail } from "@/components/StoryRail";
 import { Lock } from "lucide-react";
 
 
