@@ -136,7 +136,9 @@ export async function createStory(input: {
 export async function deleteStory(id: string, mediaPath?: string) {
   const { error } = await sb.from("stories").delete().eq("id", id);
   if (error) throw error;
-  if (mediaPath) await supabase.storage.from("stories").remove([mediaPath]).catch?.(() => {});
+  if (mediaPath) {
+    try { await supabase.storage.from("stories").remove([mediaPath]); } catch { /* best effort */ }
+  }
 }
 
 export async function markStoryViewed(storyId: string) {
