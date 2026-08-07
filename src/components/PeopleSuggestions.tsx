@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router";
 import { UserPlus, X, Check, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "@/components/Avatar";
-import { signedPhotoUrl } from "@/lib/huddl";
 import { sendHuddleRequest } from "@/lib/huddle-connect";
 import { getSuggestions, dismissSuggestion, invalidateSuggestionsCache, type Suggestion } from "@/lib/suggestions";
 
@@ -17,7 +16,6 @@ function reason(s: Suggestion) {
 
 export function PeopleSuggestions({ variant = "rail" }: { variant?: "rail" | "grid" }) {
   const [items, setItems] = useState<Suggestion[]>([]);
-  const [photos, setPhotos] = useState<Record<string, string>>({});
   const [sent, setSent] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
@@ -25,14 +23,7 @@ export function PeopleSuggestions({ variant = "rail" }: { variant?: "rail" | "gr
   useEffect(() => {
     (async () => {
       try {
-        const list = await getSuggestions();
-        setItems(list);
-        const entries = await Promise.all(
-          list.slice(0, variant === "rail" ? 12 : 40)
-            .filter((s) => s.photo)
-            .map(async (s) => [s.id, await signedPhotoUrl(s.photo!)] as const),
-        );
-        setPhotos(Object.fromEntries(entries));
+        setItems(await getSuggestions());
       } catch { /* non-critical */ }
       finally { setLoading(false); }
     })();
@@ -69,7 +60,7 @@ export function PeopleSuggestions({ variant = "rail" }: { variant?: "rail" | "gr
       </button>
       <Link to="/u/$userId" params={{ userId: s.id }} className="block text-center">
         <div className="mx-auto w-fit">
-          <Avatar photoUrl={photos[s.id]} photo={s.photo} name={s.full_name} size={64} />
+          <Avatar photo={s.photo} name={s.full_name} size={64} />
         </div>
         <div className="mt-2 text-[13px] font-semibold truncate">{s.full_name ?? "Member"}</div>
         <div className="text-[11px] text-muted-foreground truncate">{reason(s)}</div>
