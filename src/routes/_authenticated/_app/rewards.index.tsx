@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, Copy, Gift, Share2, Sparkles, Ticket, Rocket, BadgeCheck } from "lucide-react";
@@ -22,7 +22,6 @@ export const Route = createFileRoute("/_authenticated/_app/rewards/")({
 });
 
 function Rewards() {
-  const navigate = useNavigate();
   const [me, setMe] = useState<MyRewards | null>(null);
   const [cfg, setCfg] = useState<RewardsConfig | null>(null);
   const [tx, setTx] = useState<PointsTx[]>([]);

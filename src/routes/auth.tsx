@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { captureReferralFromUrl } from "@/lib/rewards";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 import { ArrowLeft, ShieldCheck, Phone, Apple } from "lucide-react";
