@@ -467,6 +467,36 @@ export type Database = {
         }
         Relationships: []
       }
+      points_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          kind: string
+          reason: string | null
+          ref_user_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          kind: string
+          reason?: string | null
+          ref_user_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          kind?: string
+          reason?: string | null
+          ref_user_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       post_comments: {
         Row: {
           body: string
@@ -638,11 +668,15 @@ export type Database = {
           onboarding_complete: boolean
           phone: string | null
           photos: string[]
+          points: number
           premium_expires_at: string | null
           pride_opt_in: boolean
           profession: string | null
           razorpay_customer_id: string | null
           razorpay_subscription_id: string | null
+          referral_awarded_at: string | null
+          referral_code: string | null
+          referred_by: string | null
           selfie_url: string | null
           smoking: string | null
           spotify_url: string | null
@@ -669,11 +703,15 @@ export type Database = {
           onboarding_complete?: boolean
           phone?: string | null
           photos?: string[]
+          points?: number
           premium_expires_at?: string | null
           pride_opt_in?: boolean
           profession?: string | null
           razorpay_customer_id?: string | null
           razorpay_subscription_id?: string | null
+          referral_awarded_at?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
           selfie_url?: string | null
           smoking?: string | null
           spotify_url?: string | null
@@ -700,11 +738,15 @@ export type Database = {
           onboarding_complete?: boolean
           phone?: string | null
           photos?: string[]
+          points?: number
           premium_expires_at?: string | null
           pride_opt_in?: boolean
           profession?: string | null
           razorpay_customer_id?: string | null
           razorpay_subscription_id?: string | null
+          referral_awarded_at?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
           selfie_url?: string | null
           smoking?: string | null
           spotify_url?: string | null
@@ -782,6 +824,42 @@ export type Database = {
           status?: string
           target_id?: string
           target_type?: string
+        }
+        Relationships: []
+      }
+      rewards_config: {
+        Row: {
+          badge_name: string
+          cost_badge: number
+          cost_boost: number
+          cost_trial_days: number
+          id: number
+          referral_points: number
+          trial_days: number
+          updated_at: string
+          welcome_points: number
+        }
+        Insert: {
+          badge_name?: string
+          cost_badge?: number
+          cost_boost?: number
+          cost_trial_days?: number
+          id?: number
+          referral_points?: number
+          trial_days?: number
+          updated_at?: string
+          welcome_points?: number
+        }
+        Update: {
+          badge_name?: string
+          cost_badge?: number
+          cost_boost?: number
+          cost_trial_days?: number
+          id?: number
+          referral_points?: number
+          trial_days?: number
+          updated_at?: string
+          welcome_points?: number
         }
         Relationships: []
       }
@@ -915,6 +993,24 @@ export type Database = {
         }
         Relationships: []
       }
+      suggestion_dismissals: {
+        Row: {
+          created_at: string
+          dismissed_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dismissed_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dismissed_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       support_tickets: {
         Row: {
           created_at: string
@@ -941,6 +1037,30 @@ export type Database = {
           screenshot_path?: string | null
           status?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_badges: {
+        Row: {
+          badge: string
+          created_at: string
+          id: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          badge: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          badge?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
           user_id?: string
         }
         Relationships: []
@@ -1037,6 +1157,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_adjust_points: {
+        Args: { _amount: number; _reason: string; _user: string }
+        Returns: undefined
+      }
       admin_get_user: {
         Args: { _user: string }
         Returns: {
@@ -1046,6 +1170,22 @@ export type Database = {
           id: string
           phone: string
           suspended_until: string
+        }[]
+      }
+      admin_grant_badge: {
+        Args: { _badge: string; _reason: string; _user: string }
+        Returns: undefined
+      }
+      admin_list_points_tx: {
+        Args: { _kind?: string; _limit?: number; _user?: string }
+        Returns: {
+          amount: number
+          created_at: string
+          full_name: string
+          id: string
+          kind: string
+          reason: string
+          user_id: string
         }[]
       }
       admin_list_users: {
@@ -1059,10 +1199,40 @@ export type Database = {
           suspended_until: string
         }[]
       }
+      admin_points_stats: {
+        Args: never
+        Returns: {
+          issued_this_month: number
+          spent_this_month: number
+          total_balance: number
+        }[]
+      }
+      admin_set_rewards_config: {
+        Args: {
+          _badge_name: string
+          _cost_badge: number
+          _cost_boost: number
+          _cost_trial_days: number
+          _referral_points: number
+          _trial_days: number
+          _welcome_points: number
+        }
+        Returns: undefined
+      }
       admin_suspend_user: {
         Args: { _reason: string; _until: string; _user: string }
         Returns: undefined
       }
+      admin_top_referrers: {
+        Args: { _limit?: number }
+        Returns: {
+          full_name: string
+          points: number
+          referrals: number
+          user_id: string
+        }[]
+      }
+      claim_referral: { Args: { _code: string }; Returns: boolean }
       cleanup_expired_stories: { Args: never; Returns: undefined }
       count_events_created_last_30d: {
         Args: { _user: string }
@@ -1107,6 +1277,15 @@ export type Database = {
           x_handle: string
         }[]
       }
+      get_my_rewards: {
+        Args: never
+        Returns: {
+          points: number
+          referral_code: string
+          referral_count: number
+          referred_by: string
+        }[]
+      }
       get_pride_identities: {
         Args: { _pride_ids: string[] }
         Returns: {
@@ -1118,6 +1297,7 @@ export type Database = {
       }
       mark_dm_read: { Args: { _thread: string }; Returns: undefined }
       pride_suspended: { Args: { _user: string }; Returns: boolean }
+      redeem_reward: { Args: { _kind: string }; Returns: string }
     }
     Enums: {
       app_role: "admin"

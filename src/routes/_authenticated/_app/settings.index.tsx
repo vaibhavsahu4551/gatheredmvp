@@ -178,6 +178,11 @@ function Settings() {
         ))}
       </Card>
 
+      <SectionTitle>Rewards</SectionTitle>
+      <Card>
+        <Row title="Invite friends & rewards" subtitle="Share your code, earn points, redeem rewards" onClick={() => navigate({ to: "/rewards" })} right={<ChevronRight className="h-4 w-4 text-muted-foreground" />} />
+      </Card>
+
       <SectionTitle>Subscription</SectionTitle>
       <Card>
         <Row title="Manage subscription" subtitle="Plan, renewal date and cancellation" onClick={() => navigate({ to: "/subscription" })} right={<ChevronRight className="h-4 w-4 text-muted-foreground" />} />

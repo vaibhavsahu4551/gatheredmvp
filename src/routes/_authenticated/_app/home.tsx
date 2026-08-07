@@ -14,6 +14,7 @@ import { getActiveBanner, getAppSettings, type HomeBanner } from "@/lib/admin";
 import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { StoryRail } from "@/components/StoryRail";
+import { PeopleSuggestions } from "@/components/PeopleSuggestions";
 import { Lock } from "lucide-react";
 
 
@@ -250,6 +251,7 @@ function HomeFeed() {
         </Link>
       </header>
       <StoryRail />
+      <PeopleSuggestions />
 
       <div className="px-5 mt-3">
 

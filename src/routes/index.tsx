@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { captureReferralFromUrl } from "@/lib/rewards";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -21,6 +22,7 @@ function Splash() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    captureReferralFromUrl();
     let alive = true;
     const started = Date.now();
 

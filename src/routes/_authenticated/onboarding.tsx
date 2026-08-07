@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { claimPendingReferral } from "@/lib/rewards";
 import { INTERESTS, loadMe, signedPhotoUrl } from "@/lib/huddl";
 import { compressImage } from "@/lib/image-compress";
 import { normalizeHandle, normalizeSpotify } from "@/lib/socials";
@@ -145,6 +146,7 @@ function Onboarding() {
       }
     }
     setSaving(true);
+    await claimPendingReferral().catch(() => {});
     const { error } = await supabase.from("profiles").upsert(
       {
         id: userId,
