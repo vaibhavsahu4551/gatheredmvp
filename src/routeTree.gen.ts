@@ -34,6 +34,7 @@ import { Route as AuthenticatedAppDiscoverRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAppCreateRouteImport } from './routes/_authenticated/_app/create'
 import { Route as AuthenticatedAppChatRouteImport } from './routes/_authenticated/_app/chat'
 import { Route as AuthenticatedAppSettingsIndexRouteImport } from './routes/_authenticated/_app/settings.index'
+import { Route as AuthenticatedAppRewardsIndexRouteImport } from './routes/_authenticated/_app/rewards.index'
 import { Route as AuthenticatedAppProfileIndexRouteImport } from './routes/_authenticated/_app/profile.index'
 import { Route as AuthenticatedAppPrideIndexRouteImport } from './routes/_authenticated/_app/pride.index'
 import { Route as AuthenticatedAppMessagesIndexRouteImport } from './routes/_authenticated/_app/messages.index'
@@ -182,6 +183,12 @@ const AuthenticatedAppSettingsIndexRoute =
   AuthenticatedAppSettingsIndexRouteImport.update({
     id: '/settings/',
     path: '/settings/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppRewardsIndexRoute =
+  AuthenticatedAppRewardsIndexRouteImport.update({
+    id: '/rewards/',
+    path: '/rewards/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppProfileIndexRoute =
@@ -345,6 +352,7 @@ export interface FileRoutesByFullPath {
   '/messages/': typeof AuthenticatedAppMessagesIndexRoute
   '/pride/': typeof AuthenticatedAppPrideIndexRoute
   '/profile/': typeof AuthenticatedAppProfileIndexRoute
+  '/rewards/': typeof AuthenticatedAppRewardsIndexRoute
   '/settings/': typeof AuthenticatedAppSettingsIndexRoute
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
@@ -389,6 +397,7 @@ export interface FileRoutesByTo {
   '/messages': typeof AuthenticatedAppMessagesIndexRoute
   '/pride': typeof AuthenticatedAppPrideIndexRoute
   '/profile': typeof AuthenticatedAppProfileIndexRoute
+  '/rewards': typeof AuthenticatedAppRewardsIndexRoute
   '/settings': typeof AuthenticatedAppSettingsIndexRoute
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/events/$eventId': typeof AuthenticatedAppEventsEventIdIndexRoute
@@ -437,6 +446,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/messages/': typeof AuthenticatedAppMessagesIndexRoute
   '/_authenticated/_app/pride/': typeof AuthenticatedAppPrideIndexRoute
   '/_authenticated/_app/profile/': typeof AuthenticatedAppProfileIndexRoute
+  '/_authenticated/_app/rewards/': typeof AuthenticatedAppRewardsIndexRoute
   '/_authenticated/_app/settings/': typeof AuthenticatedAppSettingsIndexRoute
   '/_authenticated/_app/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/_authenticated/_app/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
@@ -484,6 +494,7 @@ export interface FileRouteTypes {
     | '/messages/'
     | '/pride/'
     | '/profile/'
+    | '/rewards/'
     | '/settings/'
     | '/events/$eventId/edit'
     | '/events/$eventId/'
@@ -528,6 +539,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/pride'
     | '/profile'
+    | '/rewards'
     | '/settings'
     | '/events/$eventId/edit'
     | '/events/$eventId'
@@ -575,6 +587,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/messages/'
     | '/_authenticated/_app/pride/'
     | '/_authenticated/_app/profile/'
+    | '/_authenticated/_app/rewards/'
     | '/_authenticated/_app/settings/'
     | '/_authenticated/_app/events/$eventId/edit'
     | '/_authenticated/_app/events/$eventId/'
@@ -768,6 +781,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/rewards/': {
+      id: '/_authenticated/_app/rewards/'
+      path: '/rewards'
+      fullPath: '/rewards/'
+      preLoaderRoute: typeof AuthenticatedAppRewardsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/profile/': {
       id: '/_authenticated/_app/profile/'
       path: '/profile'
@@ -948,6 +968,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppMessagesIndexRoute: typeof AuthenticatedAppMessagesIndexRoute
   AuthenticatedAppPrideIndexRoute: typeof AuthenticatedAppPrideIndexRoute
   AuthenticatedAppProfileIndexRoute: typeof AuthenticatedAppProfileIndexRoute
+  AuthenticatedAppRewardsIndexRoute: typeof AuthenticatedAppRewardsIndexRoute
   AuthenticatedAppSettingsIndexRoute: typeof AuthenticatedAppSettingsIndexRoute
   AuthenticatedAppEventsEventIdEditRoute: typeof AuthenticatedAppEventsEventIdEditRoute
   AuthenticatedAppEventsEventIdIndexRoute: typeof AuthenticatedAppEventsEventIdIndexRoute
@@ -980,6 +1001,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppMessagesIndexRoute: AuthenticatedAppMessagesIndexRoute,
   AuthenticatedAppPrideIndexRoute: AuthenticatedAppPrideIndexRoute,
   AuthenticatedAppProfileIndexRoute: AuthenticatedAppProfileIndexRoute,
+  AuthenticatedAppRewardsIndexRoute: AuthenticatedAppRewardsIndexRoute,
   AuthenticatedAppSettingsIndexRoute: AuthenticatedAppSettingsIndexRoute,
   AuthenticatedAppEventsEventIdEditRoute:
     AuthenticatedAppEventsEventIdEditRoute,
@@ -1036,13 +1058,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
