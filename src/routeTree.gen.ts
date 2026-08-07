@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AuthenticatedPendingRouteImport } from './routes/_authenticated/pending'
@@ -98,6 +99,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRewardsRoute = AdminRewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
@@ -321,6 +327,7 @@ export interface FileRoutesByFullPath {
   '/pending': typeof AuthenticatedPendingRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/rewards': typeof AdminRewardsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
@@ -366,6 +373,7 @@ export interface FileRoutesByTo {
   '/pending': typeof AuthenticatedPendingRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/rewards': typeof AdminRewardsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin': typeof AdminIndexRoute
@@ -415,6 +423,7 @@ export interface FileRoutesById {
   '/_authenticated/pending': typeof AuthenticatedPendingRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/rewards': typeof AdminRewardsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
@@ -463,6 +472,7 @@ export interface FileRouteTypes {
     | '/pending'
     | '/admin/events'
     | '/admin/reports'
+    | '/admin/rewards'
     | '/admin/settings'
     | '/admin/users'
     | '/admin/'
@@ -508,6 +518,7 @@ export interface FileRouteTypes {
     | '/pending'
     | '/admin/events'
     | '/admin/reports'
+    | '/admin/rewards'
     | '/admin/settings'
     | '/admin/users'
     | '/admin'
@@ -556,6 +567,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pending'
     | '/admin/events'
     | '/admin/reports'
+    | '/admin/rewards'
     | '/admin/settings'
     | '/admin/users'
     | '/admin/'
@@ -667,6 +679,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/rewards': {
+      id: '/admin/rewards'
+      path: '/rewards'
+      fullPath: '/admin/rewards'
+      preLoaderRoute: typeof AdminRewardsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/reports': {
@@ -1030,6 +1049,7 @@ const AuthenticatedRouteRouteWithChildren =
 interface AdminRouteChildren {
   AdminEventsRoute: typeof AdminEventsRoute
   AdminReportsRoute: typeof AdminReportsRoute
+  AdminRewardsRoute: typeof AdminRewardsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1038,6 +1058,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminEventsRoute: AdminEventsRoute,
   AdminReportsRoute: AdminReportsRoute,
+  AdminRewardsRoute: AdminRewardsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
