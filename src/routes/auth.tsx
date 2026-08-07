@@ -51,6 +51,8 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [showApple, setShowApple] = useState(false);
 
+  useEffect(() => { captureReferralFromUrl(); }, []);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/home" });

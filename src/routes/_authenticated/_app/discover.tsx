@@ -6,6 +6,7 @@ import { ageFromDob, signedPhotoUrl, type ProfileRow } from "@/lib/huddl";
 import { loadBlockedIds } from "@/lib/safety";
 import { huddleStatusWith, sendHuddleRequest, type HuddleStatus } from "@/lib/huddle-connect";
 import { Avatar } from "@/components/Avatar";
+import { PeopleSuggestions } from "@/components/PeopleSuggestions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/_app/discover")({
@@ -117,6 +118,11 @@ function Discover() {
       </header>
 
       <div className="max-w-md mx-auto">
+        <div className="px-4 mt-4">
+          <div className="text-xs font-semibold text-muted-foreground mb-2">PEOPLE YOU MAY KNOW</div>
+          <PeopleSuggestions variant="grid" />
+        </div>
+
         {me && (me.interests?.length ?? 0) > 0 && (
           <div className="px-4 mt-3 flex gap-2 overflow-x-auto pb-2">
             {["All", ...allTags].map((t) => (
