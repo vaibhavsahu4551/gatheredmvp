@@ -92,10 +92,12 @@ function HomeFeed() {
   // Hydrate a batch of posts (profiles, likes, linked events, signed image URLs) in parallel.
   const hydratePosts = useCallback(async (batch: PostItem[]) => {
     if (!batch.length) return;
-    const [l, n, evMap, imgPairs] = await Promise.all([
+    const { getPromptsLite } = await import("@/lib/icebreakers");
+    const [l, n, evMap, promptMap, imgPairs] = await Promise.all([
       getLikes(batch.map((p) => p.id)),
       getProfilesLite(batch.map((p) => p.user_id)),
       getEventsLite(batch.map((p) => p.event_id ?? "").filter(Boolean)),
+      getPromptsLite(batch.map((p) => p.prompt_id ?? "").filter(Boolean)),
       Promise.all(
         batch.filter((p) => p.photo_url).map(async (p) => [p.id, await signedFeedUrl(p.photo_url!)] as const),
       ),
@@ -106,6 +108,7 @@ function HomeFeed() {
     }));
     setNames((prev) => ({ ...prev, ...n }));
     setLinkedEvents((prev) => ({ ...prev, ...evMap }));
+    setPrompts((prev) => ({ ...prev, ...promptMap }));
     setImgs((prev) => {
       const next = { ...prev };
       for (const [id, url] of imgPairs) next[id] = url;
