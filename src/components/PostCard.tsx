@@ -179,6 +179,7 @@ export function PostCard({
       </div>
 
       {img && <img src={img} className="w-full aspect-square object-cover" alt="" />}
+      {promptChip && <div className="px-3 pt-2">{promptChip}</div>}
       {p.caption && <div className="px-3 pt-2 text-[14px] whitespace-pre-wrap">{p.caption}</div>}
       {linked && linkedStyle && (
         <button
