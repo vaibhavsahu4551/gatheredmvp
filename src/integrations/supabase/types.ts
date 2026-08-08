@@ -53,6 +53,44 @@ export type Database = {
         }
         Relationships: []
       }
+      challenge_completions: {
+        Row: {
+          challenge_id: string | null
+          created_at: string
+          id: string
+          reward_detail: string | null
+          reward_kind: string | null
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          challenge_id?: string | null
+          created_at?: string
+          id?: string
+          reward_detail?: string | null
+          reward_kind?: string | null
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          challenge_id?: string | null
+          created_at?: string
+          id?: string
+          reward_detail?: string | null
+          reward_kind?: string | null
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_completions_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_groups: {
         Row: {
           created_at: string
@@ -116,6 +154,32 @@ export type Database = {
             columns: ["group_id"]
             isOneToOne: false
             referencedRelation: "chat_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_icebreakers: {
+        Row: {
+          created_at: string
+          day: string
+          prompt_id: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          prompt_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          prompt_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_icebreakers_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "icebreaker_prompts"
             referencedColumns: ["id"]
           },
         ]
@@ -431,6 +495,27 @@ export type Database = {
         }
         Relationships: []
       }
+      icebreaker_prompts: {
+        Row: {
+          active: boolean
+          body: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          active?: boolean
+          body: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          active?: boolean
+          body?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           actor_id: string | null
@@ -561,8 +646,11 @@ export type Database = {
           city: string
           created_at: string
           event_id: string | null
+          icebreaker_day: string | null
           id: string
+          kind: string
           photo_url: string | null
+          prompt_id: string | null
           updated_at: string
           user_id: string
         }
@@ -571,8 +659,11 @@ export type Database = {
           city: string
           created_at?: string
           event_id?: string | null
+          icebreaker_day?: string | null
           id?: string
+          kind?: string
           photo_url?: string | null
+          prompt_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -581,8 +672,11 @@ export type Database = {
           city?: string
           created_at?: string
           event_id?: string | null
+          icebreaker_day?: string | null
           id?: string
+          kind?: string
           photo_url?: string | null
+          prompt_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -592,6 +686,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "icebreaker_prompts"
             referencedColumns: ["id"]
           },
         ]
@@ -1152,6 +1253,71 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_challenge_assignments: {
+        Row: {
+          challenge_id: string
+          created_at: string
+          week_start: string
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string
+          week_start: string
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_challenge_assignments_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      weekly_challenges: {
+        Row: {
+          active: boolean
+          badge_name: string | null
+          created_at: string
+          description: string | null
+          goal_target: number
+          goal_type: string
+          id: string
+          reward_amount: number
+          reward_kind: string
+          title: string
+        }
+        Insert: {
+          active?: boolean
+          badge_name?: string | null
+          created_at?: string
+          description?: string | null
+          goal_target?: number
+          goal_type: string
+          id?: string
+          reward_amount?: number
+          reward_kind?: string
+          title: string
+        }
+        Update: {
+          active?: boolean
+          badge_name?: string | null
+          created_at?: string
+          description?: string | null
+          goal_target?: number
+          goal_type?: string
+          id?: string
+          reward_amount?: number
+          reward_kind?: string
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1232,7 +1398,9 @@ export type Database = {
           user_id: string
         }[]
       }
+      announce_daily_icebreaker: { Args: never; Returns: undefined }
       claim_referral: { Args: { _code: string }; Returns: boolean }
+      claim_weekly_challenge: { Args: never; Returns: string }
       cleanup_expired_stories: { Args: never; Returns: undefined }
       count_events_created_last_30d: {
         Args: { _user: string }
@@ -1295,9 +1463,37 @@ export type Database = {
           pride_id: string
         }[]
       }
+      get_today_icebreaker: {
+        Args: never
+        Returns: {
+          answer_count: number
+          day: string
+          my_post_id: string
+          prompt: string
+          prompt_id: string
+        }[]
+      }
+      get_weekly_challenge: {
+        Args: never
+        Returns: {
+          badge_name: string
+          challenge_id: string
+          completed: boolean
+          description: string
+          goal_target: number
+          goal_type: string
+          progress: number
+          reward_amount: number
+          reward_kind: string
+          title: string
+          week_start: string
+        }[]
+      }
       mark_dm_read: { Args: { _thread: string }; Returns: undefined }
       pride_suspended: { Args: { _user: string }; Returns: boolean }
       redeem_reward: { Args: { _kind: string }; Returns: string }
+      roll_daily_icebreaker: { Args: never; Returns: string }
+      roll_weekly_challenge: { Args: never; Returns: string }
     }
     Enums: {
       app_role: "admin"
