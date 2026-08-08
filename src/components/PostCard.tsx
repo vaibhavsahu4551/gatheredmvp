@@ -112,6 +112,7 @@ export function PostCard({
                 <SafetyMenu targetType="user" targetId={p.user_id} userId={p.user_id} />
               )}
             </div>
+            {promptChip}
             {p.caption && (
               <div className="mt-1 text-[15px] leading-relaxed whitespace-pre-wrap text-foreground">{p.caption}</div>
             )}
