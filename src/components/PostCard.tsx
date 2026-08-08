@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "@tanstack/react-router";
-import { Heart, MessageSquare, Link2, Trash2 } from "lucide-react";
+import { Heart, MessageSquare, Link2, Trash2, Sparkles } from "lucide-react";
 import { SafetyMenu } from "@/components/SafetyMenu";
 import { ShareButton } from "@/components/ShareToConnection";
 import { Avatar } from "@/components/Avatar";
@@ -14,6 +14,7 @@ export type PostItem = {
   caption: string | null;
   photo_url: string | null;
   event_id: string | null;
+  prompt_id?: string | null;
 };
 
 export function PostCard({
@@ -22,6 +23,7 @@ export function PostCard({
   name,
   avatarPhoto,
   linked,
+  prompt,
   liked,
   likeCount,
   onLike,
@@ -32,6 +34,7 @@ export function PostCard({
   name: string;
   avatarPhoto?: string | null;
   linked?: { id: string; title: string; event_type: string | null };
+  prompt?: string | null;
   liked: boolean;
   likeCount: number;
   onLike: () => void;
@@ -42,6 +45,12 @@ export function PostCard({
   const [comments, setComments] = useState<any[]>([]);
   const [text, setText] = useState("");
   const linkedStyle = linked ? eventTypeStyle(linked.event_type) : null;
+  const promptChip = prompt ? (
+    <Link to="/icebreaker" className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-gradient-brand-soft px-3 py-1 text-[11px] font-semibold text-foreground/80">
+      <Sparkles className="h-3 w-3" /> {prompt}
+    </Link>
+  ) : null;
+
 
   const [authors, setAuthors] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const load = async () => {
@@ -103,6 +112,7 @@ export function PostCard({
                 <SafetyMenu targetType="user" targetId={p.user_id} userId={p.user_id} />
               )}
             </div>
+            {promptChip}
             {p.caption && (
               <div className="mt-1 text-[15px] leading-relaxed whitespace-pre-wrap text-foreground">{p.caption}</div>
             )}
@@ -169,6 +179,7 @@ export function PostCard({
       </div>
 
       {img && <img src={img} className="w-full aspect-square object-cover" alt="" />}
+      {promptChip && <div className="px-3 pt-2">{promptChip}</div>}
       {p.caption && <div className="px-3 pt-2 text-[14px] whitespace-pre-wrap">{p.caption}</div>}
       {linked && linkedStyle && (
         <button

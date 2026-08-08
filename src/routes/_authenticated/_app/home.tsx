@@ -15,6 +15,8 @@ import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { StoryRail } from "@/components/StoryRail";
 import { PeopleSuggestions } from "@/components/PeopleSuggestions";
+import { IcebreakerCard } from "@/components/IcebreakerCard";
+import { WeeklyChallengeCard } from "@/components/WeeklyChallengeCard";
 import { Lock } from "lucide-react";
 
 
@@ -58,6 +60,7 @@ function HomeFeed() {
   const [likes, setLikes] = useState<{ counts: Record<string, number>; mine: Set<string> }>({ counts: {}, mine: new Set() });
   const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [linkedEvents, setLinkedEvents] = useState<Record<string, { id: string; title: string; event_type: string | null }>>({});
+  const [prompts, setPrompts] = useState<Record<string, string>>({});
 
   const meIdRef = useRef<string>("");
   const blockedRef = useRef<Set<string>>(new Set());
@@ -89,10 +92,12 @@ function HomeFeed() {
   // Hydrate a batch of posts (profiles, likes, linked events, signed image URLs) in parallel.
   const hydratePosts = useCallback(async (batch: PostItem[]) => {
     if (!batch.length) return;
-    const [l, n, evMap, imgPairs] = await Promise.all([
+    const { getPromptsLite } = await import("@/lib/icebreakers");
+    const [l, n, evMap, promptMap, imgPairs] = await Promise.all([
       getLikes(batch.map((p) => p.id)),
       getProfilesLite(batch.map((p) => p.user_id)),
       getEventsLite(batch.map((p) => p.event_id ?? "").filter(Boolean)),
+      getPromptsLite(batch.map((p) => p.prompt_id ?? "").filter(Boolean)),
       Promise.all(
         batch.filter((p) => p.photo_url).map(async (p) => [p.id, await signedFeedUrl(p.photo_url!)] as const),
       ),
@@ -103,6 +108,7 @@ function HomeFeed() {
     }));
     setNames((prev) => ({ ...prev, ...n }));
     setLinkedEvents((prev) => ({ ...prev, ...evMap }));
+    setPrompts((prev) => ({ ...prev, ...promptMap }));
     setImgs((prev) => {
       const next = { ...prev };
       for (const [id, url] of imgPairs) next[id] = url;
@@ -144,6 +150,7 @@ function HomeFeed() {
         .map((p) => ({
           kind: "post", id: p.id, created_at: p.created_at, user_id: p.user_id,
           caption: p.caption, photo_url: p.photo_url, event_id: p.event_id ?? null,
+          prompt_id: p.prompt_id ?? null,
         }));
       setPosts(pItems);
       setPostsOffset(firstPosts.length);
@@ -167,6 +174,7 @@ function HomeFeed() {
         .map((p) => ({
           kind: "post", id: p.id, created_at: p.created_at, user_id: p.user_id,
           caption: p.caption, photo_url: p.photo_url, event_id: p.event_id ?? null,
+          prompt_id: p.prompt_id ?? null,
         }));
       setPosts((prev) => [...prev, ...batch]);
       setPostsOffset((n) => n + raw.length);
@@ -273,6 +281,8 @@ function HomeFeed() {
 
 
       <div className="mt-3 px-5 space-y-3 pb-4">
+        <IcebreakerCard city={city} />
+        <WeeklyChallengeCard />
         {banner && (
           <div className="rounded-2xl overflow-hidden border border-border bg-gradient-brand text-white shadow-sm">
             {banner.image_url && <img src={banner.image_url} alt="" className="w-full h-32 object-cover" />}
@@ -323,6 +333,7 @@ function HomeFeed() {
           <PostCard key={"p" + it.id} p={it} img={imgs[it.id]} name={names[it.user_id]?.full_name ?? "Someone"}
             avatarPhoto={names[it.user_id]?.photo ?? null}
             linked={it.event_id ? linkedEvents[it.event_id] : undefined}
+            prompt={it.prompt_id ? prompts[it.prompt_id] : undefined}
             liked={likes.mine.has(it.id)} likeCount={likes.counts[it.id] ?? 0}
             onLike={() => onLike(it.id)} />
         ))}
