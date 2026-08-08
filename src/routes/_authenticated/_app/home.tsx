@@ -15,6 +15,8 @@ import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { StoryRail } from "@/components/StoryRail";
 import { PeopleSuggestions } from "@/components/PeopleSuggestions";
+import { IcebreakerCard } from "@/components/IcebreakerCard";
+import { WeeklyChallengeCard } from "@/components/WeeklyChallengeCard";
 import { Lock } from "lucide-react";
 
 
