@@ -30,6 +30,7 @@ import { Route as AuthenticatedAppSubscriptionRouteImport } from './routes/_auth
 import { Route as AuthenticatedAppRequestsRouteImport } from './routes/_authenticated/_app/requests'
 import { Route as AuthenticatedAppPremiumRouteImport } from './routes/_authenticated/_app/premium'
 import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/_app/notifications'
+import { Route as AuthenticatedAppIcebreakerRouteImport } from './routes/_authenticated/_app/icebreaker'
 import { Route as AuthenticatedAppHomeRouteImport } from './routes/_authenticated/_app/home'
 import { Route as AuthenticatedAppDiscoverRouteImport } from './routes/_authenticated/_app/discover'
 import { Route as AuthenticatedAppCreateRouteImport } from './routes/_authenticated/_app/create'
@@ -162,6 +163,12 @@ const AuthenticatedAppNotificationsRoute =
   AuthenticatedAppNotificationsRouteImport.update({
     id: '/notifications',
     path: '/notifications',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppIcebreakerRoute =
+  AuthenticatedAppIcebreakerRouteImport.update({
+    id: '/icebreaker',
+    path: '/icebreaker',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppHomeRoute = AuthenticatedAppHomeRouteImport.update({
@@ -335,6 +342,7 @@ export interface FileRoutesByFullPath {
   '/create': typeof AuthenticatedAppCreateRoute
   '/discover': typeof AuthenticatedAppDiscoverRoute
   '/home': typeof AuthenticatedAppHomeRoute
+  '/icebreaker': typeof AuthenticatedAppIcebreakerRoute
   '/notifications': typeof AuthenticatedAppNotificationsRoute
   '/premium': typeof AuthenticatedAppPremiumRoute
   '/requests': typeof AuthenticatedAppRequestsRoute
@@ -381,6 +389,7 @@ export interface FileRoutesByTo {
   '/create': typeof AuthenticatedAppCreateRoute
   '/discover': typeof AuthenticatedAppDiscoverRoute
   '/home': typeof AuthenticatedAppHomeRoute
+  '/icebreaker': typeof AuthenticatedAppIcebreakerRoute
   '/notifications': typeof AuthenticatedAppNotificationsRoute
   '/premium': typeof AuthenticatedAppPremiumRoute
   '/requests': typeof AuthenticatedAppRequestsRoute
@@ -431,6 +440,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/create': typeof AuthenticatedAppCreateRoute
   '/_authenticated/_app/discover': typeof AuthenticatedAppDiscoverRoute
   '/_authenticated/_app/home': typeof AuthenticatedAppHomeRoute
+  '/_authenticated/_app/icebreaker': typeof AuthenticatedAppIcebreakerRoute
   '/_authenticated/_app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/_authenticated/_app/premium': typeof AuthenticatedAppPremiumRoute
   '/_authenticated/_app/requests': typeof AuthenticatedAppRequestsRoute
@@ -480,6 +490,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/discover'
     | '/home'
+    | '/icebreaker'
     | '/notifications'
     | '/premium'
     | '/requests'
@@ -526,6 +537,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/discover'
     | '/home'
+    | '/icebreaker'
     | '/notifications'
     | '/premium'
     | '/requests'
@@ -575,6 +587,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/create'
     | '/_authenticated/_app/discover'
     | '/_authenticated/_app/home'
+    | '/_authenticated/_app/icebreaker'
     | '/_authenticated/_app/notifications'
     | '/_authenticated/_app/premium'
     | '/_authenticated/_app/requests'
@@ -763,6 +776,13 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/notifications'
       preLoaderRoute: typeof AuthenticatedAppNotificationsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/icebreaker': {
+      id: '/_authenticated/_app/icebreaker'
+      path: '/icebreaker'
+      fullPath: '/icebreaker'
+      preLoaderRoute: typeof AuthenticatedAppIcebreakerRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/home': {
@@ -966,6 +986,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppCreateRoute: typeof AuthenticatedAppCreateRoute
   AuthenticatedAppDiscoverRoute: typeof AuthenticatedAppDiscoverRoute
   AuthenticatedAppHomeRoute: typeof AuthenticatedAppHomeRoute
+  AuthenticatedAppIcebreakerRoute: typeof AuthenticatedAppIcebreakerRoute
   AuthenticatedAppNotificationsRoute: typeof AuthenticatedAppNotificationsRoute
   AuthenticatedAppPremiumRoute: typeof AuthenticatedAppPremiumRoute
   AuthenticatedAppRequestsRoute: typeof AuthenticatedAppRequestsRoute
@@ -998,6 +1019,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppCreateRoute: AuthenticatedAppCreateRoute,
   AuthenticatedAppDiscoverRoute: AuthenticatedAppDiscoverRoute,
   AuthenticatedAppHomeRoute: AuthenticatedAppHomeRoute,
+  AuthenticatedAppIcebreakerRoute: AuthenticatedAppIcebreakerRoute,
   AuthenticatedAppNotificationsRoute: AuthenticatedAppNotificationsRoute,
   AuthenticatedAppPremiumRoute: AuthenticatedAppPremiumRoute,
   AuthenticatedAppRequestsRoute: AuthenticatedAppRequestsRoute,
@@ -1079,13 +1101,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
