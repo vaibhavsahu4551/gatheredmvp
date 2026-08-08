@@ -275,6 +275,8 @@ function HomeFeed() {
 
 
       <div className="mt-3 px-5 space-y-3 pb-4">
+        <IcebreakerCard city={city} />
+        <WeeklyChallengeCard />
         {banner && (
           <div className="rounded-2xl overflow-hidden border border-border bg-gradient-brand text-white shadow-sm">
             {banner.image_url && <img src={banner.image_url} alt="" className="w-full h-32 object-cover" />}
