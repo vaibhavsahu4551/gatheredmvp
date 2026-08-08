@@ -6,7 +6,7 @@ export async function listFeed(opts?: { limit?: number; offset?: number }) {
   const to = from + (opts?.limit ?? 15) - 1;
   const { data, error } = await supabase
     .from("posts")
-    .select("id, user_id, caption, photo_url, event_id, created_at")
+    .select("id, user_id, caption, photo_url, event_id, created_at, prompt_id")
     .order("created_at", { ascending: false })
     .range(from, to);
   if (error) throw error;
