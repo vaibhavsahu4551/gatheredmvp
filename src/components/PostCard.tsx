@@ -14,6 +14,7 @@ export type PostItem = {
   caption: string | null;
   photo_url: string | null;
   event_id: string | null;
+  prompt_id?: string | null;
 };
 
 export function PostCard({
