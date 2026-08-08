@@ -60,6 +60,7 @@ function HomeFeed() {
   const [likes, setLikes] = useState<{ counts: Record<string, number>; mine: Set<string> }>({ counts: {}, mine: new Set() });
   const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [linkedEvents, setLinkedEvents] = useState<Record<string, { id: string; title: string; event_type: string | null }>>({});
+  const [prompts, setPrompts] = useState<Record<string, string>>({});
 
   const meIdRef = useRef<string>("");
   const blockedRef = useRef<Set<string>>(new Set());
