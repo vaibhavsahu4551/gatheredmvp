@@ -150,6 +150,7 @@ function HomeFeed() {
         .map((p) => ({
           kind: "post", id: p.id, created_at: p.created_at, user_id: p.user_id,
           caption: p.caption, photo_url: p.photo_url, event_id: p.event_id ?? null,
+          prompt_id: p.prompt_id ?? null,
         }));
       setPosts(pItems);
       setPostsOffset(firstPosts.length);
@@ -173,6 +174,7 @@ function HomeFeed() {
         .map((p) => ({
           kind: "post", id: p.id, created_at: p.created_at, user_id: p.user_id,
           caption: p.caption, photo_url: p.photo_url, event_id: p.event_id ?? null,
+          prompt_id: p.prompt_id ?? null,
         }));
       setPosts((prev) => [...prev, ...batch]);
       setPostsOffset((n) => n + raw.length);
@@ -331,6 +333,7 @@ function HomeFeed() {
           <PostCard key={"p" + it.id} p={it} img={imgs[it.id]} name={names[it.user_id]?.full_name ?? "Someone"}
             avatarPhoto={names[it.user_id]?.photo ?? null}
             linked={it.event_id ? linkedEvents[it.event_id] : undefined}
+            prompt={it.prompt_id ? prompts[it.prompt_id] : undefined}
             liked={likes.mine.has(it.id)} likeCount={likes.counts[it.id] ?? 0}
             onLike={() => onLike(it.id)} />
         ))}
