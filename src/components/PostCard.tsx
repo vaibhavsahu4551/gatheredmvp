@@ -23,6 +23,7 @@ export function PostCard({
   name,
   avatarPhoto,
   linked,
+  prompt,
   liked,
   likeCount,
   onLike,
@@ -33,6 +34,7 @@ export function PostCard({
   name: string;
   avatarPhoto?: string | null;
   linked?: { id: string; title: string; event_type: string | null };
+  prompt?: string | null;
   liked: boolean;
   likeCount: number;
   onLike: () => void;
@@ -43,6 +45,12 @@ export function PostCard({
   const [comments, setComments] = useState<any[]>([]);
   const [text, setText] = useState("");
   const linkedStyle = linked ? eventTypeStyle(linked.event_type) : null;
+  const promptChip = prompt ? (
+    <Link to="/icebreaker" className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-gradient-brand-soft px-3 py-1 text-[11px] font-semibold text-foreground/80">
+      <Sparkles className="h-3 w-3" /> {prompt}
+    </Link>
+  ) : null;
+
 
   const [authors, setAuthors] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const load = async () => {
