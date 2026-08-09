@@ -158,6 +158,48 @@ export type Database = {
           },
         ]
       }
+      content_flags: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          id: string
+          image_path: string | null
+          is_pride: boolean
+          reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          is_pride?: boolean
+          reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source?: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          is_pride?: boolean
+          reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       daily_icebreakers: {
         Row: {
           created_at: string
@@ -1233,6 +1275,7 @@ export type Database = {
         Row: {
           notes: string | null
           priority: boolean
+          rejection_reason: string | null
           status: Database["public"]["Enums"]["verification_state"]
           updated_at: string
           user_id: string
@@ -1240,6 +1283,7 @@ export type Database = {
         Insert: {
           notes?: string | null
           priority?: boolean
+          rejection_reason?: string | null
           status?: Database["public"]["Enums"]["verification_state"]
           updated_at?: string
           user_id: string
@@ -1247,6 +1291,7 @@ export type Database = {
         Update: {
           notes?: string | null
           priority?: boolean
+          rejection_reason?: string | null
           status?: Database["public"]["Enums"]["verification_state"]
           updated_at?: string
           user_id?: string
@@ -1327,6 +1372,24 @@ export type Database = {
         Args: { _amount: number; _reason: string; _user: string }
         Returns: undefined
       }
+      admin_challenge_stats: {
+        Args: never
+        Returns: {
+          badge_count: number
+          boost_count: number
+          challenge_id: string
+          completions: number
+          title: string
+          trial_count: number
+          week_start: string
+        }[]
+      }
+      admin_delete_challenge: { Args: { _id: string }; Returns: undefined }
+      admin_delete_icebreaker_prompt: {
+        Args: { _id: string }
+        Returns: undefined
+      }
+      admin_delete_post: { Args: { _id: string }; Returns: undefined }
       admin_get_user: {
         Args: { _user: string }
         Returns: {
@@ -1342,6 +1405,67 @@ export type Database = {
         Args: { _badge: string; _reason: string; _user: string }
         Returns: undefined
       }
+      admin_icebreaker_history: {
+        Args: { _limit?: number }
+        Returns: {
+          body: string
+          day: string
+          prompt_id: string
+          responses: number
+        }[]
+      }
+      admin_icebreaker_responses: {
+        Args: { _day?: string; _limit?: number }
+        Returns: {
+          caption: string
+          created_at: string
+          full_name: string
+          id: string
+          user_id: string
+        }[]
+      }
+      admin_list_challenges: {
+        Args: never
+        Returns: {
+          active: boolean
+          badge_name: string
+          created_at: string
+          description: string
+          goal_target: number
+          goal_type: string
+          id: string
+          reward_amount: number
+          reward_kind: string
+          times_used: number
+          title: string
+        }[]
+      }
+      admin_list_flags: {
+        Args: { _status?: string }
+        Returns: {
+          confidence: number
+          created_at: string
+          full_name: string
+          id: string
+          image_path: string
+          is_pride: boolean
+          reason: string
+          source: string
+          status: string
+          user_id: string
+        }[]
+      }
+      admin_list_icebreaker_prompts: {
+        Args: never
+        Returns: {
+          active: boolean
+          body: string
+          created_at: string
+          id: string
+          last_used: string
+          uses: number
+        }[]
+      }
       admin_list_points_tx: {
         Args: { _kind?: string; _limit?: number; _user?: string }
         Returns: {
@@ -1351,6 +1475,22 @@ export type Database = {
           id: string
           kind: string
           reason: string
+          user_id: string
+        }[]
+      }
+      admin_list_posts: {
+        Args: { _limit?: number; _search?: string }
+        Returns: {
+          caption: string
+          city: string
+          comments: number
+          created_at: string
+          full_name: string
+          id: string
+          kind: string
+          likes: number
+          photo_url: string
+          reports: number
           user_id: string
         }[]
       }
@@ -1365,12 +1505,39 @@ export type Database = {
           suspended_until: string
         }[]
       }
+      admin_list_verification: {
+        Args: { _status?: string }
+        Returns: {
+          full_name: string
+          notes: string
+          photos: string[]
+          priority: boolean
+          rejection_reason: string
+          selfie_url: string
+          status: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       admin_points_stats: {
         Args: never
         Returns: {
           issued_this_month: number
           spent_this_month: number
           total_balance: number
+        }[]
+      }
+      admin_resolve_flag: {
+        Args: { _action: string; _id: string; _suspend_days?: number }
+        Returns: undefined
+      }
+      admin_revenue_stats: {
+        Args: never
+        Returns: {
+          active_premium: number
+          cancelled_this_month: number
+          mrr: number
+          new_this_month: number
         }[]
       }
       admin_set_rewards_config: {
@@ -1385,6 +1552,19 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_set_today_icebreaker: { Args: { _prompt: string }; Returns: string }
+      admin_set_verification: {
+        Args: { _reason?: string; _status: string; _user: string }
+        Returns: undefined
+      }
+      admin_set_week_challenge: { Args: { _id: string }; Returns: string }
+      admin_subscriber_trend: {
+        Args: { _days?: number }
+        Returns: {
+          day: string
+          subscribers: number
+        }[]
+      }
       admin_suspend_user: {
         Args: { _reason: string; _until: string; _user: string }
         Returns: undefined
@@ -1397,6 +1577,24 @@ export type Database = {
           referrals: number
           user_id: string
         }[]
+      }
+      admin_upsert_challenge: {
+        Args: {
+          _active: boolean
+          _badge_name: string
+          _description: string
+          _goal_target: number
+          _goal_type: string
+          _id: string
+          _reward_amount: number
+          _reward_kind: string
+          _title: string
+        }
+        Returns: string
+      }
+      admin_upsert_icebreaker_prompt: {
+        Args: { _active: boolean; _body: string; _id: string }
+        Returns: string
       }
       announce_daily_icebreaker: { Args: never; Returns: undefined }
       claim_referral: { Args: { _code: string }; Returns: boolean }
