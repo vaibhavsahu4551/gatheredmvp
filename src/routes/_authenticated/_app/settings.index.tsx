@@ -33,6 +33,7 @@ export const Route = createFileRoute("/_authenticated/_app/settings/")({
 
 function Settings() {
   const navigate = useNavigate();
+  const subsEnabled = useSubscriptionsEnabled();
   const [s, setS] = useState<UserSettings | null>(null);
   const [pride, setPride] = useState(false);
   const [busy, setBusy] = useState(false);
