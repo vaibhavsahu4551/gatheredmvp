@@ -131,7 +131,7 @@ function ManageSubscription() {
               </button>
             )}
 
-            {state.tier !== "premium" && (
+            {state.tier !== "premium" && state.subscriptionsEnabled && (
               <Link
                 to="/premium"
                 className="block w-full text-center rounded-full bg-gradient-brand text-white py-3.5 text-sm font-semibold shadow-glow"

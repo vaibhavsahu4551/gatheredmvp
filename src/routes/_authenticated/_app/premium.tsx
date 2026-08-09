@@ -10,10 +10,27 @@ import {
 } from "@/lib/subscription";
 import { createRazorpaySubscription } from "@/lib/razorpay.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { useSubscriptionsEnabled } from "@/hooks/useSubscriptionsEnabled";
+import { getAppSettingsCached } from "@/lib/admin";
 
 export const Route = createFileRoute("/_authenticated/_app/premium")({
-  component: PremiumScreen,
+  component: PremiumGuard,
 });
+
+/** When the admin subscription toggle is OFF there is no paywall — send users home. */
+function PremiumGuard() {
+  const navigate = useNavigate();
+  const enabled = useSubscriptionsEnabled();
+  const [checked, setChecked] = useState(false);
+  useEffect(() => {
+    getAppSettingsCached().then((s) => {
+      if (!s.subscription_enabled) navigate({ to: "/home" });
+      setChecked(true);
+    });
+  }, [navigate]);
+  if (!checked || !enabled) return null;
+  return <PremiumScreen />;
+}
 
 declare global {
   interface Window {
