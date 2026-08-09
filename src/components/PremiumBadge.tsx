@@ -1,7 +1,13 @@
 import { Sparkles } from "lucide-react";
+import { useSubscriptionsEnabled } from "@/hooks/useSubscriptionsEnabled";
 
-/** Small "Premium" badge shown next to a subscriber's name. */
+/**
+ * Small "Premium" badge shown next to a subscriber's name.
+ * Hidden entirely while the admin subscription toggle is OFF.
+ */
 export function PremiumBadge({ size = 12, className = "" }: { size?: number; className?: string }) {
+  const enabled = useSubscriptionsEnabled();
+  if (!enabled) return null;
   return (
     <span
       title="Gathr Premium member"

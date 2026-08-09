@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { ArrowLeft, MapPin, UserPlus, Check, X, MessageCircle, Clock } from "lucide-react";
 import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { PremiumBadge } from "@/components/PremiumBadge";
+import { useSubscriptionsEnabled } from "@/hooks/useSubscriptionsEnabled";
 
 export const Route = createFileRoute("/_authenticated/_app/u/$userId")({
   component: UserProfile,
@@ -32,6 +33,7 @@ function UserProfile() {
   const [connNames, setConnNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<"posts" | "hosting" | "joined">("posts");
+  const subsEnabled = useSubscriptionsEnabled();
   const [targetPremium, setTargetPremium] = useState(false);
   const [myPremium, setMyPremium] = useState(false);
 
@@ -172,7 +174,7 @@ function UserProfile() {
             )}
           </div>
         )}
-        {!isMe && myPremium && status !== "connected" && (
+        {!isMe && myPremium && subsEnabled && status !== "connected" && (
           <button onClick={openDm} className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-full border border-border py-2.5 text-sm font-semibold">
             <MessageCircle className="h-4 w-4" /> Message directly <PremiumBadge />
           </button>
@@ -228,7 +230,7 @@ function UserProfile() {
 
         <div className="mt-6 border-b border-border">
           <div className="flex gap-6 text-sm">
-            {((isMe || targetPremium)
+            {((isMe || targetPremium || !subsEnabled)
               ? ([["posts","Posts"],["hosting","Host history"],["joined","Joined"]] as const).filter(([k]) => isMe || k !== "joined")
               : ([["posts","Posts"]] as const)
             ).map(([k,label]) => (
@@ -241,7 +243,7 @@ function UserProfile() {
         </div>
         <div className="py-5">
           {tab === "posts" && <UserPosts userId={userId} name={profile.full_name} />}
-          {tab === "hosting" && (isMe || targetPremium) && <UserEvents kind="hosting" userId={userId} />}
+          {tab === "hosting" && (isMe || targetPremium || !subsEnabled) && <UserEvents kind="hosting" userId={userId} />}
           {isMe && tab === "joined" && <UserEvents kind="joined" userId={userId} />}
         </div>
       </div>

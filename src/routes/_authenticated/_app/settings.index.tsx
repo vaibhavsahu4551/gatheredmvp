@@ -15,6 +15,7 @@ import { SettingsShell, SectionTitle, Toggle, Card, Row } from "@/components/Set
 import { deleteMyAccount } from "@/lib/account.functions";
 import { enablePush, disablePushForThisDevice } from "@/lib/push";
 import { useServerFn } from "@tanstack/react-start";
+import { useSubscriptionsEnabled } from "@/hooks/useSubscriptionsEnabled";
 
 export const Route = createFileRoute("/_authenticated/_app/settings/")({
   head: () => ({
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/_authenticated/_app/settings/")({
 
 function Settings() {
   const navigate = useNavigate();
+  const subsEnabled = useSubscriptionsEnabled();
   const [s, setS] = useState<UserSettings | null>(null);
   const [pride, setPride] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -185,7 +187,7 @@ function Settings() {
 
       <SectionTitle>Subscription</SectionTitle>
       <Card>
-        <Row title="Manage subscription" subtitle="Plan, renewal date and cancellation" onClick={() => navigate({ to: "/subscription" })} right={<ChevronRight className="h-4 w-4 text-muted-foreground" />} />
+        {subsEnabled && <Row title="Manage subscription" subtitle="Plan, renewal date and cancellation" onClick={() => navigate({ to: "/subscription" })} right={<ChevronRight className="h-4 w-4 text-muted-foreground" />} />}
       </Card>
 
       <SectionTitle>Support &amp; Legal</SectionTitle>

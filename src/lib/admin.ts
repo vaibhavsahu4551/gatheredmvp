@@ -28,7 +28,22 @@ export async function getAppSettings(): Promise<AppSettings> {
   return { subscription_enabled: !!(data as any)?.subscription_enabled };
 }
 
+let _settingsCache: Promise<AppSettings> | null = null;
+
+/** Cached app settings (admin master switches). Cheap for render-path checks. */
+export function getAppSettingsCached(): Promise<AppSettings> {
+  if (!_settingsCache) {
+    _settingsCache = getAppSettings().catch(() => ({ subscription_enabled: false }));
+  }
+  return _settingsCache;
+}
+
+export function clearAppSettingsCache() {
+  _settingsCache = null;
+}
+
 export async function setSubscriptionEnabled(enabled: boolean) {
+  clearAppSettingsCache();
   const { error } = await supabase
     .from("app_settings" as any)
     .update({ subscription_enabled: enabled, updated_at: new Date().toISOString() })

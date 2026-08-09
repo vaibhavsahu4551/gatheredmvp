@@ -16,11 +16,16 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminVerificationRouteImport } from './routes/admin.verification'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
+import { Route as AdminRevenueRouteImport } from './routes/admin.revenue'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminPostsRouteImport } from './routes/admin.posts'
+import { Route as AdminFlaggedRouteImport } from './routes/admin.flagged'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
+import { Route as AdminEngagementRouteImport } from './routes/admin.engagement'
 import { Route as AuthenticatedPendingRouteImport } from './routes/_authenticated/pending'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/_app'
@@ -34,13 +39,13 @@ import { Route as AuthenticatedAppIcebreakerRouteImport } from './routes/_authen
 import { Route as AuthenticatedAppHomeRouteImport } from './routes/_authenticated/_app/home'
 import { Route as AuthenticatedAppDiscoverRouteImport } from './routes/_authenticated/_app/discover'
 import { Route as AuthenticatedAppCreateRouteImport } from './routes/_authenticated/_app/create'
-import { Route as AuthenticatedAppChatRouteImport } from './routes/_authenticated/_app/chat'
 import { Route as AuthenticatedAppSettingsIndexRouteImport } from './routes/_authenticated/_app/settings.index'
 import { Route as AuthenticatedAppRewardsIndexRouteImport } from './routes/_authenticated/_app/rewards.index'
 import { Route as AuthenticatedAppProfileIndexRouteImport } from './routes/_authenticated/_app/profile.index'
 import { Route as AuthenticatedAppPrideIndexRouteImport } from './routes/_authenticated/_app/pride.index'
 import { Route as AuthenticatedAppMessagesIndexRouteImport } from './routes/_authenticated/_app/messages.index'
 import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/_app/events.index'
+import { Route as AuthenticatedAppChatIndexRouteImport } from './routes/_authenticated/_app/chat.index'
 import { Route as AuthenticatedAppUUserIdRouteImport } from './routes/_authenticated/_app/u.$userId'
 import { Route as AuthenticatedAppSettingsTermsRouteImport } from './routes/_authenticated/_app/settings.terms'
 import { Route as AuthenticatedAppSettingsReportRouteImport } from './routes/_authenticated/_app/settings.report'
@@ -92,6 +97,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminVerificationRoute = AdminVerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -107,14 +117,34 @@ const AdminRewardsRoute = AdminRewardsRouteImport.update({
   path: '/rewards',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRevenueRoute = AdminRevenueRouteImport.update({
+  id: '/revenue',
+  path: '/revenue',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPostsRoute = AdminPostsRouteImport.update({
+  id: '/posts',
+  path: '/posts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFlaggedRoute = AdminFlaggedRouteImport.update({
+  id: '/flagged',
+  path: '/flagged',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEventsRoute = AdminEventsRouteImport.update({
   id: '/events',
   path: '/events',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEngagementRoute = AdminEngagementRouteImport.update({
+  id: '/engagement',
+  path: '/engagement',
   getParentRoute: () => AdminRoute,
 } as any)
 const AuthenticatedPendingRoute = AuthenticatedPendingRouteImport.update({
@@ -187,11 +217,6 @@ const AuthenticatedAppCreateRoute = AuthenticatedAppCreateRouteImport.update({
   path: '/create',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
-const AuthenticatedAppChatRoute = AuthenticatedAppChatRouteImport.update({
-  id: '/chat',
-  path: '/chat',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
 const AuthenticatedAppSettingsIndexRoute =
   AuthenticatedAppSettingsIndexRouteImport.update({
     id: '/settings/',
@@ -226,6 +251,12 @@ const AuthenticatedAppEventsIndexRoute =
   AuthenticatedAppEventsIndexRouteImport.update({
     id: '/events/',
     path: '/events/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppChatIndexRoute =
+  AuthenticatedAppChatIndexRouteImport.update({
+    id: '/chat/',
+    path: '/chat/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppUUserIdRoute = AuthenticatedAppUUserIdRouteImport.update({
@@ -307,9 +338,9 @@ const AuthenticatedAppMessagesThreadIdRoute =
   } as any)
 const AuthenticatedAppChatGroupIdRoute =
   AuthenticatedAppChatGroupIdRouteImport.update({
-    id: '/$groupId',
-    path: '/$groupId',
-    getParentRoute: () => AuthenticatedAppChatRoute,
+    id: '/chat/$groupId',
+    path: '/chat/$groupId',
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppEventsEventIdIndexRoute =
   AuthenticatedAppEventsEventIdIndexRouteImport.update({
@@ -332,13 +363,17 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pending': typeof AuthenticatedPendingRoute
+  '/admin/engagement': typeof AdminEngagementRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/flagged': typeof AdminFlaggedRoute
+  '/admin/posts': typeof AdminPostsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/revenue': typeof AdminRevenueRoute
   '/admin/rewards': typeof AdminRewardsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/verification': typeof AdminVerificationRoute
   '/admin/': typeof AdminIndexRoute
-  '/chat': typeof AuthenticatedAppChatRouteWithChildren
   '/create': typeof AuthenticatedAppCreateRoute
   '/discover': typeof AuthenticatedAppDiscoverRoute
   '/home': typeof AuthenticatedAppHomeRoute
@@ -363,6 +398,7 @@ export interface FileRoutesByFullPath {
   '/settings/report': typeof AuthenticatedAppSettingsReportRoute
   '/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
+  '/chat/': typeof AuthenticatedAppChatIndexRoute
   '/events/': typeof AuthenticatedAppEventsIndexRoute
   '/messages/': typeof AuthenticatedAppMessagesIndexRoute
   '/pride/': typeof AuthenticatedAppPrideIndexRoute
@@ -379,13 +415,17 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pending': typeof AuthenticatedPendingRoute
+  '/admin/engagement': typeof AdminEngagementRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/flagged': typeof AdminFlaggedRoute
+  '/admin/posts': typeof AdminPostsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/revenue': typeof AdminRevenueRoute
   '/admin/rewards': typeof AdminRewardsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/verification': typeof AdminVerificationRoute
   '/admin': typeof AdminIndexRoute
-  '/chat': typeof AuthenticatedAppChatRouteWithChildren
   '/create': typeof AuthenticatedAppCreateRoute
   '/discover': typeof AuthenticatedAppDiscoverRoute
   '/home': typeof AuthenticatedAppHomeRoute
@@ -410,6 +450,7 @@ export interface FileRoutesByTo {
   '/settings/report': typeof AuthenticatedAppSettingsReportRoute
   '/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
+  '/chat': typeof AuthenticatedAppChatIndexRoute
   '/events': typeof AuthenticatedAppEventsIndexRoute
   '/messages': typeof AuthenticatedAppMessagesIndexRoute
   '/pride': typeof AuthenticatedAppPrideIndexRoute
@@ -430,13 +471,17 @@ export interface FileRoutesById {
   '/_authenticated/_app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/pending': typeof AuthenticatedPendingRoute
+  '/admin/engagement': typeof AdminEngagementRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/flagged': typeof AdminFlaggedRoute
+  '/admin/posts': typeof AdminPostsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/revenue': typeof AdminRevenueRoute
   '/admin/rewards': typeof AdminRewardsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/verification': typeof AdminVerificationRoute
   '/admin/': typeof AdminIndexRoute
-  '/_authenticated/_app/chat': typeof AuthenticatedAppChatRouteWithChildren
   '/_authenticated/_app/create': typeof AuthenticatedAppCreateRoute
   '/_authenticated/_app/discover': typeof AuthenticatedAppDiscoverRoute
   '/_authenticated/_app/home': typeof AuthenticatedAppHomeRoute
@@ -461,6 +506,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/settings/report': typeof AuthenticatedAppSettingsReportRoute
   '/_authenticated/_app/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/_authenticated/_app/u/$userId': typeof AuthenticatedAppUUserIdRoute
+  '/_authenticated/_app/chat/': typeof AuthenticatedAppChatIndexRoute
   '/_authenticated/_app/events/': typeof AuthenticatedAppEventsIndexRoute
   '/_authenticated/_app/messages/': typeof AuthenticatedAppMessagesIndexRoute
   '/_authenticated/_app/pride/': typeof AuthenticatedAppPrideIndexRoute
@@ -480,13 +526,17 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/onboarding'
     | '/pending'
+    | '/admin/engagement'
     | '/admin/events'
+    | '/admin/flagged'
+    | '/admin/posts'
     | '/admin/reports'
+    | '/admin/revenue'
     | '/admin/rewards'
     | '/admin/settings'
     | '/admin/users'
+    | '/admin/verification'
     | '/admin/'
-    | '/chat'
     | '/create'
     | '/discover'
     | '/home'
@@ -511,6 +561,7 @@ export interface FileRouteTypes {
     | '/settings/report'
     | '/settings/terms'
     | '/u/$userId'
+    | '/chat/'
     | '/events/'
     | '/messages/'
     | '/pride/'
@@ -527,13 +578,17 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/onboarding'
     | '/pending'
+    | '/admin/engagement'
     | '/admin/events'
+    | '/admin/flagged'
+    | '/admin/posts'
     | '/admin/reports'
+    | '/admin/revenue'
     | '/admin/rewards'
     | '/admin/settings'
     | '/admin/users'
+    | '/admin/verification'
     | '/admin'
-    | '/chat'
     | '/create'
     | '/discover'
     | '/home'
@@ -558,6 +613,7 @@ export interface FileRouteTypes {
     | '/settings/report'
     | '/settings/terms'
     | '/u/$userId'
+    | '/chat'
     | '/events'
     | '/messages'
     | '/pride'
@@ -577,13 +633,17 @@ export interface FileRouteTypes {
     | '/_authenticated/_app'
     | '/_authenticated/onboarding'
     | '/_authenticated/pending'
+    | '/admin/engagement'
     | '/admin/events'
+    | '/admin/flagged'
+    | '/admin/posts'
     | '/admin/reports'
+    | '/admin/revenue'
     | '/admin/rewards'
     | '/admin/settings'
     | '/admin/users'
+    | '/admin/verification'
     | '/admin/'
-    | '/_authenticated/_app/chat'
     | '/_authenticated/_app/create'
     | '/_authenticated/_app/discover'
     | '/_authenticated/_app/home'
@@ -608,6 +668,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/settings/report'
     | '/_authenticated/_app/settings/terms'
     | '/_authenticated/_app/u/$userId'
+    | '/_authenticated/_app/chat/'
     | '/_authenticated/_app/events/'
     | '/_authenticated/_app/messages/'
     | '/_authenticated/_app/pride/'
@@ -680,6 +741,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/verification': {
+      id: '/admin/verification'
+      path: '/verification'
+      fullPath: '/admin/verification'
+      preLoaderRoute: typeof AdminVerificationRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -701,6 +769,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRewardsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/revenue': {
+      id: '/admin/revenue'
+      path: '/revenue'
+      fullPath: '/admin/revenue'
+      preLoaderRoute: typeof AdminRevenueRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reports': {
       id: '/admin/reports'
       path: '/reports'
@@ -708,11 +783,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReportsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/posts': {
+      id: '/admin/posts'
+      path: '/posts'
+      fullPath: '/admin/posts'
+      preLoaderRoute: typeof AdminPostsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/flagged': {
+      id: '/admin/flagged'
+      path: '/flagged'
+      fullPath: '/admin/flagged'
+      preLoaderRoute: typeof AdminFlaggedRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/events': {
       id: '/admin/events'
       path: '/events'
       fullPath: '/admin/events'
       preLoaderRoute: typeof AdminEventsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/engagement': {
+      id: '/admin/engagement'
+      path: '/engagement'
+      fullPath: '/admin/engagement'
+      preLoaderRoute: typeof AdminEngagementRouteImport
       parentRoute: typeof AdminRoute
     }
     '/_authenticated/pending': {
@@ -806,13 +902,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppCreateRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/_app/chat': {
-      id: '/_authenticated/_app/chat'
-      path: '/chat'
-      fullPath: '/chat'
-      preLoaderRoute: typeof AuthenticatedAppChatRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
     '/_authenticated/_app/settings/': {
       id: '/_authenticated/_app/settings/'
       path: '/settings'
@@ -853,6 +942,13 @@ declare module '@tanstack/react-router' {
       path: '/events'
       fullPath: '/events/'
       preLoaderRoute: typeof AuthenticatedAppEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/chat/': {
+      id: '/_authenticated/_app/chat/'
+      path: '/chat'
+      fullPath: '/chat/'
+      preLoaderRoute: typeof AuthenticatedAppChatIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/u/$userId': {
@@ -948,10 +1044,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/_app/chat/$groupId': {
       id: '/_authenticated/_app/chat/$groupId'
-      path: '/$groupId'
+      path: '/chat/$groupId'
       fullPath: '/chat/$groupId'
       preLoaderRoute: typeof AuthenticatedAppChatGroupIdRouteImport
-      parentRoute: typeof AuthenticatedAppChatRoute
+      parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/events/$eventId/': {
       id: '/_authenticated/_app/events/$eventId/'
@@ -970,19 +1066,7 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedAppChatRouteChildren {
-  AuthenticatedAppChatGroupIdRoute: typeof AuthenticatedAppChatGroupIdRoute
-}
-
-const AuthenticatedAppChatRouteChildren: AuthenticatedAppChatRouteChildren = {
-  AuthenticatedAppChatGroupIdRoute: AuthenticatedAppChatGroupIdRoute,
-}
-
-const AuthenticatedAppChatRouteWithChildren =
-  AuthenticatedAppChatRoute._addFileChildren(AuthenticatedAppChatRouteChildren)
-
 interface AuthenticatedAppRouteChildren {
-  AuthenticatedAppChatRoute: typeof AuthenticatedAppChatRouteWithChildren
   AuthenticatedAppCreateRoute: typeof AuthenticatedAppCreateRoute
   AuthenticatedAppDiscoverRoute: typeof AuthenticatedAppDiscoverRoute
   AuthenticatedAppHomeRoute: typeof AuthenticatedAppHomeRoute
@@ -991,6 +1075,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppPremiumRoute: typeof AuthenticatedAppPremiumRoute
   AuthenticatedAppRequestsRoute: typeof AuthenticatedAppRequestsRoute
   AuthenticatedAppSubscriptionRoute: typeof AuthenticatedAppSubscriptionRoute
+  AuthenticatedAppChatGroupIdRoute: typeof AuthenticatedAppChatGroupIdRoute
   AuthenticatedAppMessagesThreadIdRoute: typeof AuthenticatedAppMessagesThreadIdRoute
   AuthenticatedAppPostsPostIdRoute: typeof AuthenticatedAppPostsPostIdRoute
   AuthenticatedAppPrideNotificationsRoute: typeof AuthenticatedAppPrideNotificationsRoute
@@ -1004,6 +1089,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppSettingsReportRoute: typeof AuthenticatedAppSettingsReportRoute
   AuthenticatedAppSettingsTermsRoute: typeof AuthenticatedAppSettingsTermsRoute
   AuthenticatedAppUUserIdRoute: typeof AuthenticatedAppUUserIdRoute
+  AuthenticatedAppChatIndexRoute: typeof AuthenticatedAppChatIndexRoute
   AuthenticatedAppEventsIndexRoute: typeof AuthenticatedAppEventsIndexRoute
   AuthenticatedAppMessagesIndexRoute: typeof AuthenticatedAppMessagesIndexRoute
   AuthenticatedAppPrideIndexRoute: typeof AuthenticatedAppPrideIndexRoute
@@ -1015,7 +1101,6 @@ interface AuthenticatedAppRouteChildren {
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
-  AuthenticatedAppChatRoute: AuthenticatedAppChatRouteWithChildren,
   AuthenticatedAppCreateRoute: AuthenticatedAppCreateRoute,
   AuthenticatedAppDiscoverRoute: AuthenticatedAppDiscoverRoute,
   AuthenticatedAppHomeRoute: AuthenticatedAppHomeRoute,
@@ -1024,6 +1109,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppPremiumRoute: AuthenticatedAppPremiumRoute,
   AuthenticatedAppRequestsRoute: AuthenticatedAppRequestsRoute,
   AuthenticatedAppSubscriptionRoute: AuthenticatedAppSubscriptionRoute,
+  AuthenticatedAppChatGroupIdRoute: AuthenticatedAppChatGroupIdRoute,
   AuthenticatedAppMessagesThreadIdRoute: AuthenticatedAppMessagesThreadIdRoute,
   AuthenticatedAppPostsPostIdRoute: AuthenticatedAppPostsPostIdRoute,
   AuthenticatedAppPrideNotificationsRoute:
@@ -1038,6 +1124,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppSettingsReportRoute: AuthenticatedAppSettingsReportRoute,
   AuthenticatedAppSettingsTermsRoute: AuthenticatedAppSettingsTermsRoute,
   AuthenticatedAppUUserIdRoute: AuthenticatedAppUUserIdRoute,
+  AuthenticatedAppChatIndexRoute: AuthenticatedAppChatIndexRoute,
   AuthenticatedAppEventsIndexRoute: AuthenticatedAppEventsIndexRoute,
   AuthenticatedAppMessagesIndexRoute: AuthenticatedAppMessagesIndexRoute,
   AuthenticatedAppPrideIndexRoute: AuthenticatedAppPrideIndexRoute,
@@ -1069,20 +1156,30 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AdminRouteChildren {
+  AdminEngagementRoute: typeof AdminEngagementRoute
   AdminEventsRoute: typeof AdminEventsRoute
+  AdminFlaggedRoute: typeof AdminFlaggedRoute
+  AdminPostsRoute: typeof AdminPostsRoute
   AdminReportsRoute: typeof AdminReportsRoute
+  AdminRevenueRoute: typeof AdminRevenueRoute
   AdminRewardsRoute: typeof AdminRewardsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminVerificationRoute: typeof AdminVerificationRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminEngagementRoute: AdminEngagementRoute,
   AdminEventsRoute: AdminEventsRoute,
+  AdminFlaggedRoute: AdminFlaggedRoute,
+  AdminPostsRoute: AdminPostsRoute,
   AdminReportsRoute: AdminReportsRoute,
+  AdminRevenueRoute: AdminRevenueRoute,
   AdminRewardsRoute: AdminRewardsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminVerificationRoute: AdminVerificationRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

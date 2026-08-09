@@ -199,6 +199,16 @@ function Create() {
           <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls} placeholder="Sunday coffee run" />
         </Field>
 
+        <Field label="Description">
+          <textarea
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
+            rows={4}
+            className={inputCls + " resize-none"}
+            placeholder="What's the plan? Who should join? Anything people should know."
+          />
+        </Field>
+
 
 
 

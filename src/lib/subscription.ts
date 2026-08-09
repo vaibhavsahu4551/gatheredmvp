@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { getAppSettings } from "@/lib/admin";
+import { getAppSettingsCached } from "@/lib/admin";
 
 export const PREMIUM_PRICE_INR = 199;
 
@@ -35,7 +35,7 @@ export type SubscriptionState = {
 export async function getMySubscriptionState(): Promise<SubscriptionState> {
   const [{ data: { user } }, settings] = await Promise.all([
     supabase.auth.getUser(),
-    getAppSettings().catch(() => ({ subscription_enabled: false })),
+    getAppSettingsCached(),
   ]);
 
   const subscriptionsEnabled = !!settings.subscription_enabled;
