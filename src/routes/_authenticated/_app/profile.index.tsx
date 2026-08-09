@@ -28,6 +28,7 @@ import { SocialLinks } from "@/components/SocialLinks";
 import { ProfileDetails } from "@/components/ProfileDetails";
 
 import { PostCard, type PostItem } from "@/components/PostCard";
+import { useSubscriptionsEnabled } from "@/hooks/useSubscriptionsEnabled";
 
 
 export const Route = createFileRoute("/_authenticated/_app/profile/")({
@@ -147,7 +148,7 @@ function Profile() {
           </div>
         )}
 
-        <Link
+        {subsEnabled && <Link
           to="/premium"
           className="mt-5 flex items-center gap-3 rounded-2xl border border-border p-3 bg-gradient-to-r from-rose-50 to-indigo-50 hover:opacity-90 transition"
         >
@@ -161,7 +162,7 @@ function Profile() {
             </div>
           </div>
           <span className="text-xs font-semibold text-primary shrink-0">₹199/mo</span>
-        </Link>
+        </Link>}
 
         {showConnections && (
           <ConnectionsModal ids={connIds} onClose={() => setShowConnections(false)} />

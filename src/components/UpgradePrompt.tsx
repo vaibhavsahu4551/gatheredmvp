@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Sparkles, X } from "lucide-react";
+import { useSubscriptionsEnabled } from "@/hooks/useSubscriptionsEnabled";
 
 /**
  * Modal-style upgrade prompt shown when a free user hits a Premium limit.
@@ -16,7 +17,9 @@ export function UpgradePrompt({
   message: string;
   onClose: () => void;
 }) {
-  if (!open) return null;
+  const subsEnabled = useSubscriptionsEnabled();
+  // Monetization off platform-wide -> never show paywall UI.
+  if (!open || !subsEnabled) return null;
   return (
     <div className="fixed inset-0 z-[60] bg-black/60 flex items-end sm:items-center justify-center p-4" onClick={onClose}>
       <div
