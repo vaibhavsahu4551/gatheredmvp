@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useLocation } from "@tansta
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { isCurrentUserAdmin } from "@/lib/admin";
-import { LayoutDashboard, Users, Calendar, Flag, Settings, LogOut, Gift } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, Flag, Settings, LogOut, Gift, Image as ImageIcon, BadgeCheck, ShieldAlert, Sparkles, IndianRupee } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
@@ -52,10 +52,16 @@ function AdminLayout() {
     { to: "/admin", label: "Overview", icon: LayoutDashboard },
     { to: "/admin/users", label: "Users", icon: Users },
     { to: "/admin/events", label: "Events", icon: Calendar },
+    { to: "/admin/posts", label: "Posts", icon: ImageIcon },
+    { to: "/admin/verification", label: "Verification", icon: BadgeCheck },
     { to: "/admin/reports", label: "Reports", icon: Flag },
+    { to: "/admin/flagged", label: "Flagged", icon: ShieldAlert },
+    { to: "/admin/engagement", label: "Engagement", icon: Sparkles },
+    { to: "/admin/revenue", label: "Revenue", icon: IndianRupee },
     { to: "/admin/rewards", label: "Rewards", icon: Gift },
     { to: "/admin/settings", label: "Settings", icon: Settings },
   ];
+
 
   return (
     <div className="min-h-screen bg-muted/30">
