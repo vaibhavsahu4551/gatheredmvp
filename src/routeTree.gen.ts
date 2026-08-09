@@ -34,13 +34,13 @@ import { Route as AuthenticatedAppIcebreakerRouteImport } from './routes/_authen
 import { Route as AuthenticatedAppHomeRouteImport } from './routes/_authenticated/_app/home'
 import { Route as AuthenticatedAppDiscoverRouteImport } from './routes/_authenticated/_app/discover'
 import { Route as AuthenticatedAppCreateRouteImport } from './routes/_authenticated/_app/create'
-import { Route as AuthenticatedAppChatRouteImport } from './routes/_authenticated/_app/chat'
 import { Route as AuthenticatedAppSettingsIndexRouteImport } from './routes/_authenticated/_app/settings.index'
 import { Route as AuthenticatedAppRewardsIndexRouteImport } from './routes/_authenticated/_app/rewards.index'
 import { Route as AuthenticatedAppProfileIndexRouteImport } from './routes/_authenticated/_app/profile.index'
 import { Route as AuthenticatedAppPrideIndexRouteImport } from './routes/_authenticated/_app/pride.index'
 import { Route as AuthenticatedAppMessagesIndexRouteImport } from './routes/_authenticated/_app/messages.index'
 import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/_app/events.index'
+import { Route as AuthenticatedAppChatIndexRouteImport } from './routes/_authenticated/_app/chat.index'
 import { Route as AuthenticatedAppUUserIdRouteImport } from './routes/_authenticated/_app/u.$userId'
 import { Route as AuthenticatedAppSettingsTermsRouteImport } from './routes/_authenticated/_app/settings.terms'
 import { Route as AuthenticatedAppSettingsReportRouteImport } from './routes/_authenticated/_app/settings.report'
@@ -187,11 +187,6 @@ const AuthenticatedAppCreateRoute = AuthenticatedAppCreateRouteImport.update({
   path: '/create',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
-const AuthenticatedAppChatRoute = AuthenticatedAppChatRouteImport.update({
-  id: '/chat',
-  path: '/chat',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
 const AuthenticatedAppSettingsIndexRoute =
   AuthenticatedAppSettingsIndexRouteImport.update({
     id: '/settings/',
@@ -226,6 +221,12 @@ const AuthenticatedAppEventsIndexRoute =
   AuthenticatedAppEventsIndexRouteImport.update({
     id: '/events/',
     path: '/events/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppChatIndexRoute =
+  AuthenticatedAppChatIndexRouteImport.update({
+    id: '/chat/',
+    path: '/chat/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppUUserIdRoute = AuthenticatedAppUUserIdRouteImport.update({
@@ -307,9 +308,9 @@ const AuthenticatedAppMessagesThreadIdRoute =
   } as any)
 const AuthenticatedAppChatGroupIdRoute =
   AuthenticatedAppChatGroupIdRouteImport.update({
-    id: '/$groupId',
-    path: '/$groupId',
-    getParentRoute: () => AuthenticatedAppChatRoute,
+    id: '/chat/$groupId',
+    path: '/chat/$groupId',
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppEventsEventIdIndexRoute =
   AuthenticatedAppEventsEventIdIndexRouteImport.update({
@@ -338,7 +339,6 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
-  '/chat': typeof AuthenticatedAppChatRouteWithChildren
   '/create': typeof AuthenticatedAppCreateRoute
   '/discover': typeof AuthenticatedAppDiscoverRoute
   '/home': typeof AuthenticatedAppHomeRoute
@@ -363,6 +363,7 @@ export interface FileRoutesByFullPath {
   '/settings/report': typeof AuthenticatedAppSettingsReportRoute
   '/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
+  '/chat/': typeof AuthenticatedAppChatIndexRoute
   '/events/': typeof AuthenticatedAppEventsIndexRoute
   '/messages/': typeof AuthenticatedAppMessagesIndexRoute
   '/pride/': typeof AuthenticatedAppPrideIndexRoute
@@ -385,7 +386,6 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin': typeof AdminIndexRoute
-  '/chat': typeof AuthenticatedAppChatRouteWithChildren
   '/create': typeof AuthenticatedAppCreateRoute
   '/discover': typeof AuthenticatedAppDiscoverRoute
   '/home': typeof AuthenticatedAppHomeRoute
@@ -410,6 +410,7 @@ export interface FileRoutesByTo {
   '/settings/report': typeof AuthenticatedAppSettingsReportRoute
   '/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
+  '/chat': typeof AuthenticatedAppChatIndexRoute
   '/events': typeof AuthenticatedAppEventsIndexRoute
   '/messages': typeof AuthenticatedAppMessagesIndexRoute
   '/pride': typeof AuthenticatedAppPrideIndexRoute
@@ -436,7 +437,6 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
-  '/_authenticated/_app/chat': typeof AuthenticatedAppChatRouteWithChildren
   '/_authenticated/_app/create': typeof AuthenticatedAppCreateRoute
   '/_authenticated/_app/discover': typeof AuthenticatedAppDiscoverRoute
   '/_authenticated/_app/home': typeof AuthenticatedAppHomeRoute
@@ -461,6 +461,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/settings/report': typeof AuthenticatedAppSettingsReportRoute
   '/_authenticated/_app/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/_authenticated/_app/u/$userId': typeof AuthenticatedAppUUserIdRoute
+  '/_authenticated/_app/chat/': typeof AuthenticatedAppChatIndexRoute
   '/_authenticated/_app/events/': typeof AuthenticatedAppEventsIndexRoute
   '/_authenticated/_app/messages/': typeof AuthenticatedAppMessagesIndexRoute
   '/_authenticated/_app/pride/': typeof AuthenticatedAppPrideIndexRoute
@@ -486,7 +487,6 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/admin/'
-    | '/chat'
     | '/create'
     | '/discover'
     | '/home'
@@ -511,6 +511,7 @@ export interface FileRouteTypes {
     | '/settings/report'
     | '/settings/terms'
     | '/u/$userId'
+    | '/chat/'
     | '/events/'
     | '/messages/'
     | '/pride/'
@@ -533,7 +534,6 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/admin'
-    | '/chat'
     | '/create'
     | '/discover'
     | '/home'
@@ -558,6 +558,7 @@ export interface FileRouteTypes {
     | '/settings/report'
     | '/settings/terms'
     | '/u/$userId'
+    | '/chat'
     | '/events'
     | '/messages'
     | '/pride'
@@ -583,7 +584,6 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/admin/'
-    | '/_authenticated/_app/chat'
     | '/_authenticated/_app/create'
     | '/_authenticated/_app/discover'
     | '/_authenticated/_app/home'
@@ -608,6 +608,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/settings/report'
     | '/_authenticated/_app/settings/terms'
     | '/_authenticated/_app/u/$userId'
+    | '/_authenticated/_app/chat/'
     | '/_authenticated/_app/events/'
     | '/_authenticated/_app/messages/'
     | '/_authenticated/_app/pride/'
@@ -806,13 +807,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppCreateRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/_app/chat': {
-      id: '/_authenticated/_app/chat'
-      path: '/chat'
-      fullPath: '/chat'
-      preLoaderRoute: typeof AuthenticatedAppChatRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
     '/_authenticated/_app/settings/': {
       id: '/_authenticated/_app/settings/'
       path: '/settings'
@@ -853,6 +847,13 @@ declare module '@tanstack/react-router' {
       path: '/events'
       fullPath: '/events/'
       preLoaderRoute: typeof AuthenticatedAppEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/chat/': {
+      id: '/_authenticated/_app/chat/'
+      path: '/chat'
+      fullPath: '/chat/'
+      preLoaderRoute: typeof AuthenticatedAppChatIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/u/$userId': {
@@ -948,10 +949,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/_app/chat/$groupId': {
       id: '/_authenticated/_app/chat/$groupId'
-      path: '/$groupId'
+      path: '/chat/$groupId'
       fullPath: '/chat/$groupId'
       preLoaderRoute: typeof AuthenticatedAppChatGroupIdRouteImport
-      parentRoute: typeof AuthenticatedAppChatRoute
+      parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/events/$eventId/': {
       id: '/_authenticated/_app/events/$eventId/'
@@ -970,19 +971,7 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedAppChatRouteChildren {
-  AuthenticatedAppChatGroupIdRoute: typeof AuthenticatedAppChatGroupIdRoute
-}
-
-const AuthenticatedAppChatRouteChildren: AuthenticatedAppChatRouteChildren = {
-  AuthenticatedAppChatGroupIdRoute: AuthenticatedAppChatGroupIdRoute,
-}
-
-const AuthenticatedAppChatRouteWithChildren =
-  AuthenticatedAppChatRoute._addFileChildren(AuthenticatedAppChatRouteChildren)
-
 interface AuthenticatedAppRouteChildren {
-  AuthenticatedAppChatRoute: typeof AuthenticatedAppChatRouteWithChildren
   AuthenticatedAppCreateRoute: typeof AuthenticatedAppCreateRoute
   AuthenticatedAppDiscoverRoute: typeof AuthenticatedAppDiscoverRoute
   AuthenticatedAppHomeRoute: typeof AuthenticatedAppHomeRoute
@@ -991,6 +980,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppPremiumRoute: typeof AuthenticatedAppPremiumRoute
   AuthenticatedAppRequestsRoute: typeof AuthenticatedAppRequestsRoute
   AuthenticatedAppSubscriptionRoute: typeof AuthenticatedAppSubscriptionRoute
+  AuthenticatedAppChatGroupIdRoute: typeof AuthenticatedAppChatGroupIdRoute
   AuthenticatedAppMessagesThreadIdRoute: typeof AuthenticatedAppMessagesThreadIdRoute
   AuthenticatedAppPostsPostIdRoute: typeof AuthenticatedAppPostsPostIdRoute
   AuthenticatedAppPrideNotificationsRoute: typeof AuthenticatedAppPrideNotificationsRoute
@@ -1004,6 +994,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppSettingsReportRoute: typeof AuthenticatedAppSettingsReportRoute
   AuthenticatedAppSettingsTermsRoute: typeof AuthenticatedAppSettingsTermsRoute
   AuthenticatedAppUUserIdRoute: typeof AuthenticatedAppUUserIdRoute
+  AuthenticatedAppChatIndexRoute: typeof AuthenticatedAppChatIndexRoute
   AuthenticatedAppEventsIndexRoute: typeof AuthenticatedAppEventsIndexRoute
   AuthenticatedAppMessagesIndexRoute: typeof AuthenticatedAppMessagesIndexRoute
   AuthenticatedAppPrideIndexRoute: typeof AuthenticatedAppPrideIndexRoute
@@ -1015,7 +1006,6 @@ interface AuthenticatedAppRouteChildren {
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
-  AuthenticatedAppChatRoute: AuthenticatedAppChatRouteWithChildren,
   AuthenticatedAppCreateRoute: AuthenticatedAppCreateRoute,
   AuthenticatedAppDiscoverRoute: AuthenticatedAppDiscoverRoute,
   AuthenticatedAppHomeRoute: AuthenticatedAppHomeRoute,
@@ -1024,6 +1014,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppPremiumRoute: AuthenticatedAppPremiumRoute,
   AuthenticatedAppRequestsRoute: AuthenticatedAppRequestsRoute,
   AuthenticatedAppSubscriptionRoute: AuthenticatedAppSubscriptionRoute,
+  AuthenticatedAppChatGroupIdRoute: AuthenticatedAppChatGroupIdRoute,
   AuthenticatedAppMessagesThreadIdRoute: AuthenticatedAppMessagesThreadIdRoute,
   AuthenticatedAppPostsPostIdRoute: AuthenticatedAppPostsPostIdRoute,
   AuthenticatedAppPrideNotificationsRoute:
@@ -1038,6 +1029,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppSettingsReportRoute: AuthenticatedAppSettingsReportRoute,
   AuthenticatedAppSettingsTermsRoute: AuthenticatedAppSettingsTermsRoute,
   AuthenticatedAppUUserIdRoute: AuthenticatedAppUUserIdRoute,
+  AuthenticatedAppChatIndexRoute: AuthenticatedAppChatIndexRoute,
   AuthenticatedAppEventsIndexRoute: AuthenticatedAppEventsIndexRoute,
   AuthenticatedAppMessagesIndexRoute: AuthenticatedAppMessagesIndexRoute,
   AuthenticatedAppPrideIndexRoute: AuthenticatedAppPrideIndexRoute,
@@ -1101,13 +1093,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

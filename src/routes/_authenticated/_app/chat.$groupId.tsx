@@ -18,6 +18,8 @@ function ChatRoom() {
   const navigate = useNavigate();
   const [me, setMe] = useState("");
   const [isPride, setIsPride] = useState(false);
+  const [closed, setClosed] = useState(false);
+  const [eventTitle, setEventTitle] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [names, setNames] = useState<Record<string, { full_name: string | null }>>({});
   const [prideNames, setPrideNames] = useState<Record<string, string>>({});
@@ -31,8 +33,10 @@ function ChatRoom() {
       const { data: g } = await supabase.from("chat_groups").select("event_id").eq("id", groupId).maybeSingle();
       let pride = false;
       if (g?.event_id) {
-        const { data: e } = await supabase.from("events").select("is_pride").eq("id", g.event_id).maybeSingle();
+        const { data: e } = await supabase.from("events").select("is_pride, status, title").eq("id", g.event_id).maybeSingle();
         pride = !!(e as any)?.is_pride;
+        setClosed(["cancelled", "completed"].includes((e as any)?.status ?? ""));
+        setEventTitle((e as any)?.title ?? "");
       }
       setIsPride(pride);
 
@@ -83,7 +87,8 @@ function ChatRoom() {
         </button>
         <div className="text-sm font-semibold flex items-center gap-1.5">
           {isPride && <Sparkles className="h-4 w-4 text-fuchsia-500" />}
-          {isPride ? "Pride group chat" : "Group chat"}
+          {isPride ? "Pride group chat" : (eventTitle || "Group chat")}
+          {closed && <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">Read-only</span>}
         </div>
       </header>
 
@@ -108,6 +113,11 @@ function ChatRoom() {
         <div ref={bottomRef} />
       </div>
 
+      {closed ? (
+        <div className="border-t border-border p-4 pb-8 text-center text-[13px] text-muted-foreground">
+          This Gathr has ended — the chat is read-only.
+        </div>
+      ) : (
       <div className="border-t border-border p-3 flex gap-2 pb-6 items-center relative">
         <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()}
           placeholder="Message…" className="flex-1 rounded-full border border-border bg-background px-4 py-2.5 text-sm outline-none" />
@@ -116,6 +126,7 @@ function ChatRoom() {
           <Send className="h-4 w-4" />
         </button>
       </div>
+      )}
     </div>
   );
 }
