@@ -7,7 +7,7 @@ import { Avatar } from "@/components/Avatar";
 import { MessageCircle, Users } from "lucide-react";
 import { useDmUnread } from "@/hooks/useDmUnread";
 
-export const Route = createFileRoute("/_authenticated/_app/chat")({
+export const Route = createFileRoute("/_authenticated/_app/chat/")({
   component: Chat,
 });
 
