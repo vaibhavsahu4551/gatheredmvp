@@ -39,6 +39,7 @@ type Tab = "posts" | "hosting" | "joined";
 
 function Profile() {
   const navigate = useNavigate();
+  const subsEnabled = useSubscriptionsEnabled();
   const [me, setMe] = useState<Awaited<ReturnType<typeof loadMe>>>(null);
   const [avatar, setAvatar] = useState<string>("");
   const [tab, setTab] = useState<Tab>("posts");
