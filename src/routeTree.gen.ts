@@ -56,7 +56,9 @@ import { Route as AuthenticatedAppSettingsHelpRouteImport } from './routes/_auth
 import { Route as AuthenticatedAppSettingsBlockedRouteImport } from './routes/_authenticated/_app/settings.blocked'
 import { Route as AuthenticatedAppProfileEditRouteImport } from './routes/_authenticated/_app/profile.edit'
 import { Route as AuthenticatedAppPrideSetupRouteImport } from './routes/_authenticated/_app/pride.setup'
+import { Route as AuthenticatedAppPrideResourcesRouteImport } from './routes/_authenticated/_app/pride.resources'
 import { Route as AuthenticatedAppPrideNotificationsRouteImport } from './routes/_authenticated/_app/pride.notifications'
+import { Route as AuthenticatedAppPrideGuidelinesRouteImport } from './routes/_authenticated/_app/pride.guidelines'
 import { Route as AuthenticatedAppPostsPostIdRouteImport } from './routes/_authenticated/_app/posts.$postId'
 import { Route as AuthenticatedAppMessagesThreadIdRouteImport } from './routes/_authenticated/_app/messages.$threadId'
 import { Route as AuthenticatedAppChatGroupIdRouteImport } from './routes/_authenticated/_app/chat.$groupId'
@@ -318,10 +320,22 @@ const AuthenticatedAppPrideSetupRoute =
     path: '/pride/setup',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppPrideResourcesRoute =
+  AuthenticatedAppPrideResourcesRouteImport.update({
+    id: '/pride/resources',
+    path: '/pride/resources',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppPrideNotificationsRoute =
   AuthenticatedAppPrideNotificationsRouteImport.update({
     id: '/pride/notifications',
     path: '/pride/notifications',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppPrideGuidelinesRoute =
+  AuthenticatedAppPrideGuidelinesRouteImport.update({
+    id: '/pride/guidelines',
+    path: '/pride/guidelines',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppPostsPostIdRoute =
@@ -387,7 +401,9 @@ export interface FileRoutesByFullPath {
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
+  '/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
   '/pride/notifications': typeof AuthenticatedAppPrideNotificationsRoute
+  '/pride/resources': typeof AuthenticatedAppPrideResourcesRoute
   '/pride/setup': typeof AuthenticatedAppPrideSetupRoute
   '/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/settings/blocked': typeof AuthenticatedAppSettingsBlockedRoute
@@ -439,7 +455,9 @@ export interface FileRoutesByTo {
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
+  '/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
   '/pride/notifications': typeof AuthenticatedAppPrideNotificationsRoute
+  '/pride/resources': typeof AuthenticatedAppPrideResourcesRoute
   '/pride/setup': typeof AuthenticatedAppPrideSetupRoute
   '/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/settings/blocked': typeof AuthenticatedAppSettingsBlockedRoute
@@ -495,7 +513,9 @@ export interface FileRoutesById {
   '/_authenticated/_app/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/_authenticated/_app/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/_authenticated/_app/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
+  '/_authenticated/_app/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
   '/_authenticated/_app/pride/notifications': typeof AuthenticatedAppPrideNotificationsRoute
+  '/_authenticated/_app/pride/resources': typeof AuthenticatedAppPrideResourcesRoute
   '/_authenticated/_app/pride/setup': typeof AuthenticatedAppPrideSetupRoute
   '/_authenticated/_app/profile/edit': typeof AuthenticatedAppProfileEditRoute
   '/_authenticated/_app/settings/blocked': typeof AuthenticatedAppSettingsBlockedRoute
@@ -550,7 +570,9 @@ export interface FileRouteTypes {
     | '/chat/$groupId'
     | '/messages/$threadId'
     | '/posts/$postId'
+    | '/pride/guidelines'
     | '/pride/notifications'
+    | '/pride/resources'
     | '/pride/setup'
     | '/profile/edit'
     | '/settings/blocked'
@@ -602,7 +624,9 @@ export interface FileRouteTypes {
     | '/chat/$groupId'
     | '/messages/$threadId'
     | '/posts/$postId'
+    | '/pride/guidelines'
     | '/pride/notifications'
+    | '/pride/resources'
     | '/pride/setup'
     | '/profile/edit'
     | '/settings/blocked'
@@ -657,7 +681,9 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/chat/$groupId'
     | '/_authenticated/_app/messages/$threadId'
     | '/_authenticated/_app/posts/$postId'
+    | '/_authenticated/_app/pride/guidelines'
     | '/_authenticated/_app/pride/notifications'
+    | '/_authenticated/_app/pride/resources'
     | '/_authenticated/_app/pride/setup'
     | '/_authenticated/_app/profile/edit'
     | '/_authenticated/_app/settings/blocked'
@@ -1021,11 +1047,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppPrideSetupRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/pride/resources': {
+      id: '/_authenticated/_app/pride/resources'
+      path: '/pride/resources'
+      fullPath: '/pride/resources'
+      preLoaderRoute: typeof AuthenticatedAppPrideResourcesRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/pride/notifications': {
       id: '/_authenticated/_app/pride/notifications'
       path: '/pride/notifications'
       fullPath: '/pride/notifications'
       preLoaderRoute: typeof AuthenticatedAppPrideNotificationsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/pride/guidelines': {
+      id: '/_authenticated/_app/pride/guidelines'
+      path: '/pride/guidelines'
+      fullPath: '/pride/guidelines'
+      preLoaderRoute: typeof AuthenticatedAppPrideGuidelinesRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/posts/$postId': {
@@ -1078,7 +1118,9 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppChatGroupIdRoute: typeof AuthenticatedAppChatGroupIdRoute
   AuthenticatedAppMessagesThreadIdRoute: typeof AuthenticatedAppMessagesThreadIdRoute
   AuthenticatedAppPostsPostIdRoute: typeof AuthenticatedAppPostsPostIdRoute
+  AuthenticatedAppPrideGuidelinesRoute: typeof AuthenticatedAppPrideGuidelinesRoute
   AuthenticatedAppPrideNotificationsRoute: typeof AuthenticatedAppPrideNotificationsRoute
+  AuthenticatedAppPrideResourcesRoute: typeof AuthenticatedAppPrideResourcesRoute
   AuthenticatedAppPrideSetupRoute: typeof AuthenticatedAppPrideSetupRoute
   AuthenticatedAppProfileEditRoute: typeof AuthenticatedAppProfileEditRoute
   AuthenticatedAppSettingsBlockedRoute: typeof AuthenticatedAppSettingsBlockedRoute
@@ -1112,8 +1154,10 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppChatGroupIdRoute: AuthenticatedAppChatGroupIdRoute,
   AuthenticatedAppMessagesThreadIdRoute: AuthenticatedAppMessagesThreadIdRoute,
   AuthenticatedAppPostsPostIdRoute: AuthenticatedAppPostsPostIdRoute,
+  AuthenticatedAppPrideGuidelinesRoute: AuthenticatedAppPrideGuidelinesRoute,
   AuthenticatedAppPrideNotificationsRoute:
     AuthenticatedAppPrideNotificationsRoute,
+  AuthenticatedAppPrideResourcesRoute: AuthenticatedAppPrideResourcesRoute,
   AuthenticatedAppPrideSetupRoute: AuthenticatedAppPrideSetupRoute,
   AuthenticatedAppProfileEditRoute: AuthenticatedAppProfileEditRoute,
   AuthenticatedAppSettingsBlockedRoute: AuthenticatedAppSettingsBlockedRoute,

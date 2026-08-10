@@ -13,6 +13,7 @@ import {
 } from "@/lib/events";
 import { getPrideIdentities, loadMyPrideProfile, type PrideIdentity } from "@/lib/pride";
 import { EventCard } from "@/components/EventCard";
+import { PrideStoryRail } from "@/components/PrideStoryRail";
 
 
 export const Route = createFileRoute("/_authenticated/_app/pride/")({
@@ -93,9 +94,13 @@ function PrideScreen() {
             </div>
             <h1 className="text-2xl font-semibold tracking-tight">Pride</h1>
           </div>
+          <div className="flex items-center gap-2">
+          <Link to="/pride/guidelines" className="rounded-full bg-muted px-3 py-1.5 text-[11px] font-medium">Guidelines</Link>
+          <Link to="/pride/resources" className="rounded-full bg-muted px-3 py-1.5 text-[11px] font-medium">Resources</Link>
           <Link to="/pride/notifications" className="h-9 w-9 rounded-full bg-muted flex items-center justify-center" aria-label="Pride notifications">
             <Bell className="h-4 w-4" />
           </Link>
+          </div>
         </div>
         <p className="mt-2 text-sm text-muted-foreground">
           A private space for LGBTQ+ members. Your real profile is never shown here — only your Pride identity.
@@ -108,6 +113,8 @@ function PrideScreen() {
           </div>
         </div>
       </header>
+
+      <PrideStoryRail />
 
       <div className="px-5 flex items-center justify-between gap-2">
         <div className="inline-flex rounded-full border border-border p-0.5 text-xs">

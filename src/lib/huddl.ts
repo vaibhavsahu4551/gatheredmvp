@@ -58,6 +58,7 @@ export function ageFromDob(dob: string): number {
 }
 
 export async function signedPhotoUrl(path: string): Promise<string> {
+  if (/^https?:\/\//.test(path)) return path;
   const { data } = await supabase.storage.from("profile-photos").createSignedUrl(path, 60 * 60);
   return data?.signedUrl ?? "";
 }

@@ -21,10 +21,13 @@ export type StoryRow = {
   music_attribution: string | null;
   created_at: string;
   expires_at: string;
+  is_pride?: boolean;
+  pride_actor_id?: string | null;
 };
 
 export type StoryGroup = {
   user_id: string;
+  prideActorId?: string | null;
   stories: StoryRow[];
   allViewed: boolean;
 };
@@ -42,12 +45,14 @@ export async function signedStoryUrl(path: string): Promise<string> {
 }
 
 /** Active (non-expired) stories, grouped per user and ordered for the rail. */
-export async function listActiveStories(): Promise<{ groups: StoryGroup[]; meId: string }> {
+export async function listActiveStories(opts?: { pride?: boolean }): Promise<{ groups: StoryGroup[]; meId: string }> {
+  const pride = opts?.pride ?? false;
   const { data: { user } } = await supabase.auth.getUser();
   const meId = user?.id ?? "";
   const { data, error } = await sb
     .from("stories")
     .select("*")
+    .eq("is_pride", pride)
     .gt("expires_at", new Date().toISOString())
     .order("created_at", { ascending: true })
     .limit(300);
@@ -73,6 +78,7 @@ export async function listActiveStories(): Promise<{ groups: StoryGroup[]; meId:
 
   const groups: StoryGroup[] = [...byUser.entries()].map(([user_id, stories]) => ({
     user_id,
+    prideActorId: stories[0]?.pride_actor_id ?? null,
     stories,
     allViewed: stories.every((s) => viewed.has(s.id)),
   }));
@@ -100,6 +106,7 @@ export async function createStory(input: {
   text?: string | null;
   eventId?: string | null;
   music?: { title: string; artist: string; url: string; startMs: number; endMs: number; attribution: string } | null;
+  pride?: boolean;
 }) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Sign in required");
@@ -129,6 +136,7 @@ export async function createStory(input: {
     music_start_ms: input.music?.startMs ?? 0,
     music_end_ms: input.music?.endMs ?? 15000,
     music_attribution: input.music?.attribution ?? null,
+    is_pride: !!input.pride,
   });
   if (error) throw error;
 }
