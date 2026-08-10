@@ -152,19 +152,25 @@ function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      {/* Hero */}
-      <div className="relative h-[46vh] min-h-[280px] w-full overflow-hidden">
-        <img
-          src={heroImage}
-          alt="Friends laughing together at an evening rooftop gathering"
-          width={1024}
-          height={1280}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/85" />
+    <div className="relative min-h-[100dvh] w-full overflow-hidden">
+      {/* Full-screen background image */}
+      <img
+        src={heroImage}
+        alt="Friends laughing together at an evening rooftop gathering"
+        className="fixed inset-0 h-[100dvh] w-full object-cover"
+      />
+      <div
+        aria-hidden
+        className="fixed inset-0 h-[100dvh] w-full"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 30%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.86) 78%, rgba(0,0,0,0.95) 100%)",
+        }}
+      />
 
-        <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+      {/* Content overlay */}
+      <div className="relative z-10 flex min-h-[100dvh] flex-col">
+        <div className="flex items-center justify-between px-4 pt-4">
           {mode === "choose" ? (
             <Link to="/" className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur">
               <ArrowLeft className="h-5 w-5" />
@@ -182,120 +188,121 @@ function AuthPage() {
           </span>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 px-6 pb-6">
+        <div className="flex-1" />
+
+        <div className="w-full max-w-md mx-auto px-6">
           <div className="text-[13px] font-black uppercase tracking-[0.3em] text-white/70">Gathr</div>
           <h1 className="mt-2 text-[30px] font-bold leading-[1.08] tracking-tight text-white drop-shadow-sm">
             Never miss a moment.<br />Discover real hangouts.
           </h1>
         </div>
+
+        <main className="w-full max-w-md mx-auto px-6 pt-6 pb-10">
+          {mode === "choose" ? (
+            <div className="space-y-3">
+              <p className="text-[13px] text-white/70">
+                {tab === "signup" ? "Create your account with" : "Log in with"}
+              </p>
+
+              <button
+                onClick={submitGoogle}
+                disabled={loading}
+                className="w-full py-4 rounded-full bg-white text-[#1f1f1f] text-[15px] font-semibold ring-1 ring-black/10 shadow-card active:scale-[0.99] transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                <GoogleIcon /> Sign in with Google
+              </button>
+
+              {showApple && (
+                <button
+                  onClick={submitApple}
+                  disabled={loading}
+                  className="w-full py-4 rounded-full bg-black text-white text-[15px] font-semibold active:scale-[0.99] transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
+                >
+                  <Apple className="h-4 w-4" /> Continue with Apple
+                </button>
+              )}
+
+              <button
+                onClick={() => setMode("phone")}
+                className="w-full py-4 rounded-full bg-white/12 ring-1 ring-white/30 text-white text-[15px] font-semibold backdrop-blur active:scale-[0.99] transition inline-flex items-center justify-center gap-2"
+              >
+                <Phone className="h-4 w-4" /> Continue with Phone
+              </button>
+
+              <div className="pt-2 text-center text-[13px] text-white/70">
+                {tab === "signup" ? (
+                  <>Already have an account?{" "}
+                    <button onClick={() => setTab("login")} className="font-semibold text-white underline underline-offset-2">Log in</button>
+                  </>
+                ) : (
+                  <>New to Gathr?{" "}
+                    <button onClick={() => setTab("signup")} className="font-semibold text-white underline underline-offset-2">Sign up</button>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-3xl bg-white/10 ring-1 ring-white/20 backdrop-blur-xl p-5">
+              <div className="grid grid-cols-2 rounded-full bg-white/15 p-1">
+                <button
+                  onClick={() => setTab("signup")}
+                  className={`h-10 rounded-full text-[13px] font-semibold transition ${tab === "signup" ? "text-white shadow-sm" : "text-white/70"}`}
+                  style={tab === "signup" ? { backgroundImage: "var(--gradient-brand)" } : undefined}
+                >
+                  Sign up
+                </button>
+                <button
+                  onClick={() => setTab("login")}
+                  className={`h-10 rounded-full text-[13px] font-semibold transition ${tab === "login" ? "text-white shadow-sm" : "text-white/70"}`}
+                  style={tab === "login" ? { backgroundImage: "var(--gradient-brand)" } : undefined}
+                >
+                  Log in
+                </button>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                <LabeledInput
+                  label="Phone number"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  placeholder="Just digits, e.g. 9876543210"
+                  value={phone}
+                  onChange={setPhone}
+                />
+                <LabeledInput
+                  label="Password"
+                  type="password"
+                  autoComplete={tab === "signup" ? "new-password" : "current-password"}
+                  placeholder="At least 8 characters"
+                  value={password}
+                  onChange={setPassword}
+                  onEnter={submitPhone}
+                />
+                {tab === "login" && (
+                  <div className="text-right -mt-1">
+                    <Link to="/forgot-password" className="text-[12px] font-semibold text-white underline underline-offset-2">
+                      Forgot password?
+                    </Link>
+                  </div>
+                )}
+                <button
+                  onClick={submitPhone}
+                  disabled={loading}
+                  className="w-full h-12 rounded-full text-white text-[15px] font-semibold shadow-glow disabled:opacity-60 active:scale-[0.99] transition"
+                  style={{ backgroundImage: "var(--gradient-brand)" }}
+                >
+                  {loading ? "Please wait…" : tab === "signup" ? "Create my account" : "Log in"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <p className="mt-6 text-center text-[11px] text-white/60">
+            By continuing you confirm you're 18+ and agree to our Terms.
+          </p>
+        </main>
       </div>
-
-      {/* Panel */}
-      <main className="flex-1 w-full max-w-md mx-auto px-6 pt-6 pb-10">
-        {mode === "choose" ? (
-          <div className="space-y-3">
-            <p className="text-[13px] text-muted-foreground">
-              {tab === "signup" ? "Create your account with" : "Log in with"}
-            </p>
-
-            <button
-              onClick={submitGoogle}
-              disabled={loading}
-              className="w-full py-4 rounded-full bg-white text-[#1f1f1f] text-[15px] font-semibold ring-1 ring-black/10 shadow-card active:scale-[0.99] transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
-            >
-              <GoogleIcon /> Sign in with Google
-            </button>
-
-            {showApple && (
-              <button
-                onClick={submitApple}
-                disabled={loading}
-                className="w-full py-4 rounded-full bg-foreground text-background text-[15px] font-semibold active:scale-[0.99] transition inline-flex items-center justify-center gap-2 disabled:opacity-60"
-              >
-                <Apple className="h-4 w-4" /> Continue with Apple
-              </button>
-            )}
-
-            <button
-              onClick={() => setMode("phone")}
-              className="w-full py-4 rounded-full bg-card ring-1 ring-border text-[15px] font-semibold shadow-card active:scale-[0.99] transition inline-flex items-center justify-center gap-2"
-            >
-              <Phone className="h-4 w-4" /> Continue with Phone
-            </button>
-
-            <div className="pt-2 text-center text-[13px] text-muted-foreground">
-              {tab === "signup" ? (
-                <>Already have an account?{" "}
-                  <button onClick={() => setTab("login")} className="font-semibold text-gradient-brand">Log in</button>
-                </>
-              ) : (
-                <>New to Gathr?{" "}
-                  <button onClick={() => setTab("signup")} className="font-semibold text-gradient-brand">Sign up</button>
-                </>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-3xl bg-card shadow-card ring-1 ring-black/5 p-5">
-            <div className="grid grid-cols-2 rounded-full bg-muted p-1">
-              <button
-                onClick={() => setTab("signup")}
-                className={`h-10 rounded-full text-[13px] font-semibold transition ${tab === "signup" ? "text-white shadow-sm" : "text-foreground/70"}`}
-                style={tab === "signup" ? { backgroundImage: "var(--gradient-brand)" } : undefined}
-              >
-                Sign up
-              </button>
-              <button
-                onClick={() => setTab("login")}
-                className={`h-10 rounded-full text-[13px] font-semibold transition ${tab === "login" ? "text-white shadow-sm" : "text-foreground/70"}`}
-                style={tab === "login" ? { backgroundImage: "var(--gradient-brand)" } : undefined}
-              >
-                Log in
-              </button>
-            </div>
-
-            <div className="mt-4 space-y-3">
-              <LabeledInput
-                label="Phone number"
-                type="tel"
-                inputMode="numeric"
-                autoComplete="tel"
-                placeholder="Just digits, e.g. 9876543210"
-                value={phone}
-                onChange={setPhone}
-              />
-              <LabeledInput
-                label="Password"
-                type="password"
-                autoComplete={tab === "signup" ? "new-password" : "current-password"}
-                placeholder="At least 8 characters"
-                value={password}
-                onChange={setPassword}
-                onEnter={submitPhone}
-              />
-              {tab === "login" && (
-                <div className="text-right -mt-1">
-                  <Link to="/forgot-password" className="text-[12px] font-semibold text-gradient-brand">
-                    Forgot password?
-                  </Link>
-                </div>
-              )}
-              <button
-                onClick={submitPhone}
-                disabled={loading}
-                className="w-full h-12 rounded-full text-white text-[15px] font-semibold shadow-glow disabled:opacity-60 active:scale-[0.99] transition"
-                style={{ backgroundImage: "var(--gradient-brand)" }}
-              >
-                {loading ? "Please wait…" : tab === "signup" ? "Create my account" : "Log in"}
-              </button>
-            </div>
-          </div>
-        )}
-
-        <p className="mt-6 text-center text-[11px] text-muted-foreground">
-          By continuing you confirm you're 18+ and agree to our Terms.
-        </p>
-      </main>
     </div>
   );
 }
@@ -310,14 +317,15 @@ function LabeledInput({
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">) {
   return (
     <label className="block">
-      <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-wide text-white/60">{label}</span>
       <input
         {...rest}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && onEnter?.()}
-        className="mt-1 w-full rounded-2xl border border-input bg-background px-4 py-3.5 text-[15px] outline-none focus:border-transparent focus:ring-2 focus:ring-[color:var(--brand-2)]/40"
+        className="mt-1 w-full rounded-2xl border border-white/25 bg-white/10 text-white placeholder:text-white/45 px-4 py-3.5 text-[15px] outline-none focus:border-transparent focus:ring-2 focus:ring-white/40"
       />
+
     </label>
   );
 }
