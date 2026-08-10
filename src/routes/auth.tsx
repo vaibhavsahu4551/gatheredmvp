@@ -317,14 +317,15 @@ function LabeledInput({
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">) {
   return (
     <label className="block">
-      <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-wide text-white/60">{label}</span>
       <input
         {...rest}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && onEnter?.()}
-        className="mt-1 w-full rounded-2xl border border-input bg-background px-4 py-3.5 text-[15px] outline-none focus:border-transparent focus:ring-2 focus:ring-[color:var(--brand-2)]/40"
+        className="mt-1 w-full rounded-2xl border border-white/25 bg-white/10 text-white placeholder:text-white/45 px-4 py-3.5 text-[15px] outline-none focus:border-transparent focus:ring-2 focus:ring-white/40"
       />
+
     </label>
   );
 }
