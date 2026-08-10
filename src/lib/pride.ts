@@ -8,6 +8,7 @@ export type PrideProfile = {
   display_name: string;
   photo_path: string | null;
   bio: string | null;
+  interests?: string[] | null;
 };
 
 export type PrideIdentity = {
@@ -15,6 +16,7 @@ export type PrideIdentity = {
   display_name: string;
   photo_path: string | null;
   bio: string | null;
+  interests?: string[] | null;
 };
 
 export async function loadMyPrideProfile(): Promise<PrideProfile | null> {
@@ -22,7 +24,7 @@ export async function loadMyPrideProfile(): Promise<PrideProfile | null> {
   if (!user) return null;
   const { data, error } = await supabase
     .from("pride_profiles" as any)
-    .select("user_id, pride_id, display_name, photo_path, bio")
+    .select("user_id, pride_id, display_name, photo_path, bio, interests")
     .eq("user_id", user.id)
     .maybeSingle();
   if (error) return null;
@@ -103,6 +105,7 @@ export async function savePrideProfile(patch: {
   display_name: string;
   bio?: string | null;
   photo_path?: string | null;
+  interests?: string[] | null;
 }) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Sign in required");
@@ -117,6 +120,7 @@ export async function savePrideProfile(patch: {
       display_name: name,
       bio,
       photo_path: patch.photo_path ?? null,
+      ...(patch.interests ? { interests: patch.interests } : {}),
     },
     { onConflict: "user_id" },
   );
