@@ -22,6 +22,7 @@ export function StoryViewer({
   profiles,
   onClose,
   onChanged,
+  pride = false,
 }: {
   groups: StoryGroup[];
   startIndex: number;
@@ -29,6 +30,7 @@ export function StoryViewer({
   profiles: Profiles;
   onClose: () => void;
   onChanged: () => void;
+  pride?: boolean;
 }) {
   const [gi, setGi] = useState(startIndex);
   const [si, setSi] = useState(0);
@@ -117,7 +119,8 @@ export function StoryViewer({
     setViewersOpen(true);
     const v = await listStoryViewers(story.id);
     setViewers(v);
-    if (v.length) setViewerProfiles(await getProfilesLite(v.map((x) => x.viewer_id)) as Profiles);
+    // Inside Pride we never resolve real identities of viewers.
+    if (!pride && v.length) setViewerProfiles(await getProfilesLite(v.map((x) => x.viewer_id)) as Profiles);
   }
 
   async function remove() {
@@ -237,8 +240,13 @@ export function StoryViewer({
             <button onClick={() => setViewersOpen(false)} className="text-sm text-muted-foreground">Close</button>
           </div>
           {!viewers.length && <div className="text-sm text-muted-foreground py-6 text-center">No views yet.</div>}
+          {pride && !!viewers.length && (
+            <p className="text-xs text-muted-foreground mb-3">
+              Viewer names are hidden inside Pride to protect everyone's privacy.
+            </p>
+          )}
           <div className="space-y-3">
-            {viewers.map((v) => (
+            {!pride && viewers.map((v) => (
               <div key={v.viewer_id} className="flex items-center gap-3">
                 <Avatar photo={viewerProfiles[v.viewer_id]?.photo} name={viewerProfiles[v.viewer_id]?.full_name} size={36} />
                 <div className="flex-1 text-sm">{viewerProfiles[v.viewer_id]?.full_name ?? "Someone"}</div>

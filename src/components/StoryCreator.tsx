@@ -5,7 +5,7 @@ import { listMyEvents } from "@/lib/feed";
 import { MusicPicker, type MusicChoice } from "@/components/MusicPicker";
 
 /** Full-screen story composer: media, text overlay, event tag, background music. */
-export function StoryCreator({ onClose, onPosted }: { onClose: () => void; onPosted: () => void }) {
+export function StoryCreator({ onClose, onPosted, pride = false }: { onClose: () => void; onPosted: () => void; pride?: boolean }) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
   const [mediaType, setMediaType] = useState<"photo" | "video">("photo");
@@ -43,7 +43,7 @@ export function StoryCreator({ onClose, onPosted }: { onClose: () => void; onPos
     setBusy(true);
     setErr(null);
     try {
-      await createStory({ file, mediaType, text, eventId: eventId || null, music });
+      await createStory({ pride, file, mediaType, text, eventId: eventId || null, music });
       onPosted();
     } catch (e: any) {
       setErr(e?.message ?? "Couldn't post your story");
