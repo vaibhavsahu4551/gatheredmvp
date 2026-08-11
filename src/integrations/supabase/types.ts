@@ -300,6 +300,53 @@ export type Database = {
         }
         Relationships: []
       }
+      event_checkins: {
+        Row: {
+          area: string
+          back_by: string
+          contact_phone: string | null
+          created_at: string
+          event_id: string
+          expires_at: string
+          id: string
+          starts_at: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          area: string
+          back_by: string
+          contact_phone?: string | null
+          created_at?: string
+          event_id: string
+          expires_at: string
+          id?: string
+          starts_at: string
+          token: string
+          user_id: string
+        }
+        Update: {
+          area?: string
+          back_by?: string
+          contact_phone?: string | null
+          created_at?: string
+          event_id?: string
+          expires_at?: string
+          id?: string
+          starts_at?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_checkins_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_comments: {
         Row: {
           body: string
@@ -382,6 +429,9 @@ export type Database = {
           boost_weight: number
           category: Database["public"]["Enums"]["event_category"] | null
           city: string
+          cohost_id: string | null
+          cohost_pride_actor_id: string | null
+          cohost_status: string
           created_at: string
           description: string | null
           entry_fee: number | null
@@ -403,12 +453,16 @@ export type Database = {
           status: Database["public"]["Enums"]["event_status"]
           title: string
           updated_at: string
+          venue_type: string
         }
         Insert: {
           auto_cancel_hours?: number
           boost_weight?: number
           category?: Database["public"]["Enums"]["event_category"] | null
           city: string
+          cohost_id?: string | null
+          cohost_pride_actor_id?: string | null
+          cohost_status?: string
           created_at?: string
           description?: string | null
           entry_fee?: number | null
@@ -430,12 +484,16 @@ export type Database = {
           status?: Database["public"]["Enums"]["event_status"]
           title: string
           updated_at?: string
+          venue_type?: string
         }
         Update: {
           auto_cancel_hours?: number
           boost_weight?: number
           category?: Database["public"]["Enums"]["event_category"] | null
           city?: string
+          cohost_id?: string | null
+          cohost_pride_actor_id?: string | null
+          cohost_status?: string
           created_at?: string
           description?: string | null
           entry_fee?: number | null
@@ -457,6 +515,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["event_status"]
           title?: string
           updated_at?: string
+          venue_type?: string
         }
         Relationships: []
       }
@@ -744,6 +803,7 @@ export type Database = {
           bio: string | null
           created_at: string
           display_name: string
+          interests: string[]
           photo_path: string | null
           pride_id: string
           updated_at: string
@@ -753,6 +813,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name: string
+          interests?: string[]
           photo_path?: string | null
           pride_id?: string
           updated_at?: string
@@ -762,6 +823,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string
+          interests?: string[]
           photo_path?: string | null
           pride_id?: string
           updated_at?: string
@@ -813,6 +875,7 @@ export type Database = {
           photos: string[]
           points: number
           premium_expires_at: string | null
+          pride_guidelines_at: string | null
           pride_opt_in: boolean
           profession: string | null
           razorpay_customer_id: string | null
@@ -848,6 +911,7 @@ export type Database = {
           photos?: string[]
           points?: number
           premium_expires_at?: string | null
+          pride_guidelines_at?: string | null
           pride_opt_in?: boolean
           profession?: string | null
           razorpay_customer_id?: string | null
@@ -883,6 +947,7 @@ export type Database = {
           photos?: string[]
           points?: number
           premium_expires_at?: string | null
+          pride_guidelines_at?: string | null
           pride_opt_in?: boolean
           profession?: string | null
           razorpay_customer_id?: string | null
@@ -1012,6 +1077,7 @@ export type Database = {
           event_id: string | null
           expires_at: string
           id: string
+          is_pride: boolean
           media_path: string
           media_type: string
           music_artist: string | null
@@ -1020,6 +1086,7 @@ export type Database = {
           music_start_ms: number
           music_title: string | null
           music_url: string | null
+          pride_actor_id: string | null
           text_overlay: string | null
           user_id: string
         }
@@ -1028,6 +1095,7 @@ export type Database = {
           event_id?: string | null
           expires_at?: string
           id?: string
+          is_pride?: boolean
           media_path: string
           media_type?: string
           music_artist?: string | null
@@ -1036,6 +1104,7 @@ export type Database = {
           music_start_ms?: number
           music_title?: string | null
           music_url?: string | null
+          pride_actor_id?: string | null
           text_overlay?: string | null
           user_id: string
         }
@@ -1044,6 +1113,7 @@ export type Database = {
           event_id?: string | null
           expires_at?: string
           id?: string
+          is_pride?: boolean
           media_path?: string
           media_type?: string
           music_artist?: string | null
@@ -1052,6 +1122,7 @@ export type Database = {
           music_start_ms?: number
           music_title?: string | null
           music_url?: string | null
+          pride_actor_id?: string | null
           text_overlay?: string | null
           user_id?: string
         }
@@ -1605,6 +1676,10 @@ export type Database = {
         Returns: number
       }
       count_events_joined_last_30d: { Args: { _user: string }; Returns: number }
+      create_event_checkin: {
+        Args: { _event: string; _hours: number; _phone: string }
+        Returns: string
+      }
       get_dm_unread: {
         Args: never
         Returns: {
@@ -1613,6 +1688,14 @@ export type Database = {
           last_sender: string
           thread_id: string
           unread: number
+        }[]
+      }
+      get_event_checkin: {
+        Args: { _token: string }
+        Returns: {
+          area: string
+          back_by: string
+          starts_at: string
         }[]
       }
       get_my_profile: {
@@ -1657,6 +1740,7 @@ export type Database = {
         Returns: {
           bio: string
           display_name: string
+          interests: string[]
           photo_path: string
           pride_id: string
         }[]
@@ -1688,6 +1772,31 @@ export type Database = {
         }[]
       }
       mark_dm_read: { Args: { _thread: string }; Returns: undefined }
+      pride_my_cohost_invites: {
+        Args: never
+        Returns: {
+          city: string
+          event_id: string
+          starts_at: string
+          title: string
+        }[]
+      }
+      pride_respond_cohost: {
+        Args: { _accept: boolean; _event: string }
+        Returns: undefined
+      }
+      pride_search_identities: {
+        Args: { _q: string }
+        Returns: {
+          display_name: string
+          photo_path: string
+          pride_id: string
+        }[]
+      }
+      pride_set_cohost: {
+        Args: { _event: string; _pride_id: string }
+        Returns: undefined
+      }
       pride_suspended: { Args: { _user: string }; Returns: boolean }
       redeem_reward: { Args: { _kind: string }; Returns: string }
       roll_daily_icebreaker: { Args: never; Returns: string }
