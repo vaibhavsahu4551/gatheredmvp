@@ -21,6 +21,8 @@ function label(kind: string) {
     case "join_request": return "requested to join your event";
     case "join_approved": return "approved your request to join";
     case "join_declined": return "couldn't fit you in this time";
+    case "verification_approved": return "Your account is verified — the Verified badge is now on your profile";
+    case "verification_rejected": return "Verification wasn't approved — tap to retake your selfie";
     default: return "sent you a notification";
   }
 }

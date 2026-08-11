@@ -29,6 +29,8 @@ import { ProfileDetails } from "@/components/ProfileDetails";
 
 import { PostCard, type PostItem } from "@/components/PostCard";
 import { useSubscriptionsEnabled } from "@/hooks/useSubscriptionsEnabled";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { useVerification } from "@/hooks/useVerification";
 
 
 export const Route = createFileRoute("/_authenticated/_app/profile/")({
@@ -46,6 +48,7 @@ function Profile() {
   const [connIds, setConnIds] = useState<string[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [showConnections, setShowConnections] = useState(false);
+  const myVerified = useVerification().isVerified;
 
   useEffect(() => {
     loadMe().then(async (data) => {
@@ -88,6 +91,7 @@ function Profile() {
         <div className="absolute inset-x-0 bottom-0 p-5 text-white">
           <h1 className="text-3xl font-extrabold tracking-tight drop-shadow-md">
             {p.full_name || "Add your name"}
+            {myVerified && <VerifiedBadge />}
             {p.dob && <span className="font-semibold text-white/90">, {ageFromDob(p.dob)}</span>}
           </h1>
           {p.city && (

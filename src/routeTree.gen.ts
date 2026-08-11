@@ -26,11 +26,11 @@ import { Route as AdminPostsRouteImport } from './routes/admin.posts'
 import { Route as AdminFlaggedRouteImport } from './routes/admin.flagged'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminEngagementRouteImport } from './routes/admin.engagement'
-import { Route as AuthenticatedPendingRouteImport } from './routes/_authenticated/pending'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/_app'
 import { Route as ApiPublicSendPushRouteImport } from './routes/api/public/send-push'
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
+import { Route as AuthenticatedAppVerifyRouteImport } from './routes/_authenticated/_app/verify'
 import { Route as AuthenticatedAppSubscriptionRouteImport } from './routes/_authenticated/_app/subscription'
 import { Route as AuthenticatedAppRequestsRouteImport } from './routes/_authenticated/_app/requests'
 import { Route as AuthenticatedAppPremiumRouteImport } from './routes/_authenticated/_app/premium'
@@ -149,11 +149,6 @@ const AdminEngagementRoute = AdminEngagementRouteImport.update({
   path: '/engagement',
   getParentRoute: () => AdminRoute,
 } as any)
-const AuthenticatedPendingRoute = AuthenticatedPendingRouteImport.update({
-  id: '/pending',
-  path: '/pending',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -174,6 +169,11 @@ const ApiPublicRazorpayWebhookRoute =
     path: '/api/public/razorpay-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAppVerifyRoute = AuthenticatedAppVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppSubscriptionRoute =
   AuthenticatedAppSubscriptionRouteImport.update({
     id: '/subscription',
@@ -376,7 +376,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/pending': typeof AuthenticatedPendingRoute
   '/admin/engagement': typeof AdminEngagementRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
@@ -396,6 +395,7 @@ export interface FileRoutesByFullPath {
   '/premium': typeof AuthenticatedAppPremiumRoute
   '/requests': typeof AuthenticatedAppRequestsRoute
   '/subscription': typeof AuthenticatedAppSubscriptionRoute
+  '/verify': typeof AuthenticatedAppVerifyRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/api/public/send-push': typeof ApiPublicSendPushRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
@@ -430,7 +430,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/pending': typeof AuthenticatedPendingRoute
   '/admin/engagement': typeof AdminEngagementRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
@@ -450,6 +449,7 @@ export interface FileRoutesByTo {
   '/premium': typeof AuthenticatedAppPremiumRoute
   '/requests': typeof AuthenticatedAppRequestsRoute
   '/subscription': typeof AuthenticatedAppSubscriptionRoute
+  '/verify': typeof AuthenticatedAppVerifyRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/api/public/send-push': typeof ApiPublicSendPushRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
@@ -488,7 +488,6 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/_authenticated/_app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
-  '/_authenticated/pending': typeof AuthenticatedPendingRoute
   '/admin/engagement': typeof AdminEngagementRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
@@ -508,6 +507,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/premium': typeof AuthenticatedAppPremiumRoute
   '/_authenticated/_app/requests': typeof AuthenticatedAppRequestsRoute
   '/_authenticated/_app/subscription': typeof AuthenticatedAppSubscriptionRoute
+  '/_authenticated/_app/verify': typeof AuthenticatedAppVerifyRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/api/public/send-push': typeof ApiPublicSendPushRoute
   '/_authenticated/_app/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
@@ -545,7 +545,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/forgot-password'
     | '/onboarding'
-    | '/pending'
     | '/admin/engagement'
     | '/admin/events'
     | '/admin/flagged'
@@ -565,6 +564,7 @@ export interface FileRouteTypes {
     | '/premium'
     | '/requests'
     | '/subscription'
+    | '/verify'
     | '/api/public/razorpay-webhook'
     | '/api/public/send-push'
     | '/chat/$groupId'
@@ -599,7 +599,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/forgot-password'
     | '/onboarding'
-    | '/pending'
     | '/admin/engagement'
     | '/admin/events'
     | '/admin/flagged'
@@ -619,6 +618,7 @@ export interface FileRouteTypes {
     | '/premium'
     | '/requests'
     | '/subscription'
+    | '/verify'
     | '/api/public/razorpay-webhook'
     | '/api/public/send-push'
     | '/chat/$groupId'
@@ -656,7 +656,6 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/_authenticated/_app'
     | '/_authenticated/onboarding'
-    | '/_authenticated/pending'
     | '/admin/engagement'
     | '/admin/events'
     | '/admin/flagged'
@@ -676,6 +675,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/premium'
     | '/_authenticated/_app/requests'
     | '/_authenticated/_app/subscription'
+    | '/_authenticated/_app/verify'
     | '/api/public/razorpay-webhook'
     | '/api/public/send-push'
     | '/_authenticated/_app/chat/$groupId'
@@ -837,13 +837,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEngagementRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/_authenticated/pending': {
-      id: '/_authenticated/pending'
-      path: '/pending'
-      fullPath: '/pending'
-      preLoaderRoute: typeof AuthenticatedPendingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/onboarding': {
       id: '/_authenticated/onboarding'
       path: '/onboarding'
@@ -871,6 +864,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/razorpay-webhook'
       preLoaderRoute: typeof ApiPublicRazorpayWebhookRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/_app/verify': {
+      id: '/_authenticated/_app/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof AuthenticatedAppVerifyRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/subscription': {
       id: '/_authenticated/_app/subscription'
@@ -1115,6 +1115,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppPremiumRoute: typeof AuthenticatedAppPremiumRoute
   AuthenticatedAppRequestsRoute: typeof AuthenticatedAppRequestsRoute
   AuthenticatedAppSubscriptionRoute: typeof AuthenticatedAppSubscriptionRoute
+  AuthenticatedAppVerifyRoute: typeof AuthenticatedAppVerifyRoute
   AuthenticatedAppChatGroupIdRoute: typeof AuthenticatedAppChatGroupIdRoute
   AuthenticatedAppMessagesThreadIdRoute: typeof AuthenticatedAppMessagesThreadIdRoute
   AuthenticatedAppPostsPostIdRoute: typeof AuthenticatedAppPostsPostIdRoute
@@ -1151,6 +1152,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppPremiumRoute: AuthenticatedAppPremiumRoute,
   AuthenticatedAppRequestsRoute: AuthenticatedAppRequestsRoute,
   AuthenticatedAppSubscriptionRoute: AuthenticatedAppSubscriptionRoute,
+  AuthenticatedAppVerifyRoute: AuthenticatedAppVerifyRoute,
   AuthenticatedAppChatGroupIdRoute: AuthenticatedAppChatGroupIdRoute,
   AuthenticatedAppMessagesThreadIdRoute: AuthenticatedAppMessagesThreadIdRoute,
   AuthenticatedAppPostsPostIdRoute: AuthenticatedAppPostsPostIdRoute,
@@ -1187,13 +1189,11 @@ const AuthenticatedAppRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppRoute: typeof AuthenticatedAppRouteWithChildren
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
-  AuthenticatedPendingRoute: typeof AuthenticatedPendingRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppRoute: AuthenticatedAppRouteWithChildren,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
-  AuthenticatedPendingRoute: AuthenticatedPendingRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -1242,13 +1242,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

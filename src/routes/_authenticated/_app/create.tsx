@@ -7,6 +7,8 @@ import { loadMyPrideProfile, isPrideSuspended } from "@/lib/pride";
 import { createPost, listMyEvents } from "@/lib/feed";
 import { canCreateEvent, FREE_EVENT_CREATE_LIMIT } from "@/lib/entitlements";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
+import { VerifyGatePrompt } from "@/components/VerifyGatePrompt";
+import { useVerification } from "@/hooks/useVerification";
 import { toast } from "sonner";
 import { AlertTriangle, ImagePlus, ShieldAlert, Sparkles } from "lucide-react";
 
@@ -60,6 +62,8 @@ function Create() {
   const [prideSuspended, setPrideSuspendedState] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [upgradeMsg, setUpgradeMsg] = useState("");
+  const verification = useVerification();
+  const [verifyOpen, setVerifyOpen] = useState(false);
 
   useEffect(() => {
     loadMe().then(async (me) => {
@@ -80,6 +84,10 @@ function Create() {
   const residentialWarn = address.length > 4 && looksResidential(address);
 
   const submit = async () => {
+    if (!verification.loading && !verification.isVerified) {
+      setVerifyOpen(true);
+      return;
+    }
     if (!eventType) return toast.error("Pick an event type");
     if (!title.trim()) return toast.error("Add a title");
     if (!startsAt) return toast.error("Pick date and time");
@@ -273,6 +281,13 @@ function Create() {
         </div>
       </div>
       <UpgradePrompt open={upgradeOpen} onClose={() => setUpgradeOpen(false)} title="You've hit the free event limit" message={upgradeMsg} />
+      <VerifyGatePrompt
+        open={verifyOpen}
+        action="create"
+        status={verification.status === "verified" ? "unverified" : verification.status}
+        reason={verification.rejection_reason}
+        onClose={() => setVerifyOpen(false)}
+      />
     </div>
   );
 }

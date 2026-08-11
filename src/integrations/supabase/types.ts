@@ -870,6 +870,7 @@ export type Database = {
           id: string
           instagram_handle: string | null
           interests: string[]
+          is_verified: boolean
           onboarding_complete: boolean
           phone: string | null
           photos: string[]
@@ -883,7 +884,6 @@ export type Database = {
           referral_awarded_at: string | null
           referral_code: string | null
           referred_by: string | null
-          selfie_url: string | null
           smoking: string | null
           spotify_url: string | null
           subscription_tier: string
@@ -906,6 +906,7 @@ export type Database = {
           id: string
           instagram_handle?: string | null
           interests?: string[]
+          is_verified?: boolean
           onboarding_complete?: boolean
           phone?: string | null
           photos?: string[]
@@ -919,7 +920,6 @@ export type Database = {
           referral_awarded_at?: string | null
           referral_code?: string | null
           referred_by?: string | null
-          selfie_url?: string | null
           smoking?: string | null
           spotify_url?: string | null
           subscription_tier?: string
@@ -942,6 +942,7 @@ export type Database = {
           id?: string
           instagram_handle?: string | null
           interests?: string[]
+          is_verified?: boolean
           onboarding_complete?: boolean
           phone?: string | null
           photos?: string[]
@@ -955,7 +956,6 @@ export type Database = {
           referral_awarded_at?: string | null
           referral_code?: string | null
           referred_by?: string | null
-          selfie_url?: string | null
           smoking?: string | null
           spotify_url?: string | null
           subscription_tier?: string
@@ -1347,7 +1347,9 @@ export type Database = {
           notes: string | null
           priority: boolean
           rejection_reason: string | null
+          selfie_path: string | null
           status: Database["public"]["Enums"]["verification_state"]
+          submitted_at: string | null
           updated_at: string
           user_id: string
         }
@@ -1355,7 +1357,9 @@ export type Database = {
           notes?: string | null
           priority?: boolean
           rejection_reason?: string | null
+          selfie_path?: string | null
           status?: Database["public"]["Enums"]["verification_state"]
+          submitted_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1363,7 +1367,9 @@ export type Database = {
           notes?: string | null
           priority?: boolean
           rejection_reason?: string | null
+          selfie_path?: string | null
           status?: Database["public"]["Enums"]["verification_state"]
+          submitted_at?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1580,12 +1586,13 @@ export type Database = {
         Args: { _status?: string }
         Returns: {
           full_name: string
-          notes: string
+          is_premium: boolean
           photos: string[]
           priority: boolean
           rejection_reason: string
-          selfie_url: string
+          selfie_path: string
           status: string
+          submitted_at: string
           updated_at: string
           user_id: string
         }[]
@@ -1801,6 +1808,7 @@ export type Database = {
       redeem_reward: { Args: { _kind: string }; Returns: string }
       roll_daily_icebreaker: { Args: never; Returns: string }
       roll_weekly_challenge: { Args: never; Returns: string }
+      submit_verification: { Args: { _path: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin"

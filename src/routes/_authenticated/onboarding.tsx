@@ -308,7 +308,7 @@ function Onboarding() {
         )}
 
         {step === 11 && (
-          <Step title="Add a profile photo" sub="Pick a photo, then zoom and drag to frame it.">
+          <Step title="Add a profile photo" sub="Use a clear photo of your face — this will be used for verification. Pick a photo, then zoom and drag to frame it.">
             <div className="flex flex-col items-center">
               <label className={`relative h-40 w-40 rounded-full bg-muted overflow-hidden flex items-center justify-center shadow-elevated ${uploading ? "cursor-wait opacity-70" : "cursor-pointer"}`}>
                 {photoPreview ? (

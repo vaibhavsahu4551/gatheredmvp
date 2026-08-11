@@ -12,6 +12,8 @@ import { PostCard, type PostItem } from "@/components/PostCard";
 import { CityPickerModal } from "@/components/CityPickerModal";
 import { getActiveBanner, getAppSettings, type HomeBanner } from "@/lib/admin";
 import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
+import { getVerifiedIds } from "@/lib/verification";
+
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { StoryRail } from "@/components/StoryRail";
 import { PeopleSuggestions } from "@/components/PeopleSuggestions";
@@ -48,6 +50,7 @@ function HomeFeed() {
   const [counts, setCounts] = useState<Record<string, { boys: number; girls: number; total: number }>>({});
   const [hosts, setHosts] = useState<Record<string, { full_name: string | null; gender: string | null }>>({});
   const [hostTiers, setHostTiers] = useState<Record<string, "free" | "premium">>({});
+  const [verifiedHosts, setVerifiedHosts] = useState<Set<string>>(new Set());
   const [hasPremium, setHasPremium] = useState(false);
   const [advOpen, setAdvOpen] = useState(false);
   useEffect(() => { getMyEntitlements().then((e) => setHasPremium(e.hasAccess)); }, []);
@@ -144,6 +147,7 @@ function HomeFeed() {
       setCounts(cts);
       setHosts(hostsMap);
       setHostTiers(await getUserTiers(evFiltered.map((e) => e.host_id)));
+      setVerifiedHosts(await getVerifiedIds(evFiltered.map((e) => e.host_id)));
 
       const pItems: PostItem[] = (firstPosts as any[])
         .filter((p) => !blocked.has(p.user_id) && p.user_id !== meId)
@@ -328,7 +332,7 @@ function HomeFeed() {
           <div className="text-sm text-muted-foreground text-center py-12">Nothing here yet in {city || "your city"}. Create the first event or post.</div>
         )}
         {items.map((it) => it.kind === "event" ? (
-          <EventCard key={"e" + it.id} e={it.ev} c={counts[it.id] ?? { boys: 0, girls: 0, total: 0 }} host={hosts[it.ev.host_id]} hostPremium={hostTiers[it.ev.host_id] === "premium"} />
+          <EventCard key={"e" + it.id} e={it.ev} c={counts[it.id] ?? { boys: 0, girls: 0, total: 0 }} host={hosts[it.ev.host_id]} hostPremium={hostTiers[it.ev.host_id] === "premium"} hostVerified={verifiedHosts.has(it.ev.host_id)} />
         ) : (
           <PostCard key={"p" + it.id} p={it} img={imgs[it.id]} name={names[it.user_id]?.full_name ?? "Someone"}
             avatarPhoto={names[it.user_id]?.photo ?? null}

@@ -53,15 +53,17 @@ export const adminListPosts = (search = "", limit = 100) =>
   rpc<AdminPost[]>("admin_list_posts", { _search: search, _limit: limit });
 export const adminRemovePost = (id: string) => rpc<void>("admin_delete_post", { _id: id });
 
-// ---------- Verification ----------
+// ---------- Verification (live selfie vs profile photo) ----------
 export type AdminVerification = {
-  user_id: string; full_name: string | null; status: string; priority: boolean; notes: string | null;
-  rejection_reason: string | null; selfie_url: string | null; photos: string[] | null; updated_at: string;
+  user_id: string; full_name: string | null; status: string; priority: boolean;
+  rejection_reason: string | null; selfie_path: string | null; photos: string[] | null;
+  submitted_at: string | null; updated_at: string; is_premium: boolean;
 };
 export const adminListVerification = (status = "pending") =>
   rpc<AdminVerification[]>("admin_list_verification", { _status: status });
-export const adminSetVerification = (userId: string, status: string, reason?: string) =>
+export const adminSetVerification = (userId: string, status: "verified" | "rejected", reason?: string) =>
   rpc<void>("admin_set_verification", { _user: userId, _status: status, _reason: reason ?? null });
+
 
 // ---------- Revenue ----------
 export type RevenueStats = { active_premium: number; mrr: number; new_this_month: number; cancelled_this_month: number };

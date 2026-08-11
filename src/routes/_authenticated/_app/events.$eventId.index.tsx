@@ -7,6 +7,10 @@ import { countByGender, deleteEvent, getEvent, getParticipants, getProfilesLite,
 import { getPrideIdentities, signedPridePhotoUrl, type PrideIdentity } from "@/lib/pride";
 import { canJoinEvent, FREE_EVENT_JOIN_LIMIT, getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
+import { VerifyGatePrompt } from "@/components/VerifyGatePrompt";
+import { useVerification } from "@/hooks/useVerification";
+import { getVerifiedIds } from "@/lib/verification";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { PremiumBadge } from "@/components/PremiumBadge";
 import { toast } from "sonner";
 import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2, Sparkles } from "lucide-react";
@@ -34,8 +38,11 @@ function EventDetail() {
   const [sending, setSending] = useState(false);
   const commentsEndRef = useRef<HTMLDivElement>(null);
   const [tiers, setTiers] = useState<Record<string, "free" | "premium">>({});
+  const [verifiedIds, setVerifiedIds] = useState<Set<string>>(new Set());
   const [hasPremium, setHasPremium] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const verification = useVerification();
+  const [verifyOpen, setVerifyOpen] = useState(false);
   const [upgradeMsg, setUpgradeMsg] = useState("");
 
   const isPride = !!(event as any)?.is_pride;
@@ -68,6 +75,7 @@ function EventDetail() {
       const ids = Array.from(new Set([...(ev ? [ev.host_id] : []), ...ps.map((p) => p.user_id)]));
       setProfiles(await getProfilesLite(ids));
       setTiers(await getUserTiers(ids));
+      setVerifiedIds(await getVerifiedIds(ids));
     }
     setMy((await myParticipation(eventId, user.id)) as ParticipantRow | null);
     const { data: g } = await supabase.from("chat_groups").select("id").eq("event_id", eventId).maybeSingle();
@@ -159,6 +167,10 @@ function EventDetail() {
   };
 
   const doJoin = async () => {
+    if (!verification.loading && !verification.isVerified) {
+      setVerifyOpen(true);
+      return;
+    }
     const gate = await canJoinEvent();
     if (!gate.allowed) {
       setUpgradeMsg(`Free members can join up to ${FREE_EVENT_JOIN_LIMIT} events every 30 days. You've used ${gate.used}. Upgrade to Premium for unlimited joins.`);
@@ -266,6 +278,7 @@ function EventDetail() {
               className="font-medium text-foreground hover:underline inline-flex items-center gap-1"
             >
               {profiles[event.host_id]?.full_name ?? "Host"}
+              {verifiedIds.has(event.host_id) && <VerifiedBadge />}
               {tiers[event.host_id] === "premium" && <PremiumBadge />}
             </Link>
           )}
@@ -381,6 +394,7 @@ function EventDetail() {
                       )}
                       <span className="inline-flex items-center gap-1">
                         {d.name}{!isPride && d.gender ? ` · ${d.gender}` : ""}
+                        {!isPride && verifiedIds.has(p.user_id) && <VerifiedBadge />}
                         {!isPride && tiers[p.user_id] === "premium" && <PremiumBadge />}
                       </span>
                     </div>
@@ -501,6 +515,13 @@ function EventDetail() {
         </div>
       </div>
       <UpgradePrompt open={upgradeOpen} onClose={() => setUpgradeOpen(false)} title="You've hit the free join limit" message={upgradeMsg} />
+      <VerifyGatePrompt
+        open={verifyOpen}
+        action="join"
+        status={verification.status === "verified" ? "unverified" : verification.status}
+        reason={verification.rejection_reason}
+        onClose={() => setVerifyOpen(false)}
+      />
     </div>
   );
 }

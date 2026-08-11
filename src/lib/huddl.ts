@@ -14,7 +14,7 @@ export type ProfileRow = {
   bio: string | null;
   interests: string[];
   photos: string[];
-  selfie_url: string | null;
+  is_verified?: boolean;
   onboarding_complete: boolean;
   pride_opt_in: boolean;
   instagram_handle?: string | null;
