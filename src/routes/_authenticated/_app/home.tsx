@@ -12,6 +12,8 @@ import { PostCard, type PostItem } from "@/components/PostCard";
 import { CityPickerModal } from "@/components/CityPickerModal";
 import { getActiveBanner, getAppSettings, type HomeBanner } from "@/lib/admin";
 import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
+import { getVerifiedIds } from "@/lib/verification";
+
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { StoryRail } from "@/components/StoryRail";
 import { PeopleSuggestions } from "@/components/PeopleSuggestions";
