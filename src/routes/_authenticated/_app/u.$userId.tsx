@@ -53,7 +53,7 @@ function UserProfile() {
     if (ids.length) setConnNames(await getProfilesLite(ids));
     const [tiers, ent] = await Promise.all([getUserTiers([userId]), getMyEntitlements()]);
     setTargetVerified((await getVerifiedIds([userId])).has(userId));
-      setTargetPremium(tiers[userId] === "premium");
+    setTargetPremium(tiers[userId] === "premium");
     setMyPremium(ent.hasAccess);
   };
   useEffect(() => { load(); }, [userId]);

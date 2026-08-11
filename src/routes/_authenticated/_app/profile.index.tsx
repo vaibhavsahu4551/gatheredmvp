@@ -29,6 +29,8 @@ import { ProfileDetails } from "@/components/ProfileDetails";
 
 import { PostCard, type PostItem } from "@/components/PostCard";
 import { useSubscriptionsEnabled } from "@/hooks/useSubscriptionsEnabled";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { useVerification } from "@/hooks/useVerification";
 
 
 export const Route = createFileRoute("/_authenticated/_app/profile/")({
@@ -46,6 +48,7 @@ function Profile() {
   const [connIds, setConnIds] = useState<string[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [showConnections, setShowConnections] = useState(false);
+  const myVerified = useVerification().isVerified;
 
   useEffect(() => {
     loadMe().then(async (data) => {
