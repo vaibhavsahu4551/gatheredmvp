@@ -7,6 +7,9 @@ import { countByGender, deleteEvent, getEvent, getParticipants, getProfilesLite,
 import { getPrideIdentities, signedPridePhotoUrl, type PrideIdentity } from "@/lib/pride";
 import { canJoinEvent, FREE_EVENT_JOIN_LIMIT, getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
+import { VerifyGatePrompt } from "@/components/VerifyGatePrompt";
+import { useVerification } from "@/hooks/useVerification";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { PremiumBadge } from "@/components/PremiumBadge";
 import { toast } from "sonner";
 import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2, Sparkles } from "lucide-react";
@@ -36,6 +39,8 @@ function EventDetail() {
   const [tiers, setTiers] = useState<Record<string, "free" | "premium">>({});
   const [hasPremium, setHasPremium] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const verification = useVerification();
+  const [verifyOpen, setVerifyOpen] = useState(false);
   const [upgradeMsg, setUpgradeMsg] = useState("");
 
   const isPride = !!(event as any)?.is_pride;
@@ -159,6 +164,10 @@ function EventDetail() {
   };
 
   const doJoin = async () => {
+    if (!verification.loading && !verification.isVerified) {
+      setVerifyOpen(true);
+      return;
+    }
     const gate = await canJoinEvent();
     if (!gate.allowed) {
       setUpgradeMsg(`Free members can join up to ${FREE_EVENT_JOIN_LIMIT} events every 30 days. You've used ${gate.used}. Upgrade to Premium for unlimited joins.`);
@@ -501,6 +510,13 @@ function EventDetail() {
         </div>
       </div>
       <UpgradePrompt open={upgradeOpen} onClose={() => setUpgradeOpen(false)} title="You've hit the free join limit" message={upgradeMsg} />
+      <VerifyGatePrompt
+        open={verifyOpen}
+        action="join"
+        status={verification.status === "verified" ? "unverified" : verification.status}
+        reason={verification.rejection_reason}
+        onClose={() => setVerifyOpen(false)}
+      />
     </div>
   );
 }
