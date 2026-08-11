@@ -15,6 +15,8 @@ import { toast } from "sonner";
 import { ArrowLeft, MapPin, UserPlus, Check, X, MessageCircle, Clock } from "lucide-react";
 import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { PremiumBadge } from "@/components/PremiumBadge";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { getVerifiedIds } from "@/lib/verification";
 import { useSubscriptionsEnabled } from "@/hooks/useSubscriptionsEnabled";
 
 export const Route = createFileRoute("/_authenticated/_app/u/$userId")({
@@ -35,6 +37,7 @@ function UserProfile() {
   const [tab, setTab] = useState<"posts" | "hosting" | "joined">("posts");
   const subsEnabled = useSubscriptionsEnabled();
   const [targetPremium, setTargetPremium] = useState(false);
+  const [targetVerified, setTargetVerified] = useState(false);
   const [myPremium, setMyPremium] = useState(false);
 
   const load = async () => {
@@ -49,7 +52,8 @@ function UserProfile() {
     setConnIds(ids);
     if (ids.length) setConnNames(await getProfilesLite(ids));
     const [tiers, ent] = await Promise.all([getUserTiers([userId]), getMyEntitlements()]);
-    setTargetPremium(tiers[userId] === "premium");
+    setTargetVerified((await getVerifiedIds([userId])).has(userId));
+      setTargetPremium(tiers[userId] === "premium");
     setMyPremium(ent.hasAccess);
   };
   useEffect(() => { load(); }, [userId]);
@@ -119,6 +123,7 @@ function UserProfile() {
               {profile.full_name || "Member"}
               {profile.dob && <span className="font-semibold text-white/90">, {ageFromDob(profile.dob)}</span>}
             </h1>
+            {targetVerified && <VerifiedBadge />}
             {targetPremium && <PremiumBadge />}
           </div>
           {profile.city && (

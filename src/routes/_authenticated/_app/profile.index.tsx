@@ -88,6 +88,7 @@ function Profile() {
         <div className="absolute inset-x-0 bottom-0 p-5 text-white">
           <h1 className="text-3xl font-extrabold tracking-tight drop-shadow-md">
             {p.full_name || "Add your name"}
+            {myVerified && <VerifiedBadge />}
             {p.dob && <span className="font-semibold text-white/90">, {ageFromDob(p.dob)}</span>}
           </h1>
           {p.city && (

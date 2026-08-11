@@ -128,6 +128,11 @@ function Settings() {
         <Row title="Linked accounts" subtitle="Google and Apple sign-in — coming soon" right={<span className="text-xs text-muted-foreground">Soon</span>} />
       </Card>
 
+      <SectionTitle>Verification</SectionTitle>
+      <Card>
+        <Row title="Verify your account" subtitle="Live selfie matched to your profile photo — required to join or create events" onClick={() => navigate({ to: "/verify" })} right={<ChevronRight className="h-4 w-4 text-muted-foreground" />} />
+      </Card>
+
       <SectionTitle>Privacy &amp; Safety</SectionTitle>
       <Card>
         <Row
