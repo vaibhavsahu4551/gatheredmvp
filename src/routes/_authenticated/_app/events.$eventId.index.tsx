@@ -9,6 +9,7 @@ import { canJoinEvent, FREE_EVENT_JOIN_LIMIT, getMyEntitlements, getUserTiers } 
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { VerifyGatePrompt } from "@/components/VerifyGatePrompt";
 import { useVerification } from "@/hooks/useVerification";
+import { getVerifiedIds } from "@/lib/verification";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { PremiumBadge } from "@/components/PremiumBadge";
 import { toast } from "sonner";
@@ -37,6 +38,7 @@ function EventDetail() {
   const [sending, setSending] = useState(false);
   const commentsEndRef = useRef<HTMLDivElement>(null);
   const [tiers, setTiers] = useState<Record<string, "free" | "premium">>({});
+  const [verifiedIds, setVerifiedIds] = useState<Set<string>>(new Set());
   const [hasPremium, setHasPremium] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const verification = useVerification();
@@ -73,6 +75,7 @@ function EventDetail() {
       const ids = Array.from(new Set([...(ev ? [ev.host_id] : []), ...ps.map((p) => p.user_id)]));
       setProfiles(await getProfilesLite(ids));
       setTiers(await getUserTiers(ids));
+      setVerifiedIds(await getVerifiedIds(ids));
     }
     setMy((await myParticipation(eventId, user.id)) as ParticipantRow | null);
     const { data: g } = await supabase.from("chat_groups").select("id").eq("event_id", eventId).maybeSingle();
