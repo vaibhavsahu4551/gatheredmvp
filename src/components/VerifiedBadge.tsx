@@ -6,11 +6,15 @@ import { BadgeCheck } from "lucide-react";
  */
 export function VerifiedBadge({ size = 15, className = "" }: { size?: number; className?: string }) {
   return (
-    <BadgeCheck
-      aria-label="Verified member"
+    <span
       title="Verified — live selfie matched to profile photo"
-      style={{ width: size, height: size }}
-      className={`inline-block shrink-0 align-middle text-sky-500 fill-sky-500/15 ${className}`}
-    />
+      className={`inline-flex align-middle ${className}`}
+    >
+      <BadgeCheck
+        aria-label="Verified member"
+        style={{ width: size, height: size }}
+        className="shrink-0 text-sky-500 fill-sky-500/15"
+      />
+    </span>
   );
 }
