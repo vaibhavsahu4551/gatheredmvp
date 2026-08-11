@@ -870,6 +870,7 @@ export type Database = {
           id: string
           instagram_handle: string | null
           interests: string[]
+          is_verified: boolean
           onboarding_complete: boolean
           phone: string | null
           photos: string[]
@@ -905,6 +906,7 @@ export type Database = {
           id: string
           instagram_handle?: string | null
           interests?: string[]
+          is_verified?: boolean
           onboarding_complete?: boolean
           phone?: string | null
           photos?: string[]
@@ -940,6 +942,7 @@ export type Database = {
           id?: string
           instagram_handle?: string | null
           interests?: string[]
+          is_verified?: boolean
           onboarding_complete?: boolean
           phone?: string | null
           photos?: string[]
