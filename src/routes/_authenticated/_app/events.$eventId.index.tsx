@@ -275,6 +275,7 @@ function EventDetail() {
               className="font-medium text-foreground hover:underline inline-flex items-center gap-1"
             >
               {profiles[event.host_id]?.full_name ?? "Host"}
+              {verifiedIds.has(event.host_id) && <VerifiedBadge />}
               {tiers[event.host_id] === "premium" && <PremiumBadge />}
             </Link>
           )}
@@ -390,6 +391,7 @@ function EventDetail() {
                       )}
                       <span className="inline-flex items-center gap-1">
                         {d.name}{!isPride && d.gender ? ` · ${d.gender}` : ""}
+                        {!isPride && verifiedIds.has(p.user_id) && <VerifiedBadge />}
                         {!isPride && tiers[p.user_id] === "premium" && <PremiumBadge />}
                       </span>
                     </div>

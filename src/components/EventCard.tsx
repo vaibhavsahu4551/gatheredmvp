@@ -5,6 +5,7 @@ import { SafetyMenu } from "@/components/SafetyMenu";
 import { ShareButton } from "@/components/ShareToConnection";
 import { eventTypeStyle } from "@/lib/event-style";
 import { PremiumBadge } from "@/components/PremiumBadge";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 
 export type EventCounts = { boys: number; girls: number; total: number };
 
@@ -30,12 +31,14 @@ export function EventCard({
   c,
   host,
   hostPremium,
+  hostVerified,
   prideHost,
 }: {
   e: EventRow;
   c?: EventCounts;
   host?: { full_name: string | null };
   hostPremium?: boolean;
+  hostVerified?: boolean;
   /** When set (Pride surfaces), shown in place of the real host. */
   prideHost?: { display_name: string } | null;
 }) {
@@ -94,6 +97,7 @@ export function EventCard({
           <div className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground truncate">
             <span className="truncate">
               {hostLabel}
+              {!pride && hostVerified && <VerifiedBadge />}
               {!pride && hostPremium && <PremiumBadge />}
             </span>
             <span className="opacity-60">·</span>
