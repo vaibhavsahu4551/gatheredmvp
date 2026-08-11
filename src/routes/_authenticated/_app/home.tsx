@@ -48,6 +48,7 @@ function HomeFeed() {
   const [counts, setCounts] = useState<Record<string, { boys: number; girls: number; total: number }>>({});
   const [hosts, setHosts] = useState<Record<string, { full_name: string | null; gender: string | null }>>({});
   const [hostTiers, setHostTiers] = useState<Record<string, "free" | "premium">>({});
+  const [verifiedHosts, setVerifiedHosts] = useState<Set<string>>(new Set());
   const [hasPremium, setHasPremium] = useState(false);
   const [advOpen, setAdvOpen] = useState(false);
   useEffect(() => { getMyEntitlements().then((e) => setHasPremium(e.hasAccess)); }, []);
@@ -144,6 +145,7 @@ function HomeFeed() {
       setCounts(cts);
       setHosts(hostsMap);
       setHostTiers(await getUserTiers(evFiltered.map((e) => e.host_id)));
+      setVerifiedHosts(await getVerifiedIds(evFiltered.map((e) => e.host_id)));
 
       const pItems: PostItem[] = (firstPosts as any[])
         .filter((p) => !blocked.has(p.user_id) && p.user_id !== meId)
