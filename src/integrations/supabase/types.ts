@@ -1720,12 +1720,12 @@ export type Database = {
           id: string
           instagram_handle: string
           interests: string[]
+          is_verified: boolean
           onboarding_complete: boolean
           photos: string[]
           premium_expires_at: string
           pride_opt_in: boolean
           profession: string
-          selfie_url: string
           smoking: string
           spotify_url: string
           subscription_tier: string
