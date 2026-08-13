@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Calendar } from "lucide-react";
 import type { EventRow } from "@/lib/events";
 import { EventCard, type EventCounts } from "@/components/EventCard";
+import { sortEventsByStatus } from "@/lib/event-status";
 
 export const Route = createFileRoute("/_authenticated/_app/events/")({
   component: Events,
@@ -86,7 +87,7 @@ function Events() {
     })();
   }, []);
 
-  const list = tab === "hosting" ? hosting : joined;
+  const list = sortEventsByStatus(tab === "hosting" ? hosting : joined, counts);
   return (
     <div>
       <header className="px-5 pt-8 pb-3">
