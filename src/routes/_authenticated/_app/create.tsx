@@ -11,6 +11,7 @@ import { VerifyGatePrompt } from "@/components/VerifyGatePrompt";
 import { useVerification } from "@/hooks/useVerification";
 import { toast } from "sonner";
 import { AlertTriangle, ImagePlus, ShieldAlert, Sparkles } from "lucide-react";
+import { pickPlaceholderCover, uploadEventCover } from "@/lib/event-cover";
 
 export const Route = createFileRoute("/_authenticated/_app/create")({
   component: CreateScreen,
@@ -54,6 +55,8 @@ function Create() {
   
   const [minGirls, setMinGirls] = useState("");
   const [minBoys, setMinBoys] = useState("");
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState("");
   const [saving, setSaving] = useState(false);
   const [prideOptIn, setPrideOptIn] = useState(false);
   const [isPride, setIsPride] = useState(false);
@@ -80,6 +83,13 @@ function Create() {
       }
     });
   }, []);
+
+  useEffect(() => {
+    if (!coverFile) { setCoverPreview(""); return; }
+    const url = URL.createObjectURL(coverFile);
+    setCoverPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [coverFile]);
 
   const residentialWarn = address.length > 4 && looksResidential(address);
 
@@ -112,6 +122,16 @@ function Create() {
       return;
     }
 
+    let cover_url: string;
+    try {
+      cover_url = coverFile
+        ? await uploadEventCover(userId, coverFile)
+        : pickPlaceholderCover(eventType);
+    } catch (e: any) {
+      setSaving(false);
+      return toast.error(e?.message ?? "Could not upload the photo");
+    }
+
     const { data, error } = await supabase.from("events").insert({
       host_id: userId,
       title: title.trim(),
@@ -129,6 +149,7 @@ function Create() {
       min_girls: minGirls ? Number(minGirls) : null,
       min_boys: minBoys ? Number(minBoys) : null,
       is_pride: prideOptIn && isPride,
+      cover_url,
     } as any).select("id").maybeSingle();
 
     setSaving(false);
@@ -219,6 +240,23 @@ function Create() {
 
 
 
+
+        <Field label="Event photo (optional)">
+          {coverPreview ? (
+            <div className="relative">
+              <img src={coverPreview} alt="" className="w-full aspect-video object-cover rounded-2xl" />
+              <button type="button" onClick={() => setCoverFile(null)}
+                className="absolute top-2 right-2 rounded-full bg-black/60 text-white text-xs px-3 py-1">Remove</button>
+            </div>
+          ) : (
+            <label className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border py-8 text-sm text-muted-foreground cursor-pointer">
+              <ImagePlus className="h-5 w-5" />
+              Add a cover photo
+              <span className="text-[11px]">We'll pick one for you if you skip this.</span>
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => setCoverFile(e.target.files?.[0] ?? null)} />
+            </label>
+          )}
+        </Field>
 
         <Field label="Date & time">
           <input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} className={inputCls} />
