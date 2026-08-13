@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Users, MapPin, Clock } from "lucide-react";
 import type { EventRow } from "@/lib/events";
 import { SafetyMenu } from "@/components/SafetyMenu";
@@ -6,25 +7,10 @@ import { ShareButton } from "@/components/ShareToConnection";
 import { eventTypeStyle } from "@/lib/event-style";
 import { PremiumBadge } from "@/components/PremiumBadge";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { eventPhase } from "@/lib/event-status";
+import { fallbackCover, isRemoteCover, signedEventCoverUrl } from "@/lib/event-cover";
 
 export type EventCounts = { boys: number; girls: number; total: number };
-
-// Curated stock imagery per event type (Unsplash — no key needed).
-const TYPE_IMAGE: Record<string, string> = {
-  Breakfast: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=70",
-  Lunch:     "https://images.unsplash.com/photo-1543353071-10c8ba85a904?auto=format&fit=crop&w=600&q=70",
-  Dinner:    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=600&q=70",
-  Drinks:    "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=600&q=70",
-  Club:      "https://images.unsplash.com/photo-1571266028243-e4bb35f9a1a1?auto=format&fit=crop&w=600&q=70",
-  Gaming:    "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=70",
-  Movies:    "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=70",
-  Trek:      "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=600&q=70",
-  Other:     "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=70",
-};
-
-function coverFor(type?: string | null) {
-  return TYPE_IMAGE[type ?? "Other"] ?? TYPE_IMAGE.Other;
-}
 
 export function EventCard({
   e,
@@ -46,6 +32,21 @@ export function EventCard({
   const style = eventTypeStyle(e.event_type);
   const pride = !!(e as any).is_pride;
   const hostLabel = pride ? (prideHost?.display_name ?? "Pride member") : (host?.full_name ?? "Host");
+  const phase = eventPhase(e as any, counts.total);
+
+  const cover = (e as any).cover_url as string | null | undefined;
+  const [coverUrl, setCoverUrl] = useState(
+    isRemoteCover(cover) ? cover! : fallbackCover(e.id, e.event_type),
+  );
+  useEffect(() => {
+    let alive = true;
+    if (cover && !isRemoteCover(cover)) {
+      signedEventCoverUrl(cover).then((u) => { if (alive && u) setCoverUrl(u); });
+    } else {
+      setCoverUrl(isRemoteCover(cover) ? cover! : fallbackCover(e.id, e.event_type));
+    }
+    return () => { alive = false; };
+  }, [cover, e.id, e.event_type]);
 
   const when = new Date(e.starts_at).toLocaleString([], {
     weekday: "short",
@@ -53,14 +54,13 @@ export function EventCard({
     minute: "2-digit",
   });
 
-  const ctaLabel =
-    e.status === "confirmed" ? "Open" : e.status === "pending" ? "Filling up" : "Join Now";
+  const ctaLabel = phase === "closed" ? "Closed" : phase === "filling" ? "Filling up" : "Join Now";
 
   return (
     <Link
       to="/events/$eventId"
       params={{ eventId: e.id }}
-      className="relative block rounded-3xl bg-card shadow-card transition active:scale-[0.995] overflow-hidden"
+      className={`relative block rounded-3xl bg-card shadow-card transition active:scale-[0.995] overflow-hidden ${phase === "closed" ? "opacity-75" : ""}`}
     >
       <div className="flex gap-3 p-3">
         {/* Left: details */}
@@ -74,9 +74,17 @@ export function EventCard({
                 {e.event_type}
               </span>
             )}
-            {e.status === "confirmed" && (
+            {phase === "closed" ? (
+              <span className="rounded-full bg-muted text-muted-foreground px-2 py-0.5 text-[10px] font-semibold">
+                Closed
+              </span>
+            ) : phase === "filling" ? (
+              <span className="rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-semibold">
+                Filling up
+              </span>
+            ) : (
               <span className="rounded-full bg-emerald-100 text-emerald-700 px-2 py-0.5 text-[10px] font-semibold">
-                Confirmed
+                Open
               </span>
             )}
           </div>
@@ -109,8 +117,8 @@ export function EventCard({
 
           <div className="mt-2.5">
             <span
-              className="inline-flex items-center rounded-full px-4 py-1.5 text-[12px] font-semibold text-white shadow-sm"
-              style={{ backgroundImage: style.gradient }}
+              className={`inline-flex items-center rounded-full px-4 py-1.5 text-[12px] font-semibold shadow-sm ${phase === "closed" ? "bg-muted text-muted-foreground" : "text-white"}`}
+              style={phase === "closed" ? undefined : { backgroundImage: style.gradient }}
             >
               {ctaLabel}
             </span>
@@ -120,10 +128,10 @@ export function EventCard({
         {/* Right: cover thumbnail */}
         <div className="relative shrink-0" style={{ width: "38%", aspectRatio: "1 / 1" }}>
           <img
-            src={coverFor(e.event_type)}
+            src={coverUrl}
             alt=""
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover rounded-2xl"
+            className={`absolute inset-0 h-full w-full object-cover rounded-2xl ${phase === "closed" ? "grayscale" : ""}`}
           />
           <div
             className="absolute inset-0 rounded-2xl pointer-events-none"

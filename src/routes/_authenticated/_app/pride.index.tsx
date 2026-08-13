@@ -14,6 +14,7 @@ import {
 import { getPrideIdentities, loadMyPrideProfile, type PrideIdentity } from "@/lib/pride";
 import { EventCard } from "@/components/EventCard";
 import { PrideStoryRail } from "@/components/PrideStoryRail";
+import { sortEventsByStatus } from "@/lib/event-status";
 
 
 export const Route = createFileRoute("/_authenticated/_app/pride/")({
@@ -82,7 +83,7 @@ function PrideScreen() {
   }
   if (!ok) return null;
 
-  const list = tab === "discover" ? events : tab === "hosting" ? hosting : joined;
+  const list = sortEventsByStatus(tab === "discover" ? events : tab === "hosting" ? hosting : joined, counts);
 
   return (
     <div>

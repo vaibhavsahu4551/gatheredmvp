@@ -3,7 +3,7 @@ import { eventTypeStyle } from "@/lib/event-style";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { countByGender, deleteEvent, getEvent, getParticipants, getProfilesLite, leaveEvent, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
+import { countByGender, deleteEvent, setEventClosed, getEvent, getParticipants, getProfilesLite, leaveEvent, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
 import { getPrideIdentities, signedPridePhotoUrl, type PrideIdentity } from "@/lib/pride";
 import { canJoinEvent, FREE_EVENT_JOIN_LIMIT, getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
@@ -13,7 +13,8 @@ import { getVerifiedIds } from "@/lib/verification";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { PremiumBadge } from "@/components/PremiumBadge";
 import { toast } from "sonner";
-import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2, Sparkles } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2, Sparkles, CircleSlash, RotateCcw } from "lucide-react";
+import { eventPhase, isEventClosed } from "@/lib/event-status";
 import { SafetyMenu } from "@/components/SafetyMenu";
 import { Avatar } from "@/components/Avatar";
 
@@ -144,6 +145,10 @@ function EventDetail() {
   if (!event) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
   const isHost = event.host_id === me;
   const approved = parts.filter((p) => p.status === "approved");
+  const closed = isEventClosed(event as any);
+  const phase = eventPhase(event as any, approved.length);
+  const manuallyClosed = !!(event as any).closed_at;
+  const startedAlready = new Date(event.starts_at).getTime() < Date.now();
   const pending = parts.filter((p) => p.status === "pending");
   const counts = approved.reduce(
     (acc, p) => {
@@ -226,6 +231,26 @@ function EventDetail() {
               </button>
 
               <button
+                type="button"
+                onClick={async () => {
+                  const next = !manuallyClosed;
+                  if (next && !confirm("Close this event? No new joins or messages will be allowed.")) return;
+                  try {
+                    await setEventClosed(event.id, next);
+                    toast.success(next ? "Event closed" : "Event reopened");
+                    await load();
+                  } catch (e: any) {
+                    toast.error(e?.message ?? "Could not update the event");
+                  }
+                }}
+                disabled={!manuallyClosed && startedAlready}
+                className="h-9 px-3 rounded-full bg-muted flex items-center gap-1.5 text-xs font-medium disabled:opacity-40"
+                aria-label={manuallyClosed ? "Reopen event" : "Close event"}
+              >
+                {manuallyClosed ? <><RotateCcw className="h-3.5 w-3.5" /> Reopen</> : <><CircleSlash className="h-3.5 w-3.5" /> Close</>}
+              </button>
+
+              <button
                 onClick={async () => {
                   if (!confirm("Delete this event? All requests, attendees, comments, and the group chat will be removed.")) return;
                   try {
@@ -285,11 +310,26 @@ function EventDetail() {
         </div>
 
 
-        <div className={`mt-3 rounded-2xl p-3 text-sm ${event.status === "confirmed" ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : event.status === "cancelled" ? "bg-red-50 text-red-800 border border-red-200" : "bg-amber-50 text-amber-800 border border-amber-200"}`}>
-          {event.status === "confirmed" && "Confirmed — group chat unlocked."}
-          {event.status === "pending" && `Waiting for more people — ${approved.length}/${event.min_size} joined.`}
-          {event.status === "cancelled" && "This Gathr was cancelled."}
+        <div className="mt-2 flex items-center gap-1.5">
+          <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${phase === "closed" ? "bg-muted text-muted-foreground" : phase === "filling" ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>
+            {phase === "closed" ? "Closed" : phase === "filling" ? "Filling up" : "Open"}
+          </span>
         </div>
+
+        {closed ? (
+          <div className="mt-3 rounded-2xl p-3 text-sm bg-muted text-muted-foreground border border-border">
+            {event.status === "cancelled"
+              ? "This Gathr was cancelled."
+              : manuallyClosed
+                ? "The host closed this Gathr. New joins and messages are off — the event and past discussion stay visible."
+                : "This Gathr has already happened. New joins and messages are off."}
+          </div>
+        ) : (
+          <div className={`mt-3 rounded-2xl p-3 text-sm ${event.status === "confirmed" ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : "bg-amber-50 text-amber-800 border border-amber-200"}`}>
+            {event.status === "confirmed" && "Confirmed — group chat unlocked."}
+            {event.status === "pending" && `Waiting for more people — ${approved.length}/${event.min_size} joined.`}
+          </div>
+        )}
 
         <div className="mt-4 space-y-2 text-sm">
           <Row icon={<Clock className="h-4 w-4" />}>{new Date(event.starts_at).toLocaleString()}</Row>
@@ -353,7 +393,10 @@ function EventDetail() {
               </div>
             )}
             {my?.status === "rejected" && <div className="w-full rounded-full bg-red-100 text-red-700 py-3 text-sm text-center font-medium">Request declined</div>}
-            {!my && event.status !== "cancelled" && (
+            {!my && closed && (
+              <div className="w-full rounded-full bg-muted text-muted-foreground py-3 text-sm text-center font-medium">Closed — joining is off</div>
+            )}
+            {!my && !closed && event.status !== "cancelled" && (
               <button onClick={doJoin} className="w-full rounded-full bg-primary text-primary-foreground py-3.5 text-sm font-medium">Request to Join</button>
             )}
           </div>
@@ -494,6 +537,11 @@ function EventDetail() {
                 })}
                 <div ref={commentsEndRef} />
               </div>
+              {closed ? (
+                <div className="border-t border-border p-3 text-xs text-muted-foreground text-center">
+                  This discussion is closed. Past messages stay visible.
+                </div>
+              ) : (
               <div className="border-t border-border p-2 flex gap-2">
                 <input
                   value={commentText}
@@ -510,6 +558,7 @@ function EventDetail() {
                   <Send className="h-4 w-4" />
                 </button>
               </div>
+              )}
             </div>
           )}
         </div>

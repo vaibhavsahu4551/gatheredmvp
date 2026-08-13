@@ -13,6 +13,7 @@ import { CityPickerModal } from "@/components/CityPickerModal";
 import { getActiveBanner, getAppSettings, type HomeBanner } from "@/lib/admin";
 import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { getVerifiedIds } from "@/lib/verification";
+import { sortEventsByStatus } from "@/lib/event-status";
 
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { StoryRail } from "@/components/StoryRail";
@@ -232,13 +233,16 @@ function HomeFeed() {
   }), [posts, cat, girlsOnly, q]);
 
   const items: FeedItem[] = useMemo(() => {
-    const arr: FeedItem[] = [
-      ...filteredEvents.map<EventItem>((e) => ({ kind: "event", id: e.id, created_at: e.created_at ?? e.starts_at, ev: e })),
-      ...filteredPosts,
+    // Events first, grouped by status: Open → Filling up → Closed (recency within each).
+    const sortedEvents = sortEventsByStatus(filteredEvents, counts);
+    const posts = [...filteredPosts].sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    );
+    return [
+      ...sortedEvents.map<EventItem>((e) => ({ kind: "event", id: e.id, created_at: e.created_at ?? e.starts_at, ev: e })),
+      ...posts,
     ];
-    arr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    return arr;
-  }, [filteredEvents, filteredPosts]);
+  }, [filteredEvents, filteredPosts, counts]);
 
   return (
     <div>
