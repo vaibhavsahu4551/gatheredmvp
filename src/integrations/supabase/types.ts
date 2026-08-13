@@ -429,9 +429,11 @@ export type Database = {
           boost_weight: number
           category: Database["public"]["Enums"]["event_category"] | null
           city: string
+          closed_at: string | null
           cohost_id: string | null
           cohost_pride_actor_id: string | null
           cohost_status: string
+          cover_url: string | null
           created_at: string
           description: string | null
           entry_fee: number | null
@@ -460,9 +462,11 @@ export type Database = {
           boost_weight?: number
           category?: Database["public"]["Enums"]["event_category"] | null
           city: string
+          closed_at?: string | null
           cohost_id?: string | null
           cohost_pride_actor_id?: string | null
           cohost_status?: string
+          cover_url?: string | null
           created_at?: string
           description?: string | null
           entry_fee?: number | null
@@ -491,9 +495,11 @@ export type Database = {
           boost_weight?: number
           category?: Database["public"]["Enums"]["event_category"] | null
           city?: string
+          closed_at?: string | null
           cohost_id?: string | null
           cohost_pride_actor_id?: string | null
           cohost_status?: string
+          cover_url?: string | null
           created_at?: string
           description?: string | null
           entry_fee?: number | null
@@ -1687,6 +1693,7 @@ export type Database = {
         Args: { _event: string; _hours: number; _phone: string }
         Returns: string
       }
+      event_is_closed: { Args: { _event: string }; Returns: boolean }
       get_dm_unread: {
         Args: never
         Returns: {
