@@ -159,6 +159,12 @@ export async function deleteEvent(id: string) {
   if (error) throw error;
 }
 
+/** Host-only: close an event early (or reopen it if it hasn't started yet). */
+export async function setEventClosed(id: string, closed: boolean) {
+  await updateEvent(id, { closed_at: closed ? new Date().toISOString() : null } as any);
+}
+
+
 export async function myParticipation(eventId: string, userId: string) {
   const { data } = await supabase.from("event_participants")
     .select("*").eq("event_id", eventId).eq("user_id", userId).maybeSingle();
