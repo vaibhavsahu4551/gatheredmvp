@@ -24,9 +24,22 @@ function VerifyScreen() {
   const [profilePhoto, setProfilePhoto] = useState("");
   const [camOn, setCamOn] = useState(false);
   const [camError, setCamError] = useState("");
+  const [starting, setStarting] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const [shot, setShot] = useState<{ blob: Blob; url: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [cue] = useState(() => CUES[Math.floor(Math.random() * CUES.length)]);
+
+  // Bind the stream once the <video> is actually mounted (avoids the black box
+  // caused by attaching srcObject before render).
+  useEffect(() => {
+    const el = videoRef.current;
+    const stream = streamRef.current;
+    if (!camOn || !el || !stream) return;
+    if (el.srcObject !== stream) el.srcObject = stream;
+    el.play().catch(() => {});
+  }, [camOn]);
+
 
   useEffect(() => {
     (async () => {
