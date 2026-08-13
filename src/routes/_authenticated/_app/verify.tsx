@@ -227,13 +227,27 @@ function VerifyScreen() {
                     playsInline
                     muted
                     autoPlay
+                    onLoadedMetadata={(e) => {
+                      e.currentTarget.play().catch(() => {});
+                    }}
+                    onPlaying={() => setVideoReady(true)}
                     className="h-full w-full object-cover"
                     style={{ transform: "scaleX(-1)" }}
                   />
+                  {!videoReady && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="h-6 w-6 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                    </div>
+                  )}
                   <div className="absolute inset-x-0 bottom-0 p-3 text-center text-white text-sm font-medium bg-gradient-to-t from-black/70 to-transparent">
                     {cue}, then capture
                   </div>
                 </>
+              ) : camError ? (
+                <div className="h-full w-full flex flex-col items-center justify-center text-white gap-3 px-6 text-center">
+                  <Camera className="h-10 w-10 text-white/70" />
+                  <p className="text-sm leading-relaxed">{camError}</p>
+                </div>
               ) : (
                 <div className="h-full w-full flex flex-col items-center justify-center text-white/80 gap-3 px-6 text-center">
                   <ScanFace className="h-10 w-10" />
@@ -247,17 +261,23 @@ function VerifyScreen() {
             {!camOn && !shot && (
               <button
                 onClick={startCam}
-                className="w-full rounded-full bg-sky-500 text-white py-3 text-sm font-semibold inline-flex items-center justify-center gap-2"
+                disabled={starting}
+                className="w-full rounded-full bg-sky-500 text-white py-3 text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                <Camera className="h-4 w-4" /> Open camera
+                <Camera className="h-4 w-4" /> {starting ? "Opening camera…" : camError ? "Try again" : "Open camera"}
               </button>
             )}
 
             {camOn && (
-              <button onClick={capture} className="w-full rounded-full bg-sky-500 text-white py-3 text-sm font-semibold">
-                Capture selfie
+              <button
+                onClick={capture}
+                disabled={!videoReady}
+                className="w-full rounded-full bg-sky-500 text-white py-3 text-sm font-semibold disabled:opacity-50"
+              >
+                {videoReady ? "Capture selfie" : "Starting camera…"}
               </button>
             )}
+
 
             {shot && (
               <div className="flex gap-2">
