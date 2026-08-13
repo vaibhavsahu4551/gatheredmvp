@@ -24,9 +24,22 @@ function VerifyScreen() {
   const [profilePhoto, setProfilePhoto] = useState("");
   const [camOn, setCamOn] = useState(false);
   const [camError, setCamError] = useState("");
+  const [starting, setStarting] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const [shot, setShot] = useState<{ blob: Blob; url: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [cue] = useState(() => CUES[Math.floor(Math.random() * CUES.length)]);
+
+  // Bind the stream once the <video> is actually mounted (avoids the black box
+  // caused by attaching srcObject before render).
+  useEffect(() => {
+    const el = videoRef.current;
+    const stream = streamRef.current;
+    if (!camOn || !el || !stream) return;
+    if (el.srcObject !== stream) el.srcObject = stream;
+    el.play().catch(() => {});
+  }, [camOn]);
+
 
   useEffect(() => {
     (async () => {
@@ -49,13 +62,27 @@ function VerifyScreen() {
   }, []);
 
   function stopCam() {
+    if (videoRef.current) videoRef.current.srcObject = null;
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     setCamOn(false);
+    setVideoReady(false);
   }
 
   async function startCam() {
     setCamError("");
+    setVideoReady(false);
+
+    if (typeof window !== "undefined" && !window.isSecureContext) {
+      setCamError("Camera needs a secure (https) connection. Open Gathr over https and try again.");
+      return;
+    }
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCamError("This browser doesn't support camera capture. Try Chrome or Safari.");
+      return;
+    }
+
+    setStarting(true);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 960 } },
@@ -63,21 +90,23 @@ function VerifyScreen() {
       });
       streamRef.current = stream;
       setCamOn(true);
-      // wait a tick so the <video> is mounted
-      setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.play().catch(() => {});
-        }
-      }, 0);
     } catch (e: any) {
+      const name = e?.name ?? "";
       setCamError(
-        e?.name === "NotAllowedError"
-          ? "Camera access was blocked. Allow camera access in your browser settings and try again."
-          : "We couldn't open your camera on this device.",
+        name === "NotAllowedError" || name === "SecurityError"
+          ? "Camera access needed — please allow camera permissions for this site in your browser settings, then tap Try again."
+          : name === "NotFoundError" || name === "OverconstrainedError"
+            ? "No front camera was found on this device."
+            : name === "NotReadableError"
+              ? "Your camera is being used by another app. Close it and try again."
+              : "We couldn't open your camera on this device. Please try again.",
       );
+      setCamOn(false);
+    } finally {
+      setStarting(false);
     }
   }
+
 
   function capture() {
     const video = videoRef.current;
@@ -198,13 +227,27 @@ function VerifyScreen() {
                     playsInline
                     muted
                     autoPlay
+                    onLoadedMetadata={(e) => {
+                      e.currentTarget.play().catch(() => {});
+                    }}
+                    onPlaying={() => setVideoReady(true)}
                     className="h-full w-full object-cover"
                     style={{ transform: "scaleX(-1)" }}
                   />
+                  {!videoReady && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="h-6 w-6 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                    </div>
+                  )}
                   <div className="absolute inset-x-0 bottom-0 p-3 text-center text-white text-sm font-medium bg-gradient-to-t from-black/70 to-transparent">
                     {cue}, then capture
                   </div>
                 </>
+              ) : camError ? (
+                <div className="h-full w-full flex flex-col items-center justify-center text-white gap-3 px-6 text-center">
+                  <Camera className="h-10 w-10 text-white/70" />
+                  <p className="text-sm leading-relaxed">{camError}</p>
+                </div>
               ) : (
                 <div className="h-full w-full flex flex-col items-center justify-center text-white/80 gap-3 px-6 text-center">
                   <ScanFace className="h-10 w-10" />
@@ -218,17 +261,23 @@ function VerifyScreen() {
             {!camOn && !shot && (
               <button
                 onClick={startCam}
-                className="w-full rounded-full bg-sky-500 text-white py-3 text-sm font-semibold inline-flex items-center justify-center gap-2"
+                disabled={starting}
+                className="w-full rounded-full bg-sky-500 text-white py-3 text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                <Camera className="h-4 w-4" /> Open camera
+                <Camera className="h-4 w-4" /> {starting ? "Opening camera…" : camError ? "Try again" : "Open camera"}
               </button>
             )}
 
             {camOn && (
-              <button onClick={capture} className="w-full rounded-full bg-sky-500 text-white py-3 text-sm font-semibold">
-                Capture selfie
+              <button
+                onClick={capture}
+                disabled={!videoReady}
+                className="w-full rounded-full bg-sky-500 text-white py-3 text-sm font-semibold disabled:opacity-50"
+              >
+                {videoReady ? "Capture selfie" : "Starting camera…"}
               </button>
             )}
+
 
             {shot && (
               <div className="flex gap-2">
