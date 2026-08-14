@@ -32,6 +32,39 @@ export type Database = {
         }
         Relationships: []
       }
+      badge_catalog: {
+        Row: {
+          active: boolean
+          badge: string
+          created_at: string
+          description: string | null
+          icon: string
+          label: string
+          priority: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          badge: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          label: string
+          priority?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          badge?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          label?: string
+          priority?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blocks: {
         Row: {
           blocked_id: string
@@ -93,21 +126,31 @@ export type Database = {
       }
       chat_groups: {
         Row: {
+          circle_id: string | null
           created_at: string
-          event_id: string
+          event_id: string | null
           id: string
         }
         Insert: {
+          circle_id?: string | null
           created_at?: string
-          event_id: string
+          event_id?: string | null
           id?: string
         }
         Update: {
+          circle_id?: string | null
           created_at?: string
-          event_id?: string
+          event_id?: string | null
           id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "chat_groups_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: true
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "chat_groups_event_id_fkey"
             columns: ["event_id"]
@@ -157,6 +200,71 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      circle_members: {
+        Row: {
+          circle_id: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_members_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      circles: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          invite_code: string
+          name: string
+          photo_path: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          invite_code?: string
+          name: string
+          photo_path?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          invite_code?: string
+          name?: string
+          photo_path?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       content_flags: {
         Row: {
@@ -426,8 +534,10 @@ export type Database = {
       events: {
         Row: {
           auto_cancel_hours: number
+          beginner_friendly: boolean
           boost_weight: number
           category: Database["public"]["Enums"]["event_category"] | null
+          circle_id: string | null
           city: string
           closed_at: string | null
           cohost_id: string | null
@@ -459,8 +569,10 @@ export type Database = {
         }
         Insert: {
           auto_cancel_hours?: number
+          beginner_friendly?: boolean
           boost_weight?: number
           category?: Database["public"]["Enums"]["event_category"] | null
+          circle_id?: string | null
           city: string
           closed_at?: string | null
           cohost_id?: string | null
@@ -492,8 +604,10 @@ export type Database = {
         }
         Update: {
           auto_cancel_hours?: number
+          beginner_friendly?: boolean
           boost_weight?: number
           category?: Database["public"]["Enums"]["event_category"] | null
+          circle_id?: string | null
           city?: string
           closed_at?: string | null
           cohost_id?: string | null
@@ -523,7 +637,15 @@ export type Database = {
           updated_at?: string
           venue_type?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "circles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       home_banners: {
         Row: {
@@ -1507,6 +1629,18 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_list_badge_catalog: {
+        Args: never
+        Returns: {
+          active: boolean
+          awarded: number
+          badge: string
+          description: string
+          icon: string
+          label: string
+          priority: number
+        }[]
+      }
       admin_list_challenges: {
         Args: never
         Returns: {
@@ -1661,6 +1795,17 @@ export type Database = {
           referrals: number
           user_id: string
         }[]
+      }
+      admin_upsert_badge_catalog: {
+        Args: {
+          _active: boolean
+          _badge: string
+          _description: string
+          _icon: string
+          _label: string
+          _priority: number
+        }
+        Returns: undefined
       }
       admin_upsert_challenge: {
         Args: {
