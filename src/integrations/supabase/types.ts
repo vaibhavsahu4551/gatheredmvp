@@ -1930,6 +1930,7 @@ export type Database = {
           week_start: string
         }[]
       }
+      join_circle_by_code: { Args: { _code: string }; Returns: string }
       mark_dm_read: { Args: { _thread: string }; Returns: undefined }
       pride_my_cohost_invites: {
         Args: never
