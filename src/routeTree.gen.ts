@@ -45,6 +45,7 @@ import { Route as AuthenticatedAppProfileIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedAppPrideIndexRouteImport } from './routes/_authenticated/_app/pride.index'
 import { Route as AuthenticatedAppMessagesIndexRouteImport } from './routes/_authenticated/_app/messages.index'
 import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/_app/events.index'
+import { Route as AuthenticatedAppCirclesIndexRouteImport } from './routes/_authenticated/_app/circles.index'
 import { Route as AuthenticatedAppChatIndexRouteImport } from './routes/_authenticated/_app/chat.index'
 import { Route as AuthenticatedAppUUserIdRouteImport } from './routes/_authenticated/_app/u.$userId'
 import { Route as AuthenticatedAppSettingsTermsRouteImport } from './routes/_authenticated/_app/settings.terms'
@@ -255,6 +256,12 @@ const AuthenticatedAppEventsIndexRoute =
     path: '/events/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppCirclesIndexRoute =
+  AuthenticatedAppCirclesIndexRouteImport.update({
+    id: '/circles/',
+    path: '/circles/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppChatIndexRoute =
   AuthenticatedAppChatIndexRouteImport.update({
     id: '/chat/',
@@ -415,6 +422,7 @@ export interface FileRoutesByFullPath {
   '/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/chat/': typeof AuthenticatedAppChatIndexRoute
+  '/circles/': typeof AuthenticatedAppCirclesIndexRoute
   '/events/': typeof AuthenticatedAppEventsIndexRoute
   '/messages/': typeof AuthenticatedAppMessagesIndexRoute
   '/pride/': typeof AuthenticatedAppPrideIndexRoute
@@ -469,6 +477,7 @@ export interface FileRoutesByTo {
   '/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/chat': typeof AuthenticatedAppChatIndexRoute
+  '/circles': typeof AuthenticatedAppCirclesIndexRoute
   '/events': typeof AuthenticatedAppEventsIndexRoute
   '/messages': typeof AuthenticatedAppMessagesIndexRoute
   '/pride': typeof AuthenticatedAppPrideIndexRoute
@@ -527,6 +536,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/_authenticated/_app/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/_authenticated/_app/chat/': typeof AuthenticatedAppChatIndexRoute
+  '/_authenticated/_app/circles/': typeof AuthenticatedAppCirclesIndexRoute
   '/_authenticated/_app/events/': typeof AuthenticatedAppEventsIndexRoute
   '/_authenticated/_app/messages/': typeof AuthenticatedAppMessagesIndexRoute
   '/_authenticated/_app/pride/': typeof AuthenticatedAppPrideIndexRoute
@@ -584,6 +594,7 @@ export interface FileRouteTypes {
     | '/settings/terms'
     | '/u/$userId'
     | '/chat/'
+    | '/circles/'
     | '/events/'
     | '/messages/'
     | '/pride/'
@@ -638,6 +649,7 @@ export interface FileRouteTypes {
     | '/settings/terms'
     | '/u/$userId'
     | '/chat'
+    | '/circles'
     | '/events'
     | '/messages'
     | '/pride'
@@ -695,6 +707,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/settings/terms'
     | '/_authenticated/_app/u/$userId'
     | '/_authenticated/_app/chat/'
+    | '/_authenticated/_app/circles/'
     | '/_authenticated/_app/events/'
     | '/_authenticated/_app/messages/'
     | '/_authenticated/_app/pride/'
@@ -970,6 +983,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppEventsIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/circles/': {
+      id: '/_authenticated/_app/circles/'
+      path: '/circles'
+      fullPath: '/circles/'
+      preLoaderRoute: typeof AuthenticatedAppCirclesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/chat/': {
       id: '/_authenticated/_app/chat/'
       path: '/chat'
@@ -1133,6 +1153,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppSettingsTermsRoute: typeof AuthenticatedAppSettingsTermsRoute
   AuthenticatedAppUUserIdRoute: typeof AuthenticatedAppUUserIdRoute
   AuthenticatedAppChatIndexRoute: typeof AuthenticatedAppChatIndexRoute
+  AuthenticatedAppCirclesIndexRoute: typeof AuthenticatedAppCirclesIndexRoute
   AuthenticatedAppEventsIndexRoute: typeof AuthenticatedAppEventsIndexRoute
   AuthenticatedAppMessagesIndexRoute: typeof AuthenticatedAppMessagesIndexRoute
   AuthenticatedAppPrideIndexRoute: typeof AuthenticatedAppPrideIndexRoute
@@ -1171,6 +1192,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppSettingsTermsRoute: AuthenticatedAppSettingsTermsRoute,
   AuthenticatedAppUUserIdRoute: AuthenticatedAppUUserIdRoute,
   AuthenticatedAppChatIndexRoute: AuthenticatedAppChatIndexRoute,
+  AuthenticatedAppCirclesIndexRoute: AuthenticatedAppCirclesIndexRoute,
   AuthenticatedAppEventsIndexRoute: AuthenticatedAppEventsIndexRoute,
   AuthenticatedAppMessagesIndexRoute: AuthenticatedAppMessagesIndexRoute,
   AuthenticatedAppPrideIndexRoute: AuthenticatedAppPrideIndexRoute,
