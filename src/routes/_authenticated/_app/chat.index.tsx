@@ -4,8 +4,9 @@ import { listMyThreads } from "@/lib/dm";
 import { listMyGroups } from "@/lib/chat";
 import { getProfilesLite } from "@/lib/events";
 import { Avatar } from "@/components/Avatar";
-import { MessageCircle, Users } from "lucide-react";
+import { MessageCircle, Users, Plus } from "lucide-react";
 import { useDmUnread } from "@/hooks/useDmUnread";
+import { listMyCircles, type CircleWithMeta } from "@/lib/circles";
 
 export const Route = createFileRoute("/_authenticated/_app/chat/")({
   component: Chat,

@@ -66,6 +66,7 @@ import { Route as AuthenticatedAppCirclesCircleIdRouteImport } from './routes/_a
 import { Route as AuthenticatedAppChatGroupIdRouteImport } from './routes/_authenticated/_app/chat.$groupId'
 import { Route as AuthenticatedAppEventsEventIdIndexRouteImport } from './routes/_authenticated/_app/events.$eventId.index'
 import { Route as AuthenticatedAppEventsEventIdEditRouteImport } from './routes/_authenticated/_app/events.$eventId.edit'
+import { Route as AuthenticatedAppCirclesJoinCodeRouteImport } from './routes/_authenticated/_app/circles.join.$code'
 
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
@@ -382,6 +383,12 @@ const AuthenticatedAppEventsEventIdEditRoute =
     path: '/events/$eventId/edit',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppCirclesJoinCodeRoute =
+  AuthenticatedAppCirclesJoinCodeRouteImport.update({
+    id: '/circles/join/$code',
+    path: '/circles/join/$code',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -437,6 +444,7 @@ export interface FileRoutesByFullPath {
   '/profile/': typeof AuthenticatedAppProfileIndexRoute
   '/rewards/': typeof AuthenticatedAppRewardsIndexRoute
   '/settings/': typeof AuthenticatedAppSettingsIndexRoute
+  '/circles/join/$code': typeof AuthenticatedAppCirclesJoinCodeRoute
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
 }
@@ -493,6 +501,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedAppProfileIndexRoute
   '/rewards': typeof AuthenticatedAppRewardsIndexRoute
   '/settings': typeof AuthenticatedAppSettingsIndexRoute
+  '/circles/join/$code': typeof AuthenticatedAppCirclesJoinCodeRoute
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/events/$eventId': typeof AuthenticatedAppEventsEventIdIndexRoute
 }
@@ -553,6 +562,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/profile/': typeof AuthenticatedAppProfileIndexRoute
   '/_authenticated/_app/rewards/': typeof AuthenticatedAppRewardsIndexRoute
   '/_authenticated/_app/settings/': typeof AuthenticatedAppSettingsIndexRoute
+  '/_authenticated/_app/circles/join/$code': typeof AuthenticatedAppCirclesJoinCodeRoute
   '/_authenticated/_app/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/_authenticated/_app/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
 }
@@ -612,6 +622,7 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/rewards/'
     | '/settings/'
+    | '/circles/join/$code'
     | '/events/$eventId/edit'
     | '/events/$eventId/'
   fileRoutesByTo: FileRoutesByTo
@@ -668,6 +679,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/rewards'
     | '/settings'
+    | '/circles/join/$code'
     | '/events/$eventId/edit'
     | '/events/$eventId'
   id:
@@ -727,6 +739,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/profile/'
     | '/_authenticated/_app/rewards/'
     | '/_authenticated/_app/settings/'
+    | '/_authenticated/_app/circles/join/$code'
     | '/_authenticated/_app/events/$eventId/edit'
     | '/_authenticated/_app/events/$eventId/'
   fileRoutesById: FileRoutesById
@@ -1143,6 +1156,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppEventsEventIdEditRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/circles/join/$code': {
+      id: '/_authenticated/_app/circles/join/$code'
+      path: '/circles/join/$code'
+      fullPath: '/circles/join/$code'
+      preLoaderRoute: typeof AuthenticatedAppCirclesJoinCodeRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
   }
 }
 
@@ -1181,6 +1201,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppProfileIndexRoute: typeof AuthenticatedAppProfileIndexRoute
   AuthenticatedAppRewardsIndexRoute: typeof AuthenticatedAppRewardsIndexRoute
   AuthenticatedAppSettingsIndexRoute: typeof AuthenticatedAppSettingsIndexRoute
+  AuthenticatedAppCirclesJoinCodeRoute: typeof AuthenticatedAppCirclesJoinCodeRoute
   AuthenticatedAppEventsEventIdEditRoute: typeof AuthenticatedAppEventsEventIdEditRoute
   AuthenticatedAppEventsEventIdIndexRoute: typeof AuthenticatedAppEventsEventIdIndexRoute
 }
@@ -1221,6 +1242,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppProfileIndexRoute: AuthenticatedAppProfileIndexRoute,
   AuthenticatedAppRewardsIndexRoute: AuthenticatedAppRewardsIndexRoute,
   AuthenticatedAppSettingsIndexRoute: AuthenticatedAppSettingsIndexRoute,
+  AuthenticatedAppCirclesJoinCodeRoute: AuthenticatedAppCirclesJoinCodeRoute,
   AuthenticatedAppEventsEventIdEditRoute:
     AuthenticatedAppEventsEventIdEditRoute,
   AuthenticatedAppEventsEventIdIndexRoute:
