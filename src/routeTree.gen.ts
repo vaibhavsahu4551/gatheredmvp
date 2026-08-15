@@ -45,6 +45,7 @@ import { Route as AuthenticatedAppProfileIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedAppPrideIndexRouteImport } from './routes/_authenticated/_app/pride.index'
 import { Route as AuthenticatedAppMessagesIndexRouteImport } from './routes/_authenticated/_app/messages.index'
 import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/_app/events.index'
+import { Route as AuthenticatedAppCirclesIndexRouteImport } from './routes/_authenticated/_app/circles.index'
 import { Route as AuthenticatedAppChatIndexRouteImport } from './routes/_authenticated/_app/chat.index'
 import { Route as AuthenticatedAppUUserIdRouteImport } from './routes/_authenticated/_app/u.$userId'
 import { Route as AuthenticatedAppSettingsTermsRouteImport } from './routes/_authenticated/_app/settings.terms'
@@ -61,9 +62,11 @@ import { Route as AuthenticatedAppPrideNotificationsRouteImport } from './routes
 import { Route as AuthenticatedAppPrideGuidelinesRouteImport } from './routes/_authenticated/_app/pride.guidelines'
 import { Route as AuthenticatedAppPostsPostIdRouteImport } from './routes/_authenticated/_app/posts.$postId'
 import { Route as AuthenticatedAppMessagesThreadIdRouteImport } from './routes/_authenticated/_app/messages.$threadId'
+import { Route as AuthenticatedAppCirclesCircleIdRouteImport } from './routes/_authenticated/_app/circles.$circleId'
 import { Route as AuthenticatedAppChatGroupIdRouteImport } from './routes/_authenticated/_app/chat.$groupId'
 import { Route as AuthenticatedAppEventsEventIdIndexRouteImport } from './routes/_authenticated/_app/events.$eventId.index'
 import { Route as AuthenticatedAppEventsEventIdEditRouteImport } from './routes/_authenticated/_app/events.$eventId.edit'
+import { Route as AuthenticatedAppCirclesJoinCodeRouteImport } from './routes/_authenticated/_app/circles.join.$code'
 
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
@@ -255,6 +258,12 @@ const AuthenticatedAppEventsIndexRoute =
     path: '/events/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppCirclesIndexRoute =
+  AuthenticatedAppCirclesIndexRouteImport.update({
+    id: '/circles/',
+    path: '/circles/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppChatIndexRoute =
   AuthenticatedAppChatIndexRouteImport.update({
     id: '/chat/',
@@ -350,6 +359,12 @@ const AuthenticatedAppMessagesThreadIdRoute =
     path: '/messages/$threadId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppCirclesCircleIdRoute =
+  AuthenticatedAppCirclesCircleIdRouteImport.update({
+    id: '/circles/$circleId',
+    path: '/circles/$circleId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppChatGroupIdRoute =
   AuthenticatedAppChatGroupIdRouteImport.update({
     id: '/chat/$groupId',
@@ -366,6 +381,12 @@ const AuthenticatedAppEventsEventIdEditRoute =
   AuthenticatedAppEventsEventIdEditRouteImport.update({
     id: '/events/$eventId/edit',
     path: '/events/$eventId/edit',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppCirclesJoinCodeRoute =
+  AuthenticatedAppCirclesJoinCodeRouteImport.update({
+    id: '/circles/join/$code',
+    path: '/circles/join/$code',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 
@@ -399,6 +420,7 @@ export interface FileRoutesByFullPath {
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/api/public/send-push': typeof ApiPublicSendPushRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
+  '/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
@@ -415,12 +437,14 @@ export interface FileRoutesByFullPath {
   '/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/chat/': typeof AuthenticatedAppChatIndexRoute
+  '/circles/': typeof AuthenticatedAppCirclesIndexRoute
   '/events/': typeof AuthenticatedAppEventsIndexRoute
   '/messages/': typeof AuthenticatedAppMessagesIndexRoute
   '/pride/': typeof AuthenticatedAppPrideIndexRoute
   '/profile/': typeof AuthenticatedAppProfileIndexRoute
   '/rewards/': typeof AuthenticatedAppRewardsIndexRoute
   '/settings/': typeof AuthenticatedAppSettingsIndexRoute
+  '/circles/join/$code': typeof AuthenticatedAppCirclesJoinCodeRoute
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
 }
@@ -453,6 +477,7 @@ export interface FileRoutesByTo {
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/api/public/send-push': typeof ApiPublicSendPushRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
+  '/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
@@ -469,12 +494,14 @@ export interface FileRoutesByTo {
   '/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/chat': typeof AuthenticatedAppChatIndexRoute
+  '/circles': typeof AuthenticatedAppCirclesIndexRoute
   '/events': typeof AuthenticatedAppEventsIndexRoute
   '/messages': typeof AuthenticatedAppMessagesIndexRoute
   '/pride': typeof AuthenticatedAppPrideIndexRoute
   '/profile': typeof AuthenticatedAppProfileIndexRoute
   '/rewards': typeof AuthenticatedAppRewardsIndexRoute
   '/settings': typeof AuthenticatedAppSettingsIndexRoute
+  '/circles/join/$code': typeof AuthenticatedAppCirclesJoinCodeRoute
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/events/$eventId': typeof AuthenticatedAppEventsEventIdIndexRoute
 }
@@ -511,6 +538,7 @@ export interface FileRoutesById {
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/api/public/send-push': typeof ApiPublicSendPushRoute
   '/_authenticated/_app/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
+  '/_authenticated/_app/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/_authenticated/_app/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
   '/_authenticated/_app/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/_authenticated/_app/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
@@ -527,12 +555,14 @@ export interface FileRoutesById {
   '/_authenticated/_app/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/_authenticated/_app/u/$userId': typeof AuthenticatedAppUUserIdRoute
   '/_authenticated/_app/chat/': typeof AuthenticatedAppChatIndexRoute
+  '/_authenticated/_app/circles/': typeof AuthenticatedAppCirclesIndexRoute
   '/_authenticated/_app/events/': typeof AuthenticatedAppEventsIndexRoute
   '/_authenticated/_app/messages/': typeof AuthenticatedAppMessagesIndexRoute
   '/_authenticated/_app/pride/': typeof AuthenticatedAppPrideIndexRoute
   '/_authenticated/_app/profile/': typeof AuthenticatedAppProfileIndexRoute
   '/_authenticated/_app/rewards/': typeof AuthenticatedAppRewardsIndexRoute
   '/_authenticated/_app/settings/': typeof AuthenticatedAppSettingsIndexRoute
+  '/_authenticated/_app/circles/join/$code': typeof AuthenticatedAppCirclesJoinCodeRoute
   '/_authenticated/_app/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/_authenticated/_app/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
 }
@@ -568,6 +598,7 @@ export interface FileRouteTypes {
     | '/api/public/razorpay-webhook'
     | '/api/public/send-push'
     | '/chat/$groupId'
+    | '/circles/$circleId'
     | '/messages/$threadId'
     | '/posts/$postId'
     | '/pride/guidelines'
@@ -584,12 +615,14 @@ export interface FileRouteTypes {
     | '/settings/terms'
     | '/u/$userId'
     | '/chat/'
+    | '/circles/'
     | '/events/'
     | '/messages/'
     | '/pride/'
     | '/profile/'
     | '/rewards/'
     | '/settings/'
+    | '/circles/join/$code'
     | '/events/$eventId/edit'
     | '/events/$eventId/'
   fileRoutesByTo: FileRoutesByTo
@@ -622,6 +655,7 @@ export interface FileRouteTypes {
     | '/api/public/razorpay-webhook'
     | '/api/public/send-push'
     | '/chat/$groupId'
+    | '/circles/$circleId'
     | '/messages/$threadId'
     | '/posts/$postId'
     | '/pride/guidelines'
@@ -638,12 +672,14 @@ export interface FileRouteTypes {
     | '/settings/terms'
     | '/u/$userId'
     | '/chat'
+    | '/circles'
     | '/events'
     | '/messages'
     | '/pride'
     | '/profile'
     | '/rewards'
     | '/settings'
+    | '/circles/join/$code'
     | '/events/$eventId/edit'
     | '/events/$eventId'
   id:
@@ -679,6 +715,7 @@ export interface FileRouteTypes {
     | '/api/public/razorpay-webhook'
     | '/api/public/send-push'
     | '/_authenticated/_app/chat/$groupId'
+    | '/_authenticated/_app/circles/$circleId'
     | '/_authenticated/_app/messages/$threadId'
     | '/_authenticated/_app/posts/$postId'
     | '/_authenticated/_app/pride/guidelines'
@@ -695,12 +732,14 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/settings/terms'
     | '/_authenticated/_app/u/$userId'
     | '/_authenticated/_app/chat/'
+    | '/_authenticated/_app/circles/'
     | '/_authenticated/_app/events/'
     | '/_authenticated/_app/messages/'
     | '/_authenticated/_app/pride/'
     | '/_authenticated/_app/profile/'
     | '/_authenticated/_app/rewards/'
     | '/_authenticated/_app/settings/'
+    | '/_authenticated/_app/circles/join/$code'
     | '/_authenticated/_app/events/$eventId/edit'
     | '/_authenticated/_app/events/$eventId/'
   fileRoutesById: FileRoutesById
@@ -970,6 +1009,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppEventsIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/circles/': {
+      id: '/_authenticated/_app/circles/'
+      path: '/circles'
+      fullPath: '/circles/'
+      preLoaderRoute: typeof AuthenticatedAppCirclesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/chat/': {
       id: '/_authenticated/_app/chat/'
       path: '/chat'
@@ -1082,6 +1128,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppMessagesThreadIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/circles/$circleId': {
+      id: '/_authenticated/_app/circles/$circleId'
+      path: '/circles/$circleId'
+      fullPath: '/circles/$circleId'
+      preLoaderRoute: typeof AuthenticatedAppCirclesCircleIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/chat/$groupId': {
       id: '/_authenticated/_app/chat/$groupId'
       path: '/chat/$groupId'
@@ -1103,6 +1156,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppEventsEventIdEditRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/circles/join/$code': {
+      id: '/_authenticated/_app/circles/join/$code'
+      path: '/circles/join/$code'
+      fullPath: '/circles/join/$code'
+      preLoaderRoute: typeof AuthenticatedAppCirclesJoinCodeRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
   }
 }
 
@@ -1117,6 +1177,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppSubscriptionRoute: typeof AuthenticatedAppSubscriptionRoute
   AuthenticatedAppVerifyRoute: typeof AuthenticatedAppVerifyRoute
   AuthenticatedAppChatGroupIdRoute: typeof AuthenticatedAppChatGroupIdRoute
+  AuthenticatedAppCirclesCircleIdRoute: typeof AuthenticatedAppCirclesCircleIdRoute
   AuthenticatedAppMessagesThreadIdRoute: typeof AuthenticatedAppMessagesThreadIdRoute
   AuthenticatedAppPostsPostIdRoute: typeof AuthenticatedAppPostsPostIdRoute
   AuthenticatedAppPrideGuidelinesRoute: typeof AuthenticatedAppPrideGuidelinesRoute
@@ -1133,12 +1194,14 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppSettingsTermsRoute: typeof AuthenticatedAppSettingsTermsRoute
   AuthenticatedAppUUserIdRoute: typeof AuthenticatedAppUUserIdRoute
   AuthenticatedAppChatIndexRoute: typeof AuthenticatedAppChatIndexRoute
+  AuthenticatedAppCirclesIndexRoute: typeof AuthenticatedAppCirclesIndexRoute
   AuthenticatedAppEventsIndexRoute: typeof AuthenticatedAppEventsIndexRoute
   AuthenticatedAppMessagesIndexRoute: typeof AuthenticatedAppMessagesIndexRoute
   AuthenticatedAppPrideIndexRoute: typeof AuthenticatedAppPrideIndexRoute
   AuthenticatedAppProfileIndexRoute: typeof AuthenticatedAppProfileIndexRoute
   AuthenticatedAppRewardsIndexRoute: typeof AuthenticatedAppRewardsIndexRoute
   AuthenticatedAppSettingsIndexRoute: typeof AuthenticatedAppSettingsIndexRoute
+  AuthenticatedAppCirclesJoinCodeRoute: typeof AuthenticatedAppCirclesJoinCodeRoute
   AuthenticatedAppEventsEventIdEditRoute: typeof AuthenticatedAppEventsEventIdEditRoute
   AuthenticatedAppEventsEventIdIndexRoute: typeof AuthenticatedAppEventsEventIdIndexRoute
 }
@@ -1154,6 +1217,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppSubscriptionRoute: AuthenticatedAppSubscriptionRoute,
   AuthenticatedAppVerifyRoute: AuthenticatedAppVerifyRoute,
   AuthenticatedAppChatGroupIdRoute: AuthenticatedAppChatGroupIdRoute,
+  AuthenticatedAppCirclesCircleIdRoute: AuthenticatedAppCirclesCircleIdRoute,
   AuthenticatedAppMessagesThreadIdRoute: AuthenticatedAppMessagesThreadIdRoute,
   AuthenticatedAppPostsPostIdRoute: AuthenticatedAppPostsPostIdRoute,
   AuthenticatedAppPrideGuidelinesRoute: AuthenticatedAppPrideGuidelinesRoute,
@@ -1171,12 +1235,14 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppSettingsTermsRoute: AuthenticatedAppSettingsTermsRoute,
   AuthenticatedAppUUserIdRoute: AuthenticatedAppUUserIdRoute,
   AuthenticatedAppChatIndexRoute: AuthenticatedAppChatIndexRoute,
+  AuthenticatedAppCirclesIndexRoute: AuthenticatedAppCirclesIndexRoute,
   AuthenticatedAppEventsIndexRoute: AuthenticatedAppEventsIndexRoute,
   AuthenticatedAppMessagesIndexRoute: AuthenticatedAppMessagesIndexRoute,
   AuthenticatedAppPrideIndexRoute: AuthenticatedAppPrideIndexRoute,
   AuthenticatedAppProfileIndexRoute: AuthenticatedAppProfileIndexRoute,
   AuthenticatedAppRewardsIndexRoute: AuthenticatedAppRewardsIndexRoute,
   AuthenticatedAppSettingsIndexRoute: AuthenticatedAppSettingsIndexRoute,
+  AuthenticatedAppCirclesJoinCodeRoute: AuthenticatedAppCirclesJoinCodeRoute,
   AuthenticatedAppEventsEventIdEditRoute:
     AuthenticatedAppEventsEventIdEditRoute,
   AuthenticatedAppEventsEventIdIndexRoute:
