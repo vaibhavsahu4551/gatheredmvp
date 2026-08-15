@@ -18,14 +18,20 @@ function Chat() {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [names, setNames] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [groups, setGroups] = useState<any[]>([]);
+  const [circles, setCircles] = useState<CircleWithMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const { map: unread } = useDmUnread();
 
   useEffect(() => {
     (async () => {
-      const [t, g] = await Promise.all([listMyThreads() as Promise<Thread[]>, listMyGroups()]);
+      const [t, g, c] = await Promise.all([
+        listMyThreads() as Promise<Thread[]>,
+        listMyGroups(),
+        listMyCircles().catch(() => [] as CircleWithMeta[]),
+      ]);
       setThreads(t);
-      setGroups(g);
+      setCircles(c);
+      setGroups(g.filter((x: any) => !!x.event_id));
       if (t.length) setNames((await getProfilesLite(t.map((x) => x.other_id))) as any);
       setLoading(false);
     })();
