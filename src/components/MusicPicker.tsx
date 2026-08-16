@@ -26,9 +26,17 @@ export function MusicPicker({
   const [duration, setDuration] = useState(0);
   const [start, setStart] = useState(0); // seconds
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const results = searchTracks(q);
+  const [library, setLibrary] = useState<Track[]>(MUSIC_LIBRARY);
+  const results = searchTracks(q, library);
+
+  useEffect(() => {
+    let alive = true;
+    fetchTracks().then((t) => alive && setLibrary(t)).catch(() => {});
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => () => { audioRef.current?.pause(); }, []);
+
 
   function preview(track: Track, from = 0) {
     const a = audioRef.current ?? new Audio();
