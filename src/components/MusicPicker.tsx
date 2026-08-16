@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Play, Pause, Search, X, Check } from "lucide-react";
-import { MUSIC_CLIP_MS, searchTracks, type Track } from "@/lib/music";
+import { MUSIC_CLIP_MS, MUSIC_LIBRARY, fetchTracks, searchTracks, type Track } from "@/lib/music";
+
 
 export type MusicChoice = {
   title: string;
