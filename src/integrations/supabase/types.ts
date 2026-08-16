@@ -17,16 +17,22 @@ export type Database = {
       app_settings: {
         Row: {
           id: number
+          maintenance_enabled: boolean
+          maintenance_message: string | null
           subscription_enabled: boolean
           updated_at: string
         }
         Insert: {
           id?: number
+          maintenance_enabled?: boolean
+          maintenance_message?: string | null
           subscription_enabled?: boolean
           updated_at?: string
         }
         Update: {
           id?: number
+          maintenance_enabled?: boolean
+          maintenance_message?: string | null
           subscription_enabled?: boolean
           updated_at?: string
         }
@@ -742,6 +748,48 @@ export type Database = {
           body?: string
           created_at?: string
           id?: string
+        }
+        Relationships: []
+      }
+      music_tracks: {
+        Row: {
+          active: boolean
+          artist: string
+          attribution: string | null
+          category: string
+          created_at: string
+          id: string
+          license: string
+          storage_path: string | null
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          active?: boolean
+          artist: string
+          attribution?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          license?: string
+          storage_path?: string | null
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          active?: boolean
+          artist?: string
+          attribution?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          license?: string
+          storage_path?: string | null
+          title?: string
+          updated_at?: string
+          url?: string
         }
         Relationships: []
       }
@@ -1595,6 +1643,7 @@ export type Database = {
         Returns: undefined
       }
       admin_delete_post: { Args: { _id: string }; Returns: undefined }
+      admin_delete_story: { Args: { _story: string }; Returns: undefined }
       admin_get_user: {
         Args: { _user: string }
         Returns: {
@@ -1711,6 +1760,33 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_list_referrals: {
+        Args: { _search?: string }
+        Returns: {
+          awarded_at: string
+          onboarded: boolean
+          referred_id: string
+          referred_name: string
+          referrer_id: string
+          referrer_name: string
+          signed_up_at: string
+        }[]
+      }
+      admin_list_stories: {
+        Args: { _search?: string }
+        Returns: {
+          author_name: string
+          created_at: string
+          expires_at: string
+          id: string
+          media_path: string
+          media_type: string
+          reports: number
+          text_overlay: string
+          user_id: string
+          views: number
+        }[]
+      }
       admin_list_users: {
         Args: { _search?: string }
         Returns: {
@@ -1743,6 +1819,24 @@ export type Database = {
           issued_this_month: number
           spent_this_month: number
           total_balance: number
+        }[]
+      }
+      admin_referral_leaderboard: {
+        Args: { _scope?: string }
+        Returns: {
+          converted: number
+          name: string
+          referrals: number
+          user_id: string
+        }[]
+      }
+      admin_referral_stats: {
+        Args: never
+        Returns: {
+          converted: number
+          referrers: number
+          this_month: number
+          total: number
         }[]
       }
       admin_resolve_flag: {
