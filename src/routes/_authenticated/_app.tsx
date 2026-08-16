@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Home, Calendar, Plus, MessageCircle, User, Sparkles } from "lucide-react";
 import { useDmUnread } from "@/hooks/useDmUnread";
 import { enablePush, pushAsked, pushDeclined } from "@/lib/push";
+import { useMaintenance } from "@/hooks/useMaintenance";
+import { MaintenanceScreen } from "@/components/MaintenanceScreen";
 
 export const Route = createFileRoute("/_authenticated/_app")({
   component: AppShell,
@@ -16,6 +18,8 @@ function AppShell() {
   const [ready, setReady] = useState(false);
   const [pride, setPride] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const maintenance = useMaintenance();
+
 
   useEffect(() => {
     loadMe()

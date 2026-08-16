@@ -46,13 +46,36 @@ export const MUSIC_LIBRARY: Track[] = [
 
 export const MUSIC_CLIP_MS = 15_000;
 
-export function searchTracks(q: string): Track[] {
+export function searchTracks(q: string, library: Track[] = MUSIC_LIBRARY): Track[] {
   const s = q.trim().toLowerCase();
-  if (!s) return MUSIC_LIBRARY;
-  return MUSIC_LIBRARY.filter(
+  if (!s) return library;
+  return library.filter(
     (x) =>
       x.title.toLowerCase().includes(s) ||
       x.mood.toLowerCase().includes(s) ||
       x.artist.toLowerCase().includes(s),
   );
 }
+
+/**
+ * Live library, managed by admins in the admin panel (Music Library).
+ * Falls back to the bundled curated list if the table can't be read.
+ */
+export async function fetchTracks(): Promise<Track[]> {
+  const { supabase } = await import("@/integrations/supabase/client");
+  const { data, error } = await (supabase as any)
+    .from("music_tracks")
+    .select("id, title, artist, category, attribution, url, active")
+    .eq("active", true)
+    .order("title");
+  if (error || !data?.length) return MUSIC_LIBRARY;
+  return (data as any[]).map((r) => ({
+    id: r.id as string,
+    title: r.title as string,
+    artist: r.artist as string,
+    url: r.url as string,
+    attribution: (r.attribution as string) ?? `"${r.title}" by ${r.artist}`,
+    mood: (r.category as string) ?? "Other",
+  }));
+}
+

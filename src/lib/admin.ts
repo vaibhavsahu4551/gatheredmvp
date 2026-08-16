@@ -17,15 +17,23 @@ export async function isCurrentUserAdmin(): Promise<boolean> {
 }
 
 
-export type AppSettings = { subscription_enabled: boolean };
+export type AppSettings = {
+  subscription_enabled: boolean;
+  maintenance_enabled: boolean;
+  maintenance_message: string | null;
+};
 
 export async function getAppSettings(): Promise<AppSettings> {
   const { data } = await supabase
     .from("app_settings" as any)
-    .select("subscription_enabled")
+    .select("subscription_enabled, maintenance_enabled, maintenance_message")
     .eq("id", 1)
     .maybeSingle();
-  return { subscription_enabled: !!(data as any)?.subscription_enabled };
+  return {
+    subscription_enabled: !!(data as any)?.subscription_enabled,
+    maintenance_enabled: !!(data as any)?.maintenance_enabled,
+    maintenance_message: ((data as any)?.maintenance_message as string) ?? null,
+  };
 }
 
 let _settingsCache: Promise<AppSettings> | null = null;
@@ -33,7 +41,11 @@ let _settingsCache: Promise<AppSettings> | null = null;
 /** Cached app settings (admin master switches). Cheap for render-path checks. */
 export function getAppSettingsCached(): Promise<AppSettings> {
   if (!_settingsCache) {
-    _settingsCache = getAppSettings().catch(() => ({ subscription_enabled: false }));
+    _settingsCache = getAppSettings().catch(() => ({
+      subscription_enabled: false,
+      maintenance_enabled: false,
+      maintenance_message: null,
+    }));
   }
   return _settingsCache;
 }
@@ -50,6 +62,19 @@ export async function setSubscriptionEnabled(enabled: boolean) {
     .eq("id", 1);
   if (error) throw error;
 }
+
+export const DEFAULT_MAINTENANCE_MESSAGE =
+  "We'll be back soon — Gathr is undergoing scheduled maintenance.";
+
+export async function setMaintenance(patch: { enabled?: boolean; message?: string | null }) {
+  clearAppSettingsCache();
+  const body: any = { updated_at: new Date().toISOString() };
+  if (patch.enabled !== undefined) body.maintenance_enabled = patch.enabled;
+  if (patch.message !== undefined) body.maintenance_message = patch.message;
+  const { error } = await supabase.from("app_settings" as any).update(body).eq("id", 1);
+  if (error) throw error;
+}
+
 
 export type HomeBanner = {
   id: string;
