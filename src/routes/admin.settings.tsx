@@ -43,6 +43,36 @@ function AdminSettings() {
         </div>
       </section>
 
+      <section className="rounded-xl border border-border p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="font-medium">Maintenance mode</div>
+            <div className="text-xs text-muted-foreground">Blocks all non-admin users with a full-screen notice. Admins keep full access.</div>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" checked={maintEnabled} onChange={(e) => toggleMaint(e.target.checked)} className="sr-only peer" />
+            <div className="w-11 h-6 bg-muted rounded-full peer-checked:bg-foreground transition after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:h-5 after:w-5 after:bg-background after:rounded-full after:transition peer-checked:after:translate-x-5" />
+          </label>
+        </div>
+        <label className="block text-xs">Custom message
+          <textarea rows={2} value={maintMessage} onChange={(e) => setMaintMessage(e.target.value)}
+            placeholder={DEFAULT_MAINTENANCE_MESSAGE}
+            className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
+        </label>
+        <div className="flex gap-2">
+          <button onClick={saveMessage} className="rounded-lg bg-foreground text-background px-3 py-2 text-sm">Save message</button>
+          <button onClick={() => setPreview(true)} className="rounded-lg border border-border px-3 py-2 text-sm">Preview screen</button>
+        </div>
+        {maintEnabled && <div className="text-xs text-destructive">Maintenance mode is currently ON for all non-admin users.</div>}
+      </section>
+
+      {preview && (
+        <div className="fixed inset-0 z-50 bg-background">
+          <MaintenanceScreen message={maintMessage} />
+          <button onClick={() => setPreview(false)} className="absolute top-4 right-4 rounded-lg border border-border bg-background px-3 py-2 text-sm">Close preview</button>
+        </div>
+      )}
+
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Home banner</h2>
