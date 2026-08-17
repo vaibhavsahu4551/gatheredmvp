@@ -12,16 +12,34 @@ function AdminSettings() {
   const [subEnabled, setSubEnabled] = useState(false);
   const [banners, setBanners] = useState<HomeBanner[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [maintEnabled, setMaintEnabled] = useState(false);
+  const [maintMessage, setMaintMessage] = useState("");
+  const [preview, setPreview] = useState(false);
 
   async function refresh() {
     const s = await getAppSettings();
     setSubEnabled(s.subscription_enabled);
+    setMaintEnabled(s.maintenance_enabled);
+    setMaintMessage(s.maintenance_message ?? "");
     setBanners(await listBanners());
   }
   useEffect(() => { refresh(); }, []);
 
   async function toggleSub(v: boolean) {
     try { await setSubscriptionEnabled(v); setSubEnabled(v); toast.success(v ? "Premium features ON" : "Premium features OFF"); }
+    catch (e: any) { toast.error(e.message); }
+  }
+
+  async function toggleMaint(v: boolean) {
+    try {
+      await setMaintenance({ enabled: v, message: maintMessage.trim() || null });
+      setMaintEnabled(v);
+      toast.success(v ? "Maintenance mode ON" : "Maintenance mode OFF");
+    } catch (e: any) { toast.error(e.message); }
+  }
+
+  async function saveMessage() {
+    try { await setMaintenance({ message: maintMessage.trim() || null }); toast.success("Message saved"); }
     catch (e: any) { toast.error(e.message); }
   }
 
