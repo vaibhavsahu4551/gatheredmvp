@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { adminListReports, updateReportStatus, adminDeletePost, adminDeleteEvent, suspendUser, type AdminReport } from "@/lib/admin";
+import { adminDeleteStory } from "@/lib/admin-content";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
