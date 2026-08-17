@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { adminListReports, updateReportStatus, adminDeletePost, adminDeleteEvent, suspendUser, type AdminReport } from "@/lib/admin";
+import { adminDeleteStory } from "@/lib/admin-content";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -120,6 +121,7 @@ function ReportDrawer({ report, onClose, onChanged }: { report: AdminReport; onC
     try {
       if (report.target_type === "post") await adminDeletePost(report.target_id);
       else if (report.target_type === "event") await adminDeleteEvent(report.target_id);
+      else if (report.target_type === "story") await adminDeleteStory(report.target_id);
       await updateReportStatus(report.id, "actioned", "Content removed");
       toast.success("Content removed");
       onChanged(); onClose();
@@ -162,7 +164,10 @@ function ReportDrawer({ report, onClose, onChanged }: { report: AdminReport; onC
           )}
         </div>
         <div className="flex flex-wrap gap-2">
-          {(report.target_type === "post" || report.target_type === "event") && (
+          {report.target_type === "story" && (
+            <Link to="/admin/stories" className="rounded-lg border border-border px-3 py-2 text-sm">Open Stories</Link>
+          )}
+          {(report.target_type === "post" || report.target_type === "event" || report.target_type === "story") && (
             <button disabled={busy} onClick={removeContent} className="rounded-lg bg-destructive text-destructive-foreground px-3 py-2 text-sm">Remove content</button>
           )}
           {report.target_type === "user" && (

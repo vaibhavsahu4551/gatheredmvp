@@ -18,11 +18,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminVerificationRouteImport } from './routes/admin.verification'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminStoriesRouteImport } from './routes/admin.stories'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
 import { Route as AdminRevenueRouteImport } from './routes/admin.revenue'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
 import { Route as AdminPostsRouteImport } from './routes/admin.posts'
+import { Route as AdminMusicRouteImport } from './routes/admin.music'
 import { Route as AdminFlaggedRouteImport } from './routes/admin.flagged'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminEngagementRouteImport } from './routes/admin.engagement'
@@ -112,6 +115,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminStoriesRoute = AdminStoriesRouteImport.update({
+  id: '/stories',
+  path: '/stories',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -132,9 +140,19 @@ const AdminReportsRoute = AdminReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminReferralsRoute = AdminReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPostsRoute = AdminPostsRouteImport.update({
   id: '/posts',
   path: '/posts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMusicRoute = AdminMusicRouteImport.update({
+  id: '/music',
+  path: '/music',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminFlaggedRoute = AdminFlaggedRouteImport.update({
@@ -400,11 +418,14 @@ export interface FileRoutesByFullPath {
   '/admin/engagement': typeof AdminEngagementRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
+  '/admin/music': typeof AdminMusicRoute
   '/admin/posts': typeof AdminPostsRoute
+  '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/rewards': typeof AdminRewardsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/stories': typeof AdminStoriesRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
   '/admin/': typeof AdminIndexRoute
@@ -457,11 +478,14 @@ export interface FileRoutesByTo {
   '/admin/engagement': typeof AdminEngagementRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
+  '/admin/music': typeof AdminMusicRoute
   '/admin/posts': typeof AdminPostsRoute
+  '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/rewards': typeof AdminRewardsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/stories': typeof AdminStoriesRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
   '/admin': typeof AdminIndexRoute
@@ -518,11 +542,14 @@ export interface FileRoutesById {
   '/admin/engagement': typeof AdminEngagementRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
+  '/admin/music': typeof AdminMusicRoute
   '/admin/posts': typeof AdminPostsRoute
+  '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/revenue': typeof AdminRevenueRoute
   '/admin/rewards': typeof AdminRewardsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/stories': typeof AdminStoriesRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
   '/admin/': typeof AdminIndexRoute
@@ -578,11 +605,14 @@ export interface FileRouteTypes {
     | '/admin/engagement'
     | '/admin/events'
     | '/admin/flagged'
+    | '/admin/music'
     | '/admin/posts'
+    | '/admin/referrals'
     | '/admin/reports'
     | '/admin/revenue'
     | '/admin/rewards'
     | '/admin/settings'
+    | '/admin/stories'
     | '/admin/users'
     | '/admin/verification'
     | '/admin/'
@@ -635,11 +665,14 @@ export interface FileRouteTypes {
     | '/admin/engagement'
     | '/admin/events'
     | '/admin/flagged'
+    | '/admin/music'
     | '/admin/posts'
+    | '/admin/referrals'
     | '/admin/reports'
     | '/admin/revenue'
     | '/admin/rewards'
     | '/admin/settings'
+    | '/admin/stories'
     | '/admin/users'
     | '/admin/verification'
     | '/admin'
@@ -695,11 +728,14 @@ export interface FileRouteTypes {
     | '/admin/engagement'
     | '/admin/events'
     | '/admin/flagged'
+    | '/admin/music'
     | '/admin/posts'
+    | '/admin/referrals'
     | '/admin/reports'
     | '/admin/revenue'
     | '/admin/rewards'
     | '/admin/settings'
+    | '/admin/stories'
     | '/admin/users'
     | '/admin/verification'
     | '/admin/'
@@ -820,6 +856,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/stories': {
+      id: '/admin/stories'
+      path: '/stories'
+      fullPath: '/admin/stories'
+      preLoaderRoute: typeof AdminStoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -848,11 +891,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReportsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/referrals': {
+      id: '/admin/referrals'
+      path: '/referrals'
+      fullPath: '/admin/referrals'
+      preLoaderRoute: typeof AdminReferralsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/posts': {
       id: '/admin/posts'
       path: '/posts'
       fullPath: '/admin/posts'
       preLoaderRoute: typeof AdminPostsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/music': {
+      id: '/admin/music'
+      path: '/music'
+      fullPath: '/admin/music'
+      preLoaderRoute: typeof AdminMusicRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/flagged': {
@@ -1269,11 +1326,14 @@ interface AdminRouteChildren {
   AdminEngagementRoute: typeof AdminEngagementRoute
   AdminEventsRoute: typeof AdminEventsRoute
   AdminFlaggedRoute: typeof AdminFlaggedRoute
+  AdminMusicRoute: typeof AdminMusicRoute
   AdminPostsRoute: typeof AdminPostsRoute
+  AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminRevenueRoute: typeof AdminRevenueRoute
   AdminRewardsRoute: typeof AdminRewardsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminStoriesRoute: typeof AdminStoriesRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationRoute: typeof AdminVerificationRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1283,11 +1343,14 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEngagementRoute: AdminEngagementRoute,
   AdminEventsRoute: AdminEventsRoute,
   AdminFlaggedRoute: AdminFlaggedRoute,
+  AdminMusicRoute: AdminMusicRoute,
   AdminPostsRoute: AdminPostsRoute,
+  AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminRevenueRoute: AdminRevenueRoute,
   AdminRewardsRoute: AdminRewardsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminStoriesRoute: AdminStoriesRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVerificationRoute: AdminVerificationRoute,
   AdminIndexRoute: AdminIndexRoute,

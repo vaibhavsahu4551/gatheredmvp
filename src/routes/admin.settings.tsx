@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getAppSettings, setSubscriptionEnabled, listBanners, createBanner, updateBanner, deleteBanner, type HomeBanner } from "@/lib/admin";
+import { getAppSettings, setSubscriptionEnabled, setMaintenance, DEFAULT_MAINTENANCE_MESSAGE, listBanners, createBanner, updateBanner, deleteBanner, type HomeBanner } from "@/lib/admin";
+import { MaintenanceScreen } from "@/components/MaintenanceScreen";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/settings")({
@@ -11,16 +12,34 @@ function AdminSettings() {
   const [subEnabled, setSubEnabled] = useState(false);
   const [banners, setBanners] = useState<HomeBanner[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [maintEnabled, setMaintEnabled] = useState(false);
+  const [maintMessage, setMaintMessage] = useState("");
+  const [preview, setPreview] = useState(false);
 
   async function refresh() {
     const s = await getAppSettings();
     setSubEnabled(s.subscription_enabled);
+    setMaintEnabled(s.maintenance_enabled);
+    setMaintMessage(s.maintenance_message ?? "");
     setBanners(await listBanners());
   }
   useEffect(() => { refresh(); }, []);
 
   async function toggleSub(v: boolean) {
     try { await setSubscriptionEnabled(v); setSubEnabled(v); toast.success(v ? "Premium features ON" : "Premium features OFF"); }
+    catch (e: any) { toast.error(e.message); }
+  }
+
+  async function toggleMaint(v: boolean) {
+    try {
+      await setMaintenance({ enabled: v, message: maintMessage.trim() || null });
+      setMaintEnabled(v);
+      toast.success(v ? "Maintenance mode ON" : "Maintenance mode OFF");
+    } catch (e: any) { toast.error(e.message); }
+  }
+
+  async function saveMessage() {
+    try { await setMaintenance({ message: maintMessage.trim() || null }); toast.success("Message saved"); }
     catch (e: any) { toast.error(e.message); }
   }
 
@@ -42,6 +61,36 @@ function AdminSettings() {
           </label>
         </div>
       </section>
+
+      <section className="rounded-xl border border-border p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="font-medium">Maintenance mode</div>
+            <div className="text-xs text-muted-foreground">Blocks all non-admin users with a full-screen notice. Admins keep full access.</div>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" checked={maintEnabled} onChange={(e) => toggleMaint(e.target.checked)} className="sr-only peer" />
+            <div className="w-11 h-6 bg-muted rounded-full peer-checked:bg-foreground transition after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:h-5 after:w-5 after:bg-background after:rounded-full after:transition peer-checked:after:translate-x-5" />
+          </label>
+        </div>
+        <label className="block text-xs">Custom message
+          <textarea rows={2} value={maintMessage} onChange={(e) => setMaintMessage(e.target.value)}
+            placeholder={DEFAULT_MAINTENANCE_MESSAGE}
+            className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
+        </label>
+        <div className="flex gap-2">
+          <button onClick={saveMessage} className="rounded-lg bg-foreground text-background px-3 py-2 text-sm">Save message</button>
+          <button onClick={() => setPreview(true)} className="rounded-lg border border-border px-3 py-2 text-sm">Preview screen</button>
+        </div>
+        {maintEnabled && <div className="text-xs text-destructive">Maintenance mode is currently ON for all non-admin users.</div>}
+      </section>
+
+      {preview && (
+        <div className="fixed inset-0 z-50 bg-background">
+          <MaintenanceScreen message={maintMessage} />
+          <button onClick={() => setPreview(false)} className="absolute top-4 right-4 rounded-lg border border-border bg-background px-3 py-2 text-sm">Close preview</button>
+        </div>
+      )}
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
