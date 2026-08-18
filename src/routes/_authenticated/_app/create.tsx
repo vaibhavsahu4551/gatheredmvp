@@ -6,6 +6,7 @@ import { loadMe } from "@/lib/huddl";
 import { loadMyPrideProfile, isPrideSuspended } from "@/lib/pride";
 import { createPost, listMyEvents } from "@/lib/feed";
 import { canCreateEvent, FREE_EVENT_CREATE_LIMIT } from "@/lib/entitlements";
+import { listMyCircles, postToCircleChat, type CircleWithMeta } from "@/lib/circles";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { VerifyGatePrompt } from "@/components/VerifyGatePrompt";
 import { useVerification } from "@/hooks/useVerification";
@@ -14,8 +15,10 @@ import { AlertTriangle, ImagePlus, ShieldAlert, Sparkles } from "lucide-react";
 import { pickPlaceholderCover, uploadEventCover } from "@/lib/event-cover";
 
 export const Route = createFileRoute("/_authenticated/_app/create")({
+  validateSearch: (s: Record<string, unknown>) => ({ circle: typeof s.circle === "string" ? s.circle : undefined }),
   component: CreateScreen,
 });
+
 
 function CreateScreen() {
   const [mode, setMode] = useState<"event" | "post">("event");
