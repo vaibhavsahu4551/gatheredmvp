@@ -89,6 +89,16 @@ export function EventCard({
                 Open
               </span>
             )}
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${residence ? "bg-amber-100 text-amber-700" : "bg-sky-100 text-sky-700"}`}
+            >
+              {residence ? "Private residence" : "Public venue"}
+            </span>
+            {(e as any).beginner_friendly && (
+              <span className="rounded-full bg-violet-100 text-violet-700 px-2 py-0.5 text-[10px] font-semibold">
+                Beginner friendly
+              </span>
+            )}
           </div>
 
           <h3 className="text-[17px] font-bold leading-snug tracking-tight line-clamp-2">
@@ -109,7 +119,9 @@ export function EventCard({
               {hostLabel}
               {!pride && hostVerified && <VerifiedBadge />}
               {!pride && hostPremium && <PremiumBadge />}
+              {!pride && <NewHereBadge createdAt={host?.created_at} className="ml-1" />}
             </span>
+
             <span className="opacity-60">·</span>
             <Users className="h-3 w-3 shrink-0" />
             <span className="truncate">
