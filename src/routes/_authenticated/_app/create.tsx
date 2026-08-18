@@ -72,6 +72,15 @@ function Create() {
   const [upgradeMsg, setUpgradeMsg] = useState("");
   const verification = useVerification();
   const [verifyOpen, setVerifyOpen] = useState(false);
+  const search = Route.useSearch();
+  const [venueType, setVenueType] = useState<"public" | "residence">("public");
+  const [beginnerFriendly, setBeginnerFriendly] = useState(false);
+  const [circles, setCircles] = useState<CircleWithMeta[]>([]);
+  const [circleId, setCircleId] = useState<string>(search.circle ?? "");
+
+  useEffect(() => {
+    listMyCircles().then(setCircles).catch(() => {});
+  }, []);
 
   useEffect(() => {
     loadMe().then(async (me) => {
@@ -88,6 +97,7 @@ function Create() {
       }
     });
   }, []);
+
 
   useEffect(() => {
     if (!coverFile) { setCoverPreview(""); return; }
