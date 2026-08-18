@@ -15,7 +15,7 @@ function Events() {
   const [hosting, setHosting] = useState<EventRow[]>([]);
   const [joined, setJoined] = useState<EventRow[]>([]);
   const [counts, setCounts] = useState<Record<string, EventCounts>>({});
-  const [hosts, setHosts] = useState<Record<string, { full_name: string | null }>>({});
+  const [hosts, setHosts] = useState<Record<string, { full_name: string | null; created_at?: string | null }>>({});
   const [hostTiers, setHostTiers] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -50,12 +50,12 @@ function Events() {
       if (hostIds.length) {
         const { data: profs } = await supabase
           .from("profiles")
-          .select("user_id, full_name, subscription_tier")
+          .select("user_id, full_name, subscription_tier, created_at")
           .in("user_id", hostIds);
-        const hmap: Record<string, { full_name: string | null }> = {};
+        const hmap: Record<string, { full_name: string | null; created_at?: string | null }> = {};
         const tmap: Record<string, string> = {};
         (profs ?? []).forEach((p: any) => {
-          hmap[p.user_id] = { full_name: p.full_name };
+          hmap[p.user_id] = { full_name: p.full_name, created_at: p.created_at };
           tmap[p.user_id] = p.subscription_tier ?? "free";
         });
         setHosts(hmap);
