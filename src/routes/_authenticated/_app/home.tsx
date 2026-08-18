@@ -49,7 +49,7 @@ function HomeFeed() {
 
   const [events, setEvents] = useState<EventRow[]>([]);
   const [counts, setCounts] = useState<Record<string, { boys: number; girls: number; total: number }>>({});
-  const [hosts, setHosts] = useState<Record<string, { full_name: string | null; gender: string | null }>>({});
+  const [hosts, setHosts] = useState<Record<string, { full_name: string | null; gender: string | null; created_at?: string | null }>>({});
   const [hostTiers, setHostTiers] = useState<Record<string, "free" | "premium">>({});
   const [verifiedHosts, setVerifiedHosts] = useState<Set<string>>(new Set());
   const [hasPremium, setHasPremium] = useState(false);
