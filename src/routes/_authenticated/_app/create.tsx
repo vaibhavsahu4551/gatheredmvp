@@ -15,9 +15,11 @@ import { AlertTriangle, ImagePlus, ShieldAlert, Sparkles } from "lucide-react";
 import { pickPlaceholderCover, uploadEventCover } from "@/lib/event-cover";
 
 export const Route = createFileRoute("/_authenticated/_app/create")({
-  validateSearch: (s: Record<string, unknown>) => ({ circle: typeof s.circle === "string" ? s.circle : undefined }),
+  validateSearch: (s: Record<string, unknown>): { circle?: string } =>
+    typeof s.circle === "string" ? { circle: s.circle } : {},
   component: CreateScreen,
 });
+
 
 
 function CreateScreen() {
