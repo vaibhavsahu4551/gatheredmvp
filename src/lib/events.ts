@@ -103,15 +103,16 @@ export async function getProfilesLite(ids: string[]) {
   if (!ids.length) return {};
   const uniq = Array.from(new Set(ids.filter(Boolean)));
   if (!uniq.length) return {};
-  const { data, error } = await supabase.from("profiles").select("id, full_name, gender, photos").in("id", uniq);
+  const { data, error } = await supabase.from("profiles").select("id, full_name, gender, photos, created_at").in("id", uniq);
   if (error) throw error;
-  const map: Record<string, { full_name: string | null; gender: string | null; photo: string | null }> = {};
+  const map: Record<string, { full_name: string | null; gender: string | null; photo: string | null; created_at?: string | null }> = {};
   for (const p of data ?? []) {
     const photos = ((p as any).photos as string[] | null) ?? [];
-    map[p.id] = { full_name: p.full_name, gender: p.gender, photo: photos[0] ?? null };
+    map[p.id] = { full_name: p.full_name, gender: p.gender, photo: photos[0] ?? null, created_at: (p as any).created_at ?? null };
   }
   return map;
 }
+
 
 export function countByGender(participants: ParticipantRow[]) {
   let boys = 0, girls = 0, other = 0;
