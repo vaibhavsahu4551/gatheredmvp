@@ -165,14 +165,21 @@ function Create() {
       min_boys: minBoys ? Number(minBoys) : null,
       is_pride: prideOptIn && isPride,
       cover_url,
+      venue_type: venueType,
+      beginner_friendly: beginnerFriendly,
+      circle_id: !(prideOptIn && isPride) && circleId ? circleId : null,
     } as any).select("id").maybeSingle();
 
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Event created");
+    if (circleId && !(prideOptIn && isPride)) {
+      postToCircleChat(circleId, `New Gathr: ${title.trim()}`).catch(() => {});
+    }
     if (data) navigate({ to: "/events/$eventId", params: { eventId: data.id } });
     else navigate({ to: prideOptIn && isPride ? "/pride" : "/events" });
   };
+
 
   return (
     <div className="pb-32">
