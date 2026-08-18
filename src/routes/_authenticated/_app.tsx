@@ -124,7 +124,7 @@ function BottomNav({ pride }: { pride: boolean }) {
           const Icon = it.icon;
           if (it.primary) {
             return (
-              <Link key={it.to} to={it.to} className="flex items-center justify-center">
+              <Link key={it.to} to={it.to} search={{} as any} className="flex items-center justify-center">
                 <div className="h-12 w-12 rounded-full bg-gradient-brand flex items-center justify-center shadow-glow ring-4 ring-background">
                   <Icon className="h-5 w-5 text-white" />
                 </div>
@@ -134,7 +134,7 @@ function BottomNav({ pride }: { pride: boolean }) {
 
           const showBadge = it.to === "/chat" && totalUnread > 0;
           return (
-            <Link key={it.to} to={it.to} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold ${active ? "text-gradient-brand" : "text-muted-foreground"}`}>
+            <Link key={it.to} to={it.to} search={{} as any} className={`flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold ${active ? "text-gradient-brand" : "text-muted-foreground"}`}>
               <div className="relative">
                 <Icon className={`h-5 w-5 ${active ? "" : "opacity-70"}`} />
                 {showBadge && (
