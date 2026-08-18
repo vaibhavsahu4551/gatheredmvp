@@ -13,7 +13,7 @@ import { getVerifiedIds } from "@/lib/verification";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { PremiumBadge } from "@/components/PremiumBadge";
 import { toast } from "sonner";
-import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2, Sparkles, CircleSlash, RotateCcw } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2, Sparkles, CircleSlash, RotateCcw, ShieldAlert } from "lucide-react";
 import { eventPhase, isEventClosed } from "@/lib/event-status";
 import { SafetyMenu } from "@/components/SafetyMenu";
 import { Avatar } from "@/components/Avatar";
