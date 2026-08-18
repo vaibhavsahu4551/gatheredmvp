@@ -7,6 +7,8 @@ import { ShareButton } from "@/components/ShareToConnection";
 import { eventTypeStyle } from "@/lib/event-style";
 import { PremiumBadge } from "@/components/PremiumBadge";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { NewHereBadge } from "@/components/NewHereBadge";
+
 import { eventPhase } from "@/lib/event-status";
 import { fallbackCover, isRemoteCover, signedEventCoverUrl } from "@/lib/event-cover";
 
