@@ -22,7 +22,7 @@ export function EventCard({
 }: {
   e: EventRow;
   c?: EventCounts;
-  host?: { full_name: string | null };
+  host?: { full_name: string | null; created_at?: string | null };
   hostPremium?: boolean;
   hostVerified?: boolean;
   /** When set (Pride surfaces), shown in place of the real host. */
@@ -33,6 +33,8 @@ export function EventCard({
   const pride = !!(e as any).is_pride;
   const hostLabel = pride ? (prideHost?.display_name ?? "Pride member") : (host?.full_name ?? "Host");
   const phase = eventPhase(e as any, counts.total);
+  const residence = ((e as any).venue_type ?? "public") === "residence";
+
 
   const cover = (e as any).cover_url as string | null | undefined;
   const [coverUrl, setCoverUrl] = useState(
