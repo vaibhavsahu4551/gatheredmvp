@@ -7,6 +7,8 @@ import { ShareButton } from "@/components/ShareToConnection";
 import { eventTypeStyle } from "@/lib/event-style";
 import { PremiumBadge } from "@/components/PremiumBadge";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { NewHereBadge } from "@/components/NewHereBadge";
+
 import { eventPhase } from "@/lib/event-status";
 import { fallbackCover, isRemoteCover, signedEventCoverUrl } from "@/lib/event-cover";
 
@@ -22,7 +24,7 @@ export function EventCard({
 }: {
   e: EventRow;
   c?: EventCounts;
-  host?: { full_name: string | null };
+  host?: { full_name: string | null; created_at?: string | null };
   hostPremium?: boolean;
   hostVerified?: boolean;
   /** When set (Pride surfaces), shown in place of the real host. */
@@ -33,6 +35,8 @@ export function EventCard({
   const pride = !!(e as any).is_pride;
   const hostLabel = pride ? (prideHost?.display_name ?? "Pride member") : (host?.full_name ?? "Host");
   const phase = eventPhase(e as any, counts.total);
+  const residence = ((e as any).venue_type ?? "public") === "residence";
+
 
   const cover = (e as any).cover_url as string | null | undefined;
   const [coverUrl, setCoverUrl] = useState(
@@ -87,6 +91,16 @@ export function EventCard({
                 Open
               </span>
             )}
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${residence ? "bg-amber-100 text-amber-700" : "bg-sky-100 text-sky-700"}`}
+            >
+              {residence ? "Private residence" : "Public venue"}
+            </span>
+            {(e as any).beginner_friendly && (
+              <span className="rounded-full bg-violet-100 text-violet-700 px-2 py-0.5 text-[10px] font-semibold">
+                Beginner friendly
+              </span>
+            )}
           </div>
 
           <h3 className="text-[17px] font-bold leading-snug tracking-tight line-clamp-2">
@@ -107,7 +121,9 @@ export function EventCard({
               {hostLabel}
               {!pride && hostVerified && <VerifiedBadge />}
               {!pride && hostPremium && <PremiumBadge />}
+              {!pride && <NewHereBadge createdAt={host?.created_at} className="ml-1" />}
             </span>
+
             <span className="opacity-60">·</span>
             <Users className="h-3 w-3 shrink-0" />
             <span className="truncate">

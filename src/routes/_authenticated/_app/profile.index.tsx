@@ -194,9 +194,9 @@ function Profile() {
         </div>
 
         <div className="py-5">
-          {tab === "posts" && <PostsTab userId={me.user.id} onCreate={() => navigate({ to: "/create" })} />}
+          {tab === "posts" && <PostsTab userId={me.user.id} onCreate={() => navigate({ to: "/create", search: {} })} />}
           {tab === "hosting" && (
-            <EventsTab kind="hosting" userId={me.user.id} onCreate={() => navigate({ to: "/create" })} />
+            <EventsTab kind="hosting" userId={me.user.id} onCreate={() => navigate({ to: "/create", search: {} })} />
           )}
           {tab === "joined" && (
             <EventsTab kind="joined" userId={me.user.id} onCreate={() => navigate({ to: "/home" })} />

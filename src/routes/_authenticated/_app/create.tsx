@@ -6,6 +6,7 @@ import { loadMe } from "@/lib/huddl";
 import { loadMyPrideProfile, isPrideSuspended } from "@/lib/pride";
 import { createPost, listMyEvents } from "@/lib/feed";
 import { canCreateEvent, FREE_EVENT_CREATE_LIMIT } from "@/lib/entitlements";
+import { listMyCircles, postToCircleChat, type CircleWithMeta } from "@/lib/circles";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { VerifyGatePrompt } from "@/components/VerifyGatePrompt";
 import { useVerification } from "@/hooks/useVerification";
@@ -14,8 +15,12 @@ import { AlertTriangle, ImagePlus, ShieldAlert, Sparkles } from "lucide-react";
 import { pickPlaceholderCover, uploadEventCover } from "@/lib/event-cover";
 
 export const Route = createFileRoute("/_authenticated/_app/create")({
+  validateSearch: (s: Record<string, unknown>): { circle?: string } =>
+    typeof s.circle === "string" ? { circle: s.circle } : {},
   component: CreateScreen,
 });
+
+
 
 function CreateScreen() {
   const [mode, setMode] = useState<"event" | "post">("event");
@@ -67,6 +72,15 @@ function Create() {
   const [upgradeMsg, setUpgradeMsg] = useState("");
   const verification = useVerification();
   const [verifyOpen, setVerifyOpen] = useState(false);
+  const search = Route.useSearch();
+  const [venueType, setVenueType] = useState<"public" | "residence">("public");
+  const [beginnerFriendly, setBeginnerFriendly] = useState(false);
+  const [circles, setCircles] = useState<CircleWithMeta[]>([]);
+  const [circleId, setCircleId] = useState<string>(search.circle ?? "");
+
+  useEffect(() => {
+    listMyCircles().then(setCircles).catch(() => {});
+  }, []);
 
   useEffect(() => {
     loadMe().then(async (me) => {
@@ -83,6 +97,7 @@ function Create() {
       }
     });
   }, []);
+
 
   useEffect(() => {
     if (!coverFile) { setCoverPreview(""); return; }
@@ -150,14 +165,21 @@ function Create() {
       min_boys: minBoys ? Number(minBoys) : null,
       is_pride: prideOptIn && isPride,
       cover_url,
+      venue_type: venueType,
+      beginner_friendly: beginnerFriendly,
+      circle_id: !(prideOptIn && isPride) && circleId ? circleId : null,
     } as any).select("id").maybeSingle();
 
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Event created");
+    if (circleId && !(prideOptIn && isPride)) {
+      postToCircleChat(circleId, `New Gathr: ${title.trim()}`).catch(() => {});
+    }
     if (data) navigate({ to: "/events/$eventId", params: { eventId: data.id } });
     else navigate({ to: prideOptIn && isPride ? "/pride" : "/events" });
   };
+
 
   return (
     <div className="pb-32">
@@ -282,10 +304,58 @@ function Create() {
           </p>
         </Field>
 
+        <Field label="Venue type">
+          <div className="flex gap-2">
+            {([["public","Public venue"],["residence","Private residence"]] as const).map(([v, label]) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setVenueType(v)}
+                className={`flex-1 rounded-2xl px-3 py-2.5 text-[13px] font-medium border transition ${venueType === v ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {venueType === "residence" && (
+            <div className="mt-2 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5">
+              <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+              <span>Private residences carry extra risk. Only approve people you trust, share your plans with a friend, and consider meeting in public first.</span>
+            </div>
+          )}
+        </Field>
+
+        <div className="rounded-2xl border border-border p-4 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-sm font-medium">Beginner friendly</div>
+            <p className="mt-0.5 text-xs text-muted-foreground">Surfaces this Gathr to people new to the app.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setBeginnerFriendly((v) => !v)}
+            aria-pressed={beginnerFriendly}
+            className={`relative shrink-0 h-6 w-11 rounded-full transition ${beginnerFriendly ? "bg-gradient-brand" : "bg-muted"}`}
+          >
+            <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${beginnerFriendly ? "left-[22px]" : "left-0.5"}`} />
+          </button>
+        </div>
+
+        {circles.length > 0 && !(prideOptIn && isPride) && (
+          <Field label="Link to a Circle (optional)">
+            <select value={circleId} onChange={(e) => setCircleId(e.target.value)} className={inputCls}>
+              <option value="">None</option>
+              {circles.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+            <p className="mt-1.5 text-[11px] text-muted-foreground">We'll drop a note in that Circle's chat.</p>
+          </Field>
+        )}
 
         <Field label="City">
           <input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} placeholder={defaultCity || "Bengaluru"} />
         </Field>
+
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="Min group size">

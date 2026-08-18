@@ -13,7 +13,7 @@ import { getVerifiedIds } from "@/lib/verification";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { PremiumBadge } from "@/components/PremiumBadge";
 import { toast } from "sonner";
-import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2, Sparkles, CircleSlash, RotateCcw } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Trash2, Sparkles, CircleSlash, RotateCcw, ShieldAlert } from "lucide-react";
 import { eventPhase, isEventClosed } from "@/lib/event-status";
 import { SafetyMenu } from "@/components/SafetyMenu";
 import { Avatar } from "@/components/Avatar";
@@ -346,6 +346,20 @@ function EventDetail() {
               : `${counts.boys} boys, ${counts.girls} girls joined / max ${event.max_size}`}
           </Row>
         </div>
+
+        {((event as any).venue_type ?? "public") === "residence" && (
+          <div className="mt-4 flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-[13px] text-amber-800">
+            <ShieldAlert className="h-4 w-4 mt-0.5 shrink-0" />
+            <div>
+              <div className="font-semibold">This Gathr is at a private residence</div>
+              <p className="mt-0.5 text-[12px]">
+                Meet the group in public first if you can, tell a friend where you're going, share your
+                check-in, and leave any time you feel uncomfortable.
+              </p>
+            </div>
+          </div>
+        )}
+
 
 
         {event.description && <p className="mt-4 text-[14px] text-foreground/90 whitespace-pre-wrap">{event.description}</p>}
