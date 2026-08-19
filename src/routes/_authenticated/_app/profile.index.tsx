@@ -223,6 +223,9 @@ function Profile() {
           {tab === "joined" && (
             <EventsTab kind="joined" userId={me.user.id} onCreate={() => navigate({ to: "/home" })} />
           )}
+          {tab === "badges" && (
+            <BadgeGrid earned={earned} catalog={catalog} verified={myVerified} premium={myPremium && subsEnabled} />
+          )}
         </div>
 
         <button
