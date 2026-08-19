@@ -31,13 +31,16 @@ import { PostCard, type PostItem } from "@/components/PostCard";
 import { useSubscriptionsEnabled } from "@/hooks/useSubscriptionsEnabled";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { useVerification } from "@/hooks/useVerification";
+import { FeaturedBadgeRow, BadgeGrid } from "@/components/BadgeChips";
+import { featuredBadges, listBadgeCatalog, listUserBadges, type BadgeDef, type EarnedBadge } from "@/lib/badges";
+import { getMyEntitlements } from "@/lib/entitlements";
 
 
 export const Route = createFileRoute("/_authenticated/_app/profile/")({
   component: Profile,
 });
 
-type Tab = "posts" | "hosting" | "joined";
+type Tab = "posts" | "hosting" | "joined" | "badges";
 
 function Profile() {
   const navigate = useNavigate();
@@ -49,6 +52,9 @@ function Profile() {
   const [pendingCount, setPendingCount] = useState(0);
   const [showConnections, setShowConnections] = useState(false);
   const myVerified = useVerification().isVerified;
+  const [earned, setEarned] = useState<EarnedBadge[]>([]);
+  const [catalog, setCatalog] = useState<BadgeDef[]>([]);
+  const [myPremium, setMyPremium] = useState(false);
 
   useEffect(() => {
     loadMe().then(async (data) => {
@@ -60,6 +66,14 @@ function Profile() {
         setConnIds(ids);
         const inc = await listIncomingRequests();
         setPendingCount(inc.length);
+        const [mine, cat, ent] = await Promise.all([
+          listUserBadges(data.user.id),
+          listBadgeCatalog(),
+          getMyEntitlements(),
+        ]);
+        setEarned(mine);
+        setCatalog(cat);
+        setMyPremium(ent.hasAccess);
       }
     });
   }, []);
@@ -71,6 +85,12 @@ function Profile() {
       </div>
     );
   const p = me.profile;
+  const { featured, extra } = featuredBadges({
+    verified: myVerified,
+    premium: myPremium && subsEnabled,
+    earned,
+    catalog,
+  });
 
   return (
     <div>
@@ -100,6 +120,7 @@ function Profile() {
               {p.city}
             </div>
           )}
+          <FeaturedBadgeRow featured={featured} extra={extra} onMore={() => setTab("badges")} />
         </div>
       </div>
 
@@ -173,12 +194,13 @@ function Profile() {
           <ConnectionsModal ids={connIds} onClose={() => setShowConnections(false)} />
         )}
 
-        <div className="mt-6 border-b border-border">
-          <div className="flex gap-6 text-sm">
+        <div className="mt-6 border-b border-border overflow-x-auto">
+          <div className="flex gap-6 text-sm whitespace-nowrap">
             {([
               ["posts", "Posts"],
               ["hosting", "My Events"],
               ["joined", "Joined Events"],
+              ["badges", "Badges"],
             ] as const).map(([k, label]) => (
               <button
                 key={k}
@@ -200,6 +222,9 @@ function Profile() {
           )}
           {tab === "joined" && (
             <EventsTab kind="joined" userId={me.user.id} onCreate={() => navigate({ to: "/home" })} />
+          )}
+          {tab === "badges" && (
+            <BadgeGrid earned={earned} catalog={catalog} verified={myVerified} premium={myPremium && subsEnabled} />
           )}
         </div>
 

@@ -29,6 +29,7 @@ import { Route as AdminMusicRouteImport } from './routes/admin.music'
 import { Route as AdminFlaggedRouteImport } from './routes/admin.flagged'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminEngagementRouteImport } from './routes/admin.engagement'
+import { Route as AdminBadgesRouteImport } from './routes/admin.badges'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/_app'
 import { Route as ApiPublicSendPushRouteImport } from './routes/api/public/send-push'
@@ -168,6 +169,11 @@ const AdminEventsRoute = AdminEventsRouteImport.update({
 const AdminEngagementRoute = AdminEngagementRouteImport.update({
   id: '/engagement',
   path: '/engagement',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBadgesRoute = AdminBadgesRouteImport.update({
+  id: '/badges',
+  path: '/badges',
   getParentRoute: () => AdminRoute,
 } as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
@@ -415,6 +421,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/admin/badges': typeof AdminBadgesRoute
   '/admin/engagement': typeof AdminEngagementRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
@@ -475,6 +482,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/admin/badges': typeof AdminBadgesRoute
   '/admin/engagement': typeof AdminEngagementRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
@@ -539,6 +547,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/_authenticated/_app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/admin/badges': typeof AdminBadgesRoute
   '/admin/engagement': typeof AdminEngagementRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
@@ -602,6 +611,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/forgot-password'
     | '/onboarding'
+    | '/admin/badges'
     | '/admin/engagement'
     | '/admin/events'
     | '/admin/flagged'
@@ -662,6 +672,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/forgot-password'
     | '/onboarding'
+    | '/admin/badges'
     | '/admin/engagement'
     | '/admin/events'
     | '/admin/flagged'
@@ -725,6 +736,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/_authenticated/_app'
     | '/_authenticated/onboarding'
+    | '/admin/badges'
     | '/admin/engagement'
     | '/admin/events'
     | '/admin/flagged'
@@ -931,6 +943,13 @@ declare module '@tanstack/react-router' {
       path: '/engagement'
       fullPath: '/admin/engagement'
       preLoaderRoute: typeof AdminEngagementRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/badges': {
+      id: '/admin/badges'
+      path: '/badges'
+      fullPath: '/admin/badges'
+      preLoaderRoute: typeof AdminBadgesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/_authenticated/onboarding': {
@@ -1323,6 +1342,7 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AdminRouteChildren {
+  AdminBadgesRoute: typeof AdminBadgesRoute
   AdminEngagementRoute: typeof AdminEngagementRoute
   AdminEventsRoute: typeof AdminEventsRoute
   AdminFlaggedRoute: typeof AdminFlaggedRoute
@@ -1340,6 +1360,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminBadgesRoute: AdminBadgesRoute,
   AdminEngagementRoute: AdminEngagementRoute,
   AdminEventsRoute: AdminEventsRoute,
   AdminFlaggedRoute: AdminFlaggedRoute,

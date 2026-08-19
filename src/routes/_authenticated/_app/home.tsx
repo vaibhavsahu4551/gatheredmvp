@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { unreadCount } from "@/lib/notifications";
 import { loadMe } from "@/lib/huddl";
 import { EVENT_TYPES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipantsForEvents } from "@/lib/events";
+import { isNewHere } from "@/lib/badges";
 import { listFeed, getLikes, toggleLike, signedFeedUrl, getEventsLite } from "@/lib/feed";
 import { loadBlockedIds } from "@/lib/safety";
 import { EventCard } from "@/components/EventCard";
@@ -54,6 +55,7 @@ function HomeFeed() {
   const [verifiedHosts, setVerifiedHosts] = useState<Set<string>>(new Set());
   const [hasPremium, setHasPremium] = useState(false);
   const [advOpen, setAdvOpen] = useState(false);
+  const [iAmNew, setIAmNew] = useState(false);
   useEffect(() => { getMyEntitlements().then((e) => setHasPremium(e.hasAccess)); }, []);
 
   const [posts, setPosts] = useState<PostItem[]>([]);
@@ -139,10 +141,12 @@ function HomeFeed() {
       setEvents(evFiltered);
 
       // Batched participants + hosts in parallel — was N+1 before.
-      const [partsMap, hostsMap] = await Promise.all([
+      const [partsMap, hostsMap, meLite] = await Promise.all([
         getParticipantsForEvents(evFiltered.map((e) => e.id)),
         getProfilesLite(evFiltered.map((e) => e.host_id)),
+        meId ? getProfilesLite([meId]) : Promise.resolve({} as any),
       ]);
+      setIAmNew(isNewHere((meLite as any)?.[meId]?.created_at));
       const cts: typeof counts = {};
       for (const e of evFiltered) cts[e.id] = countByGender(partsMap[e.id] ?? []);
       setCounts(cts);
@@ -224,6 +228,14 @@ function HomeFeed() {
     if (q && !e.title.toLowerCase().includes(q.toLowerCase())) return false;
     return true;
   }), [events, cat, girlsOnly, q]);
+
+  const starterEvents = useMemo(
+    () =>
+      events
+        .filter((e) => (e as any).beginner_friendly && (e as any).venue_type !== "residence")
+        .slice(0, 8),
+    [events],
+  );
 
   const filteredPosts = useMemo(() => posts.filter((p) => {
     if (cat !== "All") return false;
@@ -324,6 +336,27 @@ function HomeFeed() {
             </div>
             <Link to="/premium" className="rounded-full bg-foreground text-background text-xs font-medium px-3 py-1.5">Upgrade</Link>
           </div>
+        )}
+        {!loading && iAmNew && starterEvents.length > 0 && (
+          <section>
+            <div className="mb-2">
+              <div className="text-sm font-semibold">Starter events</div>
+              <div className="text-xs text-muted-foreground">Beginner-friendly meetups at public venues</div>
+            </div>
+            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x pb-1">
+              {starterEvents.map((e) => (
+                <div key={"s" + e.id} className="w-[85%] shrink-0 snap-start">
+                  <EventCard
+                    e={e}
+                    c={counts[e.id] ?? { boys: 0, girls: 0, total: 0 }}
+                    host={hosts[e.host_id]}
+                    hostPremium={hostTiers[e.host_id] === "premium"}
+                    hostVerified={verifiedHosts.has(e.host_id)}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
         )}
         {loading && <FeedSkeleton />}
         {!loading && err && (
