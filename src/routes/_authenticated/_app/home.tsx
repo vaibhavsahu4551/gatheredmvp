@@ -229,6 +229,14 @@ function HomeFeed() {
     return true;
   }), [events, cat, girlsOnly, q]);
 
+  const starterEvents = useMemo(
+    () =>
+      events
+        .filter((e) => (e as any).beginner_friendly && (e as any).venue_type !== "residence")
+        .slice(0, 8),
+    [events],
+  );
+
   const filteredPosts = useMemo(() => posts.filter((p) => {
     if (cat !== "All") return false;
     if (girlsOnly) return false;
