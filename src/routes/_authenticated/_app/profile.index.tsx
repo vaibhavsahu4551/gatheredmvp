@@ -52,6 +52,9 @@ function Profile() {
   const [pendingCount, setPendingCount] = useState(0);
   const [showConnections, setShowConnections] = useState(false);
   const myVerified = useVerification().isVerified;
+  const [earned, setEarned] = useState<EarnedBadge[]>([]);
+  const [catalog, setCatalog] = useState<BadgeDef[]>([]);
+  const [myPremium, setMyPremium] = useState(false);
 
   useEffect(() => {
     loadMe().then(async (data) => {
@@ -63,6 +66,14 @@ function Profile() {
         setConnIds(ids);
         const inc = await listIncomingRequests();
         setPendingCount(inc.length);
+        const [mine, cat, ent] = await Promise.all([
+          listUserBadges(data.user.id),
+          listBadgeCatalog(),
+          getMyEntitlements(),
+        ]);
+        setEarned(mine);
+        setCatalog(cat);
+        setMyPremium(ent.hasAccess);
       }
     });
   }, []);
