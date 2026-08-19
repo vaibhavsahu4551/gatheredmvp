@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { unreadCount } from "@/lib/notifications";
 import { loadMe } from "@/lib/huddl";
 import { EVENT_TYPES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipantsForEvents } from "@/lib/events";
+import { isNewHere } from "@/lib/badges";
 import { listFeed, getLikes, toggleLike, signedFeedUrl, getEventsLite } from "@/lib/feed";
 import { loadBlockedIds } from "@/lib/safety";
 import { EventCard } from "@/components/EventCard";
@@ -54,6 +55,7 @@ function HomeFeed() {
   const [verifiedHosts, setVerifiedHosts] = useState<Set<string>>(new Set());
   const [hasPremium, setHasPremium] = useState(false);
   const [advOpen, setAdvOpen] = useState(false);
+  const [iAmNew, setIAmNew] = useState(false);
   useEffect(() => { getMyEntitlements().then((e) => setHasPremium(e.hasAccess)); }, []);
 
   const [posts, setPosts] = useState<PostItem[]>([]);
