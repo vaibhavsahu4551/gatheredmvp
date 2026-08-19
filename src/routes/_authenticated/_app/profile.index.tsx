@@ -120,6 +120,7 @@ function Profile() {
               {p.city}
             </div>
           )}
+          <FeaturedBadgeRow featured={featured} extra={extra} onMore={() => setTab("badges")} />
         </div>
       </div>
 
