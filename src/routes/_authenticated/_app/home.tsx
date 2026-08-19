@@ -139,10 +139,12 @@ function HomeFeed() {
       setEvents(evFiltered);
 
       // Batched participants + hosts in parallel — was N+1 before.
-      const [partsMap, hostsMap] = await Promise.all([
+      const [partsMap, hostsMap, meLite] = await Promise.all([
         getParticipantsForEvents(evFiltered.map((e) => e.id)),
         getProfilesLite(evFiltered.map((e) => e.host_id)),
+        meId ? getProfilesLite([meId]) : Promise.resolve({} as any),
       ]);
+      setIAmNew(isNewHere((meLite as any)?.[meId]?.created_at));
       const cts: typeof counts = {};
       for (const e of evFiltered) cts[e.id] = countByGender(partsMap[e.id] ?? []);
       setCounts(cts);
