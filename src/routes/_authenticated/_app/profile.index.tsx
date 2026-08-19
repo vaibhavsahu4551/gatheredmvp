@@ -194,12 +194,13 @@ function Profile() {
           <ConnectionsModal ids={connIds} onClose={() => setShowConnections(false)} />
         )}
 
-        <div className="mt-6 border-b border-border">
-          <div className="flex gap-6 text-sm">
+        <div className="mt-6 border-b border-border overflow-x-auto">
+          <div className="flex gap-6 text-sm whitespace-nowrap">
             {([
               ["posts", "Posts"],
               ["hosting", "My Events"],
               ["joined", "Joined Events"],
+              ["badges", "Badges"],
             ] as const).map(([k, label]) => (
               <button
                 key={k}
