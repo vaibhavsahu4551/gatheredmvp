@@ -31,13 +31,16 @@ import { PostCard, type PostItem } from "@/components/PostCard";
 import { useSubscriptionsEnabled } from "@/hooks/useSubscriptionsEnabled";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { useVerification } from "@/hooks/useVerification";
+import { FeaturedBadgeRow, BadgeGrid } from "@/components/BadgeChips";
+import { featuredBadges, listBadgeCatalog, listUserBadges, type BadgeDef, type EarnedBadge } from "@/lib/badges";
+import { getMyEntitlements } from "@/lib/entitlements";
 
 
 export const Route = createFileRoute("/_authenticated/_app/profile/")({
   component: Profile,
 });
 
-type Tab = "posts" | "hosting" | "joined";
+type Tab = "posts" | "hosting" | "joined" | "badges";
 
 function Profile() {
   const navigate = useNavigate();
