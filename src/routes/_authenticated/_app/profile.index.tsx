@@ -85,6 +85,12 @@ function Profile() {
       </div>
     );
   const p = me.profile;
+  const { featured, extra } = featuredBadges({
+    verified: myVerified,
+    premium: myPremium && subsEnabled,
+    earned,
+    catalog,
+  });
 
   return (
     <div>
