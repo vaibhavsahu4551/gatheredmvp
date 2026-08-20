@@ -545,6 +545,7 @@ export type Database = {
           category: Database["public"]["Enums"]["event_category"] | null
           circle_id: string | null
           city: string
+          close_reason: string | null
           closed_at: string | null
           cohost_id: string | null
           cohost_pride_actor_id: string | null
@@ -580,6 +581,7 @@ export type Database = {
           category?: Database["public"]["Enums"]["event_category"] | null
           circle_id?: string | null
           city: string
+          close_reason?: string | null
           closed_at?: string | null
           cohost_id?: string | null
           cohost_pride_actor_id?: string | null
@@ -615,6 +617,7 @@ export type Database = {
           category?: Database["public"]["Enums"]["event_category"] | null
           circle_id?: string | null
           city?: string
+          close_reason?: string | null
           closed_at?: string | null
           cohost_id?: string | null
           cohost_pride_actor_id?: string | null
@@ -1923,6 +1926,10 @@ export type Database = {
       claim_referral: { Args: { _code: string }; Returns: boolean }
       claim_weekly_challenge: { Args: never; Returns: string }
       cleanup_expired_stories: { Args: never; Returns: undefined }
+      close_event_early: {
+        Args: { _event_id: string; _reason?: string }
+        Returns: undefined
+      }
       count_events_created_last_30d: {
         Args: { _user: string }
         Returns: number
@@ -2056,6 +2063,7 @@ export type Database = {
       roll_daily_icebreaker: { Args: never; Returns: string }
       roll_weekly_challenge: { Args: never; Returns: string }
       submit_verification: { Args: { _path: string }; Returns: undefined }
+      sweep_empty_events: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin"
