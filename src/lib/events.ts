@@ -162,7 +162,16 @@ export async function deleteEvent(id: string) {
 
 /** Host-only: close an event early (or reopen it if it hasn't started yet). */
 export async function setEventClosed(id: string, closed: boolean) {
-  await updateEvent(id, { closed_at: closed ? new Date().toISOString() : null } as any);
+  await updateEvent(id, { closed_at: closed ? new Date().toISOString() : null, close_reason: closed ? undefined : null } as any);
+}
+
+/** Host-only: close early with an optional reason; notifies approved attendees. */
+export async function closeEventEarly(id: string, reason?: string) {
+  const { error } = await (supabase as any).rpc("close_event_early", {
+    _event_id: id,
+    _reason: reason?.trim() || null,
+  });
+  if (error) throw error;
 }
 
 
