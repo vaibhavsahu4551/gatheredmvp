@@ -157,6 +157,8 @@ function Create() {
       starts_at: new Date(startsAt).toISOString(),
       location_address: address.trim(),
       exact_location: exactLocation.trim() || null,
+      location_lat: pin?.lat ?? null,
+      location_lng: pin?.lng ?? null,
       city: city.trim(),
 
       min_size: minSize,
