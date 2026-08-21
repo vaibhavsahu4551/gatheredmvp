@@ -53,6 +53,7 @@ function Create() {
   const [startsAt, setStartsAt] = useState("");
   const [address, setAddress] = useState("");
   const [exactLocation, setExactLocation] = useState("");
+  const [pin, setPin] = useState<{ lat: number; lng: number } | null>(null);
 
   const [city, setCity] = useState("");
   const [minSize, setMinSize] = useState(4);
