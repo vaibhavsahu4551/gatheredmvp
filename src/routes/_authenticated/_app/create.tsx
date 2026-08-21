@@ -13,6 +13,7 @@ import { useVerification } from "@/hooks/useVerification";
 import { toast } from "sonner";
 import { AlertTriangle, ImagePlus, ShieldAlert, Sparkles } from "lucide-react";
 import { pickPlaceholderCover, uploadEventCover } from "@/lib/event-cover";
+import { LocationMap } from "@/components/LocationMap";
 
 export const Route = createFileRoute("/_authenticated/_app/create")({
   validateSearch: (s: Record<string, unknown>): { circle?: string } =>
