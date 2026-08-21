@@ -10,6 +10,7 @@ import {
 } from "@/lib/events";
 import { toast } from "sonner";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
+import { LocationMap } from "@/components/LocationMap";
 
 export const Route = createFileRoute("/_authenticated/_app/events/$eventId/edit")({
   component: EditEvent,
@@ -34,6 +35,7 @@ function EditEvent() {
   const [startsAt, setStartsAt] = useState("");
   const [address, setAddress] = useState("");
   const [exactLocation, setExactLocation] = useState("");
+  const [pin, setPin] = useState<{ lat: number; lng: number } | null>(null);
   const [city, setCity] = useState("");
   const [minSize, setMinSize] = useState(4);
   const [maxSize, setMaxSize] = useState(8);
@@ -54,6 +56,9 @@ function EditEvent() {
       setStartsAt(toLocalInput(ev.starts_at));
       setAddress(ev.location_address);
       setExactLocation((ev as any).exact_location ?? "");
+      if ((ev as any).location_lat != null && (ev as any).location_lng != null) {
+        setPin({ lat: (ev as any).location_lat, lng: (ev as any).location_lng });
+      }
       setCity(ev.city);
       setMinSize(ev.min_size);
       setMaxSize(ev.max_size);
@@ -84,6 +89,8 @@ function EditEvent() {
         starts_at: new Date(startsAt).toISOString(),
         location_address: address.trim(),
         exact_location: exactLocation.trim() || null,
+        location_lat: pin?.lat ?? null,
+        location_lng: pin?.lng ?? null,
         city: city.trim(),
         min_size: minSize,
         max_size: maxSize,
@@ -136,6 +143,20 @@ function EditEvent() {
             </div>
           )}
         </Field>
+        <Field label="Drop a pin (optional)">
+          <LocationMap
+            lat={pin?.lat ?? null}
+            lng={pin?.lng ?? null}
+            onPick={(lat, lng) => setPin({ lat, lng })}
+            height={200}
+          />
+          {pin && (
+            <button type="button" onClick={() => setPin(null)} className="mt-1 text-[11px] font-medium underline text-muted-foreground">
+              Remove pin
+            </button>
+          )}
+        </Field>
+
         <Field label="Exact meeting point (optional, private)">
           <input value={exactLocation} onChange={(e) => setExactLocation(e.target.value)} className={inputCls} />
         </Field>

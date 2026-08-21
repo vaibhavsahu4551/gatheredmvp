@@ -3,7 +3,7 @@ import { eventTypeStyle } from "@/lib/event-style";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { countByGender, deleteEvent, setEventClosed, getEvent, getParticipants, getProfilesLite, leaveEvent, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
+import { countByGender, closeEventEarly, deleteEvent, setEventClosed, getEvent, getParticipants, getProfilesLite, leaveEvent, listEventComments, myParticipation, postEventComment, requestJoin, setParticipantStatus, type EventComment, type EventRow, type ParticipantRow } from "@/lib/events";
 import { getPrideIdentities, signedPridePhotoUrl, type PrideIdentity } from "@/lib/pride";
 import { canJoinEvent, FREE_EVENT_JOIN_LIMIT, getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
@@ -17,6 +17,8 @@ import { ArrowLeft, MapPin, Clock, Users, MessageCircle, Lock, Send, Pencil, Tra
 import { eventPhase, isEventClosed } from "@/lib/event-status";
 import { SafetyMenu } from "@/components/SafetyMenu";
 import { Avatar } from "@/components/Avatar";
+import { LocationMap } from "@/components/LocationMap";
+import { CloseEventDialog } from "@/components/CloseEventDialog";
 
 
 export const Route = createFileRoute("/_authenticated/_app/events/$eventId/")({
@@ -45,6 +47,7 @@ function EventDetail() {
   const verification = useVerification();
   const [verifyOpen, setVerifyOpen] = useState(false);
   const [upgradeMsg, setUpgradeMsg] = useState("");
+  const [closeOpen, setCloseOpen] = useState(false);
 
   const isPride = !!(event as any)?.is_pride;
 
@@ -233,11 +236,10 @@ function EventDetail() {
               <button
                 type="button"
                 onClick={async () => {
-                  const next = !manuallyClosed;
-                  if (next && !confirm("Close this event? No new joins or messages will be allowed.")) return;
+                  if (!manuallyClosed) { setCloseOpen(true); return; }
                   try {
-                    await setEventClosed(event.id, next);
-                    toast.success(next ? "Event closed" : "Event reopened");
+                    await setEventClosed(event.id, false);
+                    toast.success("Event reopened");
                     await load();
                   } catch (e: any) {
                     toast.error(e?.message ?? "Could not update the event");
@@ -321,7 +323,7 @@ function EventDetail() {
             {event.status === "cancelled"
               ? "This Gathr was cancelled."
               : manuallyClosed
-                ? "The host closed this Gathr. New joins and messages are off — the event and past discussion stay visible."
+                ? `The host closed this Gathr.${(event as any).close_reason ? ` "${(event as any).close_reason}"` : ""} New joins and messages are off — the event and past discussion stay visible.`
                 : "This Gathr has already happened. New joins and messages are off."}
           </div>
         ) : (
@@ -338,6 +340,21 @@ function EventDetail() {
             <div className="ml-6 rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-[13px] text-emerald-900">
               <div className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700">Exact meeting point</div>
               <div className="mt-0.5">{(event as any).exact_location}</div>
+            </div>
+          )}
+          {(event as any).location_lat != null && (event as any).location_lng != null && (
+            <div className="ml-6 pt-1">
+              <LocationMap
+                lat={(event as any).location_lat}
+                lng={(event as any).location_lng}
+                approximate={!(event.host_id === me || my?.status === "approved")}
+                height={160}
+              />
+              <p className="mt-1.5 text-[11px] text-muted-foreground">
+                {event.host_id === me || my?.status === "approved"
+                  ? "Exact meeting point — visible to you as an attendee."
+                  : "Approximate area. The exact pin unlocks once the host approves you."}
+              </p>
             </div>
           )}
           <Row icon={<Users className="h-4 w-4" />}>
@@ -577,6 +594,21 @@ function EventDetail() {
           )}
         </div>
       </div>
+      <CloseEventDialog
+        open={closeOpen}
+        attendeeCount={approved.length}
+        onClose={() => setCloseOpen(false)}
+        onConfirm={async (reason) => {
+          try {
+            await closeEventEarly(event.id, reason);
+            setCloseOpen(false);
+            toast.success("Event closed");
+            await load();
+          } catch (e: any) {
+            toast.error(e?.message ?? "Could not close the event");
+          }
+        }}
+      />
       <UpgradePrompt open={upgradeOpen} onClose={() => setUpgradeOpen(false)} title="You've hit the free join limit" message={upgradeMsg} />
       <VerifyGatePrompt
         open={verifyOpen}

@@ -13,6 +13,7 @@ import { useVerification } from "@/hooks/useVerification";
 import { toast } from "sonner";
 import { AlertTriangle, ImagePlus, ShieldAlert, Sparkles } from "lucide-react";
 import { pickPlaceholderCover, uploadEventCover } from "@/lib/event-cover";
+import { LocationMap } from "@/components/LocationMap";
 
 export const Route = createFileRoute("/_authenticated/_app/create")({
   validateSearch: (s: Record<string, unknown>): { circle?: string } =>
@@ -53,6 +54,7 @@ function Create() {
   const [startsAt, setStartsAt] = useState("");
   const [address, setAddress] = useState("");
   const [exactLocation, setExactLocation] = useState("");
+  const [pin, setPin] = useState<{ lat: number; lng: number } | null>(null);
 
   const [city, setCity] = useState("");
   const [minSize, setMinSize] = useState(4);
@@ -156,6 +158,8 @@ function Create() {
       starts_at: new Date(startsAt).toISOString(),
       location_address: address.trim(),
       exact_location: exactLocation.trim() || null,
+      location_lat: pin?.lat ?? null,
+      location_lng: pin?.lng ?? null,
       city: city.trim(),
 
       min_size: minSize,
@@ -294,6 +298,23 @@ function Create() {
               <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
               <span>This looks like a residential address. Gathrs should meet at public places.</span>
             </div>
+          )}
+        </Field>
+
+        <Field label="Drop a pin (optional)">
+          <LocationMap
+            lat={pin?.lat ?? null}
+            lng={pin?.lng ?? null}
+            onPick={(lat, lng) => setPin({ lat, lng })}
+            height={200}
+          />
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            Everyone sees an approximate area circle. Approved attendees see the exact pin.
+          </p>
+          {pin && (
+            <button type="button" onClick={() => setPin(null)} className="mt-1 text-[11px] font-medium underline text-muted-foreground">
+              Remove pin
+            </button>
           )}
         </Field>
 

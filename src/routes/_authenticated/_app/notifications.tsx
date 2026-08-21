@@ -21,6 +21,8 @@ function label(kind: string) {
     case "join_request": return "requested to join your event";
     case "join_approved": return "approved your request to join";
     case "join_declined": return "couldn't fit you in this time";
+    case "event_closed": return "closed a Gathr you'd joined";
+    case "event_no_attendees": return "No one has joined yet — reschedule or close it";
     case "verification_approved": return "Your account is verified — the Verified badge is now on your profile";
     case "verification_rejected": return "Verification wasn't approved — tap to retake your selfie";
     default: return "sent you a notification";
@@ -94,15 +96,43 @@ function Notifications() {
           const name = p?.full_name ?? "Someone";
           const isReq = n.kind === "huddle_request";
           const isAccepted = n.kind === "huddle_accepted";
-          const isEventKind = n.kind === "join_request" || n.kind === "join_approved" || n.kind === "join_declined";
+          const isEventKind = n.kind === "join_request" || n.kind === "join_approved" || n.kind === "join_declined" || n.kind === "event_closed" || n.kind === "event_no_attendees";
+          const isHostNudge = n.kind === "event_no_attendees";
+          const reason = n.kind === "event_closed" ? (n.data?.reason as string | null) : null;
+          const eventTitle = (n.data?.title as string | null) ?? null;
 
           const inner = (
             <>
               <Avatar photo={p?.photo ?? null} name={name} size={40} />
               <div className="min-w-0 flex-1">
                 <div className="text-sm">
-                  <span className="font-semibold">{name}</span> {label(n.kind)}
+                  {isHostNudge ? (
+                    <><span className="font-semibold">{eventTitle ?? "Your Gathr"}</span> — {label(n.kind)}</>
+                  ) : (
+                    <><span className="font-semibold">{name}</span> {label(n.kind)}{eventTitle && n.kind === "event_closed" ? `: ${eventTitle}` : ""}</>
+                  )}
                 </div>
+                {reason && <div className="text-[12px] text-muted-foreground italic">"{reason}"</div>}
+                {isHostNudge && n.target_id && (
+                  <div className="mt-1.5 flex gap-2">
+                    <Link
+                      to="/events/$eventId/edit"
+                      params={{ eventId: n.target_id }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="rounded-full border border-border px-3 py-1 text-[11px] font-medium"
+                    >
+                      Reschedule
+                    </Link>
+                    <Link
+                      to="/events/$eventId"
+                      params={{ eventId: n.target_id }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="rounded-full border border-border px-3 py-1 text-[11px] font-medium"
+                    >
+                      Close event
+                    </Link>
+                  </div>
+                )}
                 <div className="text-[11px] text-muted-foreground">{new Date(n.created_at).toLocaleString()}</div>
               </div>
             </>
