@@ -323,7 +323,7 @@ function EventDetail() {
             {event.status === "cancelled"
               ? "This Gathr was cancelled."
               : manuallyClosed
-                ? "The host closed this Gathr. New joins and messages are off — the event and past discussion stay visible."
+                ? `The host closed this Gathr.${(event as any).close_reason ? ` "${(event as any).close_reason}"` : ""} New joins and messages are off — the event and past discussion stay visible.`
                 : "This Gathr has already happened. New joins and messages are off."}
           </div>
         ) : (
