@@ -594,6 +594,21 @@ function EventDetail() {
           )}
         </div>
       </div>
+      <CloseEventDialog
+        open={closeOpen}
+        attendeeCount={approved.length}
+        onClose={() => setCloseOpen(false)}
+        onConfirm={async (reason) => {
+          try {
+            await closeEventEarly(event.id, reason);
+            setCloseOpen(false);
+            toast.success("Event closed");
+            await load();
+          } catch (e: any) {
+            toast.error(e?.message ?? "Could not close the event");
+          }
+        }}
+      />
       <UpgradePrompt open={upgradeOpen} onClose={() => setUpgradeOpen(false)} title="You've hit the free join limit" message={upgradeMsg} />
       <VerifyGatePrompt
         open={verifyOpen}
