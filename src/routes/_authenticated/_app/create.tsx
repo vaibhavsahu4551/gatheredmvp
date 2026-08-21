@@ -300,6 +300,23 @@ function Create() {
           )}
         </Field>
 
+        <Field label="Drop a pin (optional)">
+          <LocationMap
+            lat={pin?.lat ?? null}
+            lng={pin?.lng ?? null}
+            onPick={(lat, lng) => setPin({ lat, lng })}
+            height={200}
+          />
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            Everyone sees an approximate area circle. Approved attendees see the exact pin.
+          </p>
+          {pin && (
+            <button type="button" onClick={() => setPin(null)} className="mt-1 text-[11px] font-medium underline text-muted-foreground">
+              Remove pin
+            </button>
+          )}
+        </Field>
+
         <Field label="Exact meeting point (optional, private)">
           <input value={exactLocation} onChange={(e) => setExactLocation(e.target.value)} className={inputCls} placeholder="Third Wave Coffee, 12th Main — table by the window" />
           <p className="mt-1.5 text-[11px] text-muted-foreground">
