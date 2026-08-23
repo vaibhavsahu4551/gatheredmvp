@@ -7,7 +7,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
  * build. Push notifications go through the native bridge (see src/lib/push.ts).
  */
 const config: CapacitorConfig = {
-  appId: "app.lovable.gathr",
+  appId: "com.gathr.app",
   appName: "Gathr",
   webDir: "dist/client",
   server: {
