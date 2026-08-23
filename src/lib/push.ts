@@ -58,6 +58,15 @@ function isNative(): boolean {
   return !!cap?.isNativePlatform?.();
 }
 
+/** "android" | "ios" for wrapped builds. */
+function nativePlatform(): string {
+  const cap = (globalThis as any).Capacitor;
+  const p = cap?.getPlatform?.();
+  return p === "ios" || p === "android" ? p : "native";
+}
+
+let nativeListenersBound = false;
+
 /** Native (Capacitor) registration — Android/iOS wrapped builds. */
 async function registerNative(navigateTo: (url: string) => void) {
   const { PushNotifications } = await import("@capacitor/push-notifications");
@@ -70,14 +79,37 @@ async function registerNative(navigateTo: (url: string) => void) {
     localStorage.setItem(DENIED_KEY, "1");
     return false;
   }
-  PushNotifications.addListener("registration", (t) => { void saveToken(t.value, "native"); });
-  PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
-    const url = (action.notification.data as any)?.url;
-    if (url) navigateTo(url);
-  });
+
+  if (!nativeListenersBound) {
+    nativeListenersBound = true;
+
+    // Native FCM/APNs device token — stored with its platform so the server
+    // sends through the right channel.
+    await PushNotifications.addListener("registration", (t) => {
+      void saveToken(t.value, nativePlatform());
+    });
+
+    await PushNotifications.addListener("registrationError", (err) => {
+      console.error("[push] native registration failed:", JSON.stringify(err));
+    });
+
+    // Foreground delivery: show an in-app toast instead of a silent drop.
+    await PushNotifications.addListener("pushNotificationReceived", (n) => {
+      if (!n.title) return;
+      void import("sonner").then(({ toast }) => toast(n.title!, { description: n.body ?? undefined }));
+    });
+
+    // Tapping a system notification deep-links to the right screen.
+    await PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
+      const url = (action.notification.data as any)?.url;
+      if (typeof url === "string" && url.startsWith("/")) navigateTo(url);
+    });
+  }
+
   await PushNotifications.register();
   return true;
 }
+
 
 /** Web/PWA registration via Firebase Cloud Messaging. */
 async function registerWeb(): Promise<boolean> {
