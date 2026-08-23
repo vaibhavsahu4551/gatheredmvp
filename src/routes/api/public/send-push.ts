@@ -50,10 +50,13 @@ export const Route = createFileRoute("/api/public/send-push")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data: rows } = await (supabaseAdmin as any)
           .from("push_tokens")
-          .select("token")
+          .select("token, platform")
           .eq("user_id", payload.user_id);
-        const tokens: string[] = (rows ?? []).map((r: any) => r.token);
-        if (!tokens.length) return Response.json({ sent: 0 });
+        const devices: { token: string; platform: string }[] = (rows ?? []).map((r: any) => ({
+          token: r.token,
+          platform: (r.platform ?? "web").toLowerCase(),
+        }));
+        if (!devices.length) return Response.json({ sent: 0 });
 
         let sa: { client_email: string; private_key: string; project_id: string };
         try {
@@ -69,29 +72,52 @@ export const Route = createFileRoute("/api/public/send-push")({
         const dead: string[] = [];
 
         await Promise.all(
-          tokens.map(async (token) => {
+          devices.map(async ({ token, platform }) => {
+            const isAndroid = platform === "android";
+            const isIos = platform === "ios";
+            const isNative = isAndroid || isIos;
+
+            // Native (Capacitor) devices get an OS-level notification through
+            // APNs/Android channels; browsers/PWAs get the webpush block.
+            const message: Record<string, unknown> = {
+              token,
+              notification: { title: payload.title, body: payload.body ?? "" },
+              data: { url },
+            };
+            if (isAndroid || !isNative) {
+              message['android'] = {
+                priority: "HIGH",
+                notification: {
+                  sound: "default",
+                  channel_id: "gathr_default",
+                  click_action: "FCM_PLUGIN_ACTIVITY",
+                },
+              };
+            }
+            if (isIos || !isNative) {
+              message['apns'] = {
+                headers: { "apns-priority": "10" },
+                payload: { aps: { sound: "default", badge: 1, "content-available": 1 } },
+              };
+            }
+            if (!isNative) {
+              message['webpush'] = {
+                notification: { icon: "/icon-192.png", badge: "/icon-192.png" },
+                fcm_options: { link: url },
+              };
+            }
+
             const res = await fetch(endpoint, {
               method: "POST",
               headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
-              body: JSON.stringify({
-                message: {
-                  token,
-                  notification: { title: payload.title, body: payload.body ?? "" },
-                  data: { url },
-                  webpush: {
-                    notification: { icon: "/icon-192.png", badge: "/icon-192.png" },
-                    fcm_options: { link: url },
-                  },
-                  android: { priority: "HIGH", notification: { click_action: "FLUTTER_NOTIFICATION_CLICK" } },
-                  apns: { payload: { aps: { sound: "default" } } },
-                },
-              }),
+              body: JSON.stringify({ message }),
             });
             if (res.ok) { sent += 1; return; }
             if (res.status === 404 || res.status === 400) dead.push(token);
-            console.error("[send-push] FCM error", res.status, await res.text());
+            console.error("[send-push] FCM error", res.status, platform, await res.text());
           }),
         );
+
 
         if (dead.length) {
           await (supabaseAdmin as any).from("push_tokens").delete().in("token", dead);
