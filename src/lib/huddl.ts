@@ -1,4 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
+import { cached, invalidate, TTL } from "@/lib/cache";
+
 
 export const INTERESTS = [
   "Gaming", "Coffee", "Dinner", "Movies",
@@ -31,7 +33,7 @@ export type VerificationRow = {
   status: "unverified" | "pending" | "verified";
 };
 
-export async function loadMe() {
+async function loadMeUncached() {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError) throw new Error(`Couldn't verify your session: ${userError.message}`);
   if (!user) return null;
@@ -48,6 +50,19 @@ export async function loadMe() {
   return { user, profile: (profile ?? null) as ProfileRow | null, verification: verification as VerificationRow | null };
 }
 
+/**
+ * My profile + verification state. Cached briefly and de-duplicated, because
+ * several components request it on the same mount.
+ */
+export function loadMe() {
+  return cached("me", TTL.short, loadMeUncached);
+}
+
+/** Call after editing the profile / verification so the next read is fresh. */
+export function invalidateMe() {
+  invalidate("me");
+}
+
 export function ageFromDob(dob: string): number {
   const d = new Date(dob);
   const now = new Date();
@@ -57,8 +72,12 @@ export function ageFromDob(dob: string): number {
   return age;
 }
 
-export async function signedPhotoUrl(path: string): Promise<string> {
-  if (/^https?:\/\//.test(path)) return path;
-  const { data } = await supabase.storage.from("profile-photos").createSignedUrl(path, 60 * 60);
-  return data?.signedUrl ?? "";
+export function signedPhotoUrl(path: string): Promise<string> {
+  if (/^https?:\/\//.test(path)) return Promise.resolve(path);
+  // Signed URLs last an hour — reuse them instead of re-signing per render.
+  return cached(`photo:${path}`, TTL.signed, async () => {
+    const { data } = await supabase.storage.from("profile-photos").createSignedUrl(path, 60 * 60);
+    return data?.signedUrl ?? "";
+  });
 }
+

@@ -17,6 +17,34 @@ export async function huddleStatusWith(otherId: string): Promise<{ status: Huddl
   return { status: data.from_id === user.id ? "outgoing" : "incoming", requestId: data.id };
 }
 
+/**
+ * Batched version of huddleStatusWith — one query for a whole list of users.
+ * Used by Discover / suggestions, which previously fired one query per row.
+ */
+export async function huddleStatusesWith(
+  otherIds: string[],
+): Promise<Record<string, { status: HuddleStatus; requestId?: string }>> {
+  const out: Record<string, { status: HuddleStatus; requestId?: string }> = {};
+  const uniq = Array.from(new Set(otherIds.filter(Boolean)));
+  if (!uniq.length) return out;
+  const { data: { user } } = await supabase.auth.getUser();
+  for (const id of uniq) out[id] = { status: "none" };
+  if (!user) return out;
+
+  const { data } = await sb.from("huddle_requests")
+    .select("id, from_id, to_id, status")
+    .or(`from_id.eq.${user.id},to_id.eq.${user.id}`);
+
+  for (const r of (data ?? []) as any[]) {
+    const other = r.from_id === user.id ? r.to_id : r.from_id;
+    if (!(other in out)) continue;
+    if (r.status === "accepted") out[other] = { status: "connected", requestId: r.id };
+    else if (r.status === "declined") out[other] = { status: "declined", requestId: r.id };
+    else out[other] = { status: r.from_id === user.id ? "outgoing" : "incoming", requestId: r.id };
+  }
+  return out;
+}
+
 export async function sendHuddleRequest(toId: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Sign in required");
