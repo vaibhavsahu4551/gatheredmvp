@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getMySubscriptionState, type SubscriptionState } from "@/lib/subscription";
+import { cached, invalidate, TTL } from "@/lib/cache";
 
 export const FREE_EVENT_CREATE_LIMIT = 3;
 export const FREE_EVENT_JOIN_LIMIT = 3;
@@ -12,17 +13,28 @@ export type Entitlements = {
   state: SubscriptionState;
 };
 
-/** Resolve the current user's premium/free entitlements. */
-export async function getMyEntitlements(): Promise<Entitlements> {
-  const state = await getMySubscriptionState();
-  return {
-    isPremium: state.tier === "premium",
-    hasAccess: state.hasPremiumAccess,
-    subscriptionsEnabled: state.subscriptionsEnabled,
-    early_access: state.tier === "premium",
-    state,
-  };
+/**
+ * Resolve the current user's premium/free entitlements.
+ * Cached briefly — many screens ask for this on the same mount.
+ */
+export function getMyEntitlements(): Promise<Entitlements> {
+  return cached("entitlements", TTL.short, async () => {
+    const state = await getMySubscriptionState();
+    return {
+      isPremium: state.tier === "premium",
+      hasAccess: state.hasPremiumAccess,
+      subscriptionsEnabled: state.subscriptionsEnabled,
+      early_access: state.tier === "premium",
+      state,
+    };
+  });
 }
+
+/** Call after a purchase/cancel so the next read reflects the new tier. */
+export function invalidateEntitlements() {
+  invalidate("entitlements");
+}
+
 
 export type LimitCheck = { allowed: boolean; used: number; limit: number };
 

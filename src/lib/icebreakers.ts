@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { cached, invalidate, TTL } from "@/lib/cache";
 
 export type TodayIcebreaker = {
   day: string;
@@ -8,12 +9,20 @@ export type TodayIcebreaker = {
   my_post_id: string | null;
 };
 
-export async function getTodayIcebreaker(): Promise<TodayIcebreaker | null> {
-  const { data, error } = await supabase.rpc("get_today_icebreaker" as any);
-  if (error) throw error;
-  const row = (data as any[])?.[0];
-  return row ? (row as TodayIcebreaker) : null;
+/** Today's prompt. Cached — it only changes once a day. */
+export function getTodayIcebreaker(): Promise<TodayIcebreaker | null> {
+  return cached("icebreaker:today", TTL.medium, async () => {
+    const { data, error } = await supabase.rpc("get_today_icebreaker" as any);
+    if (error) throw error;
+    const row = (data as any[])?.[0];
+    return row ? (row as TodayIcebreaker) : null;
+  });
 }
+
+export function invalidateTodayIcebreaker() {
+  invalidate("icebreaker:today");
+}
+
 
 /** Posts an icebreaker answer as a normal post (likes/comments work as usual). */
 export async function answerIcebreaker(promptId: string, day: string, body: string, city: string) {
