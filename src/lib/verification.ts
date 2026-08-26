@@ -1,3 +1,4 @@
+import { invalidateMe } from "@/lib/huddl";
 import { supabase } from "@/integrations/supabase/client";
 
 const sb: any = supabase;
@@ -47,6 +48,7 @@ export async function submitVerification(blob: Blob) {
   if (upErr) throw upErr;
   const { error } = await sb.rpc("submit_verification", { _path: path });
   if (error) throw error;
+  invalidateMe();
 }
 
 export async function signedSelfieUrl(path: string): Promise<string> {
