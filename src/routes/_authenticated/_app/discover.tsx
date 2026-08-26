@@ -4,9 +4,10 @@ import { ArrowLeft, MapPin, Sparkles, UserPlus, Check, Clock, MessageCircle } fr
 import { supabase } from "@/integrations/supabase/client";
 import { ageFromDob, signedPhotoUrl, type ProfileRow } from "@/lib/huddl";
 import { loadBlockedIds } from "@/lib/safety";
-import { huddleStatusWith, sendHuddleRequest, type HuddleStatus } from "@/lib/huddle-connect";
+import { huddleStatusesWith, sendHuddleRequest, type HuddleStatus } from "@/lib/huddle-connect";
 import { Avatar } from "@/components/Avatar";
 import { PeopleSuggestions } from "@/components/PeopleSuggestions";
+import { PeopleSkeleton } from "@/components/Skeletons";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/_app/discover")({
@@ -68,11 +69,17 @@ function Discover() {
           .filter((r) => r._overlap.length > 0)
           .sort((a, b) => b._overlap.length - a._overlap.length);
 
-        // Photos + huddle statuses in parallel
-        const enriched = await Promise.all(filtered.slice(0, 60).map(async (r) => {
-          const photo = r.photos?.[0] ? await signedPhotoUrl(r.photos[0]) : "";
-          const s = await huddleStatusWith(r.id);
-          return { ...r, _photo: photo, _status: s.status, _reqId: s.requestId };
+        // One batched status query for the whole page + signed photos in parallel.
+        const page = filtered.slice(0, 60);
+        const [statuses, photos] = await Promise.all([
+          huddleStatusesWith(page.map((r) => r.id)),
+          Promise.all(page.map((r) => (r.photos?.[0] ? signedPhotoUrl(r.photos[0]) : Promise.resolve("")))),
+        ]);
+        const enriched = page.map((r, i) => ({
+          ...r,
+          _photo: photos[i],
+          _status: statuses[r.id]?.status ?? ("none" as HuddleStatus),
+          _reqId: statuses[r.id]?.requestId,
         }));
         setRows(enriched);
       } finally {
@@ -135,8 +142,8 @@ function Discover() {
         )}
 
         {loading && (
-          <div className="p-8 flex items-center justify-center">
-            <div className="h-6 w-6 rounded-full border-2 border-muted border-t-primary animate-spin" />
+          <div className="p-4">
+            <PeopleSkeleton rows={4} />
           </div>
         )}
 

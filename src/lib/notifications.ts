@@ -13,10 +13,16 @@ export type Notification = {
   created_at: string;
 };
 
-export async function listNotifications(opts: { pride?: boolean } = {}): Promise<Notification[]> {
+export const NOTIFICATIONS_PAGE = 20;
+
+export async function listNotifications(
+  opts: { pride?: boolean; limit?: number; offset?: number } = {},
+): Promise<Notification[]> {
   const pride = opts.pride ?? false;
+  const from = opts.offset ?? 0;
+  const to = from + (opts.limit ?? NOTIFICATIONS_PAGE) - 1;
   const { data } = await sb.from("notifications")
-    .select("*").eq("is_pride", pride).order("created_at", { ascending: false }).limit(100);
+    .select("*").eq("is_pride", pride).order("created_at", { ascending: false }).range(from, to);
   return (data ?? []) as Notification[];
 }
 
