@@ -32,6 +32,7 @@ type EventItem = { kind: "event"; id: string; created_at: string; ev: EventRow }
 type FeedItem = PostItem | EventItem;
 
 const POSTS_PAGE = 10;
+const EVENTS_PAGE = 30;
 
 function HomeFeed() {
   const [city, setCity] = useState("");
@@ -49,6 +50,9 @@ function HomeFeed() {
   }, []);
 
   const [events, setEvents] = useState<EventRow[]>([]);
+  const [eventsOffset, setEventsOffset] = useState(0);
+  const [eventsDone, setEventsDone] = useState(false);
+  const [loadingEvents, setLoadingEvents] = useState(false);
   const [counts, setCounts] = useState<Record<string, { boys: number; girls: number; total: number }>>({});
   const [hosts, setHosts] = useState<Record<string, { full_name: string | null; gender: string | null; created_at?: string | null }>>({});
   const [hostTiers, setHostTiers] = useState<Record<string, "free" | "premium">>({});
@@ -129,7 +133,7 @@ function HomeFeed() {
     try {
       const [{ data: { user } }, ev, firstPosts, blocked] = await Promise.all([
         supabase.auth.getUser(),
-        listEvents(),
+        listEvents(undefined, { limit: EVENTS_PAGE, offset: 0 }),
         listFeed({ limit: POSTS_PAGE, offset: 0 }),
         loadBlockedIds(),
       ]);
@@ -139,6 +143,8 @@ function HomeFeed() {
 
       const evFiltered = ev.filter((e) => !blocked.has(e.host_id) && e.host_id !== meId);
       setEvents(evFiltered);
+      setEventsOffset(ev.length);
+      setEventsDone(ev.length < EVENTS_PAGE);
 
       // Batched participants + hosts in parallel — was N+1 before.
       const [partsMap, hostsMap, meLite] = await Promise.all([
@@ -191,6 +197,36 @@ function HomeFeed() {
       await hydratePosts(batch);
     } finally { setLoadingMore(false); }
   }, [loadingMore, postsDone, postsOffset, hydratePosts]);
+
+  const loadMoreEvents = useCallback(async () => {
+    if (loadingEvents || eventsDone) return;
+    setLoadingEvents(true);
+    try {
+      const ev = await listEvents(undefined, { limit: EVENTS_PAGE, offset: eventsOffset });
+      const meId = meIdRef.current;
+      const blocked = blockedRef.current;
+      const batch = ev.filter((e) => !blocked.has(e.host_id) && e.host_id !== meId);
+      setEvents((prev) => [...prev, ...batch]);
+      setEventsOffset((n) => n + ev.length);
+      if (ev.length < EVENTS_PAGE) setEventsDone(true);
+      if (batch.length) {
+        const [partsMap, hostsMap, tiers, verified] = await Promise.all([
+          getParticipantsForEvents(batch.map((e) => e.id)),
+          getProfilesLite(batch.map((e) => e.host_id)),
+          getUserTiers(batch.map((e) => e.host_id)),
+          getVerifiedIds(batch.map((e) => e.host_id)),
+        ]);
+        setCounts((prev) => {
+          const next = { ...prev };
+          for (const e of batch) next[e.id] = countByGender(partsMap[e.id] ?? []);
+          return next;
+        });
+        setHosts((prev) => ({ ...prev, ...hostsMap }));
+        setHostTiers((prev) => ({ ...prev, ...tiers }));
+        setVerifiedHosts((prev) => new Set([...prev, ...verified]));
+      }
+    } finally { setLoadingEvents(false); }
+  }, [loadingEvents, eventsDone, eventsOffset]);
 
   // Infinite scroll sentinel.
   const sentinelRef = useRef<HTMLDivElement | null>(null);
