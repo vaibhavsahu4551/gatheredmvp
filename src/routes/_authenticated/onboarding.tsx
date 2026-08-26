@@ -1,3 +1,4 @@
+import { invalidateMe } from "@/lib/huddl";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -172,6 +173,7 @@ function Onboarding() {
       console.error("Onboarding save failed", error);
       return toast.error(error.message);
     }
+    invalidateMe();
     toast.success("Welcome to Gathr");
     navigate({ to: "/home" });
   };
