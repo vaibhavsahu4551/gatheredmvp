@@ -49,48 +49,42 @@ function Notifications() {
   const [rows, setRows] = useState<Notification[]>([]);
   const [profiles, setProfiles] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [done, setDone] = useState(false);
   const [celebrate, setCelebrate] = useState<{ me: LinkupPeer; other: LinkupPeer } | null>(null);
+
+  const hydrate = async (r: Notification[]) => {
+    const ids = Array.from(new Set(r.map((x) => x.actor_id).filter(Boolean) as string[]));
+    if (ids.length) {
+      const p = (await getProfilesLite(ids)) as any;
+      setProfiles((prev) => ({ ...prev, ...p }));
+    }
+  };
 
   useEffect(() => {
     (async () => {
-      const r = await listNotifications();
+      const r = await listNotifications({ limit: NOTIFICATIONS_PAGE, offset: 0 });
       setRows(r);
-      const ids = Array.from(new Set(r.map((x) => x.actor_id).filter(Boolean) as string[]));
-      if (ids.length) setProfiles(await getProfilesLite(ids) as any);
+      setDone(r.length < NOTIFICATIONS_PAGE);
+      await hydrate(r);
       setLoading(false);
       await markAllRead();
     })();
   }, []);
 
-  const openAccepted = async (actorId: string) => {
+  const loadMore = async () => {
+    if (loadingMore || done) return;
+    setLoadingMore(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const [me, other] = await Promise.all([loadPeer(user.id), loadPeer(actorId)]);
-      setCelebrate({ me, other });
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed");
+      const r = await listNotifications({ limit: NOTIFICATIONS_PAGE, offset: rows.length });
+      setRows((prev) => [...prev, ...r]);
+      if (r.length < NOTIFICATIONS_PAGE) setDone(true);
+      await hydrate(r);
+    } finally {
+      setLoadingMore(false);
     }
   };
 
-  return (
-    <div>
-      <header className="px-5 pt-8 pb-4 flex items-center gap-3">
-        <button onClick={() => navigate({ to: "/home" })} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
-          <ArrowLeft className="h-4 w-4" />
-        </button>
-        <h1 className="text-2xl font-semibold tracking-tight">Notifications</h1>
-      </header>
-      <div className="px-5 space-y-2">
-        {loading && <div className="text-sm text-muted-foreground text-center py-8">Loading…</div>}
-        {!loading && rows.length === 0 && (
-          <div className="px-6 py-16 text-center">
-            <div className="mx-auto h-14 w-14 rounded-full bg-muted flex items-center justify-center">
-              <Bell className="h-6 w-6 text-muted-foreground" />
-            </div>
-            <p className="mt-4 text-sm text-muted-foreground">You're all caught up.</p>
-          </div>
-        )}
         {rows.map((n) => {
           const p = n.actor_id ? profiles[n.actor_id] : null;
           const name = p?.full_name ?? "Someone";
