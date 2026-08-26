@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { listNotifications, markAllRead, type Notification } from "@/lib/notifications";
+import { listNotifications, markAllRead, NOTIFICATIONS_PAGE, type Notification } from "@/lib/notifications";
+import { ListSkeleton } from "@/components/Skeletons";
 import { getProfilesLite } from "@/lib/events";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar } from "@/components/Avatar";
@@ -82,6 +83,17 @@ function Notifications() {
       await hydrate(r);
     } finally {
       setLoadingMore(false);
+    }
+  };
+
+  const openAccepted = async (actorId: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const [me, other] = await Promise.all([loadPeer(user.id), loadPeer(actorId)]);
+      setCelebrate({ me, other });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
     }
   };
 
@@ -174,6 +186,15 @@ function Notifications() {
             </Link>
           );
         })}
+        {!loading && rows.length > 0 && !done && (
+          <button
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="w-full rounded-full border border-border py-2 text-sm font-medium disabled:opacity-60"
+          >
+            {loadingMore ? "Loading…" : "Load more"}
+          </button>
+        )}
       </div>
 
       {celebrate && (
