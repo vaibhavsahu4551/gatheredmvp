@@ -85,6 +85,24 @@ function Notifications() {
     }
   };
 
+  return (
+    <div>
+      <header className="px-5 pt-8 pb-4 flex items-center gap-3">
+        <button onClick={() => navigate({ to: "/home" })} className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+        <h1 className="text-2xl font-semibold tracking-tight">Notifications</h1>
+      </header>
+      <div className="px-5 space-y-2">
+        {loading && <ListSkeleton rows={6} />}
+        {!loading && rows.length === 0 && (
+          <div className="px-6 py-16 text-center">
+            <div className="mx-auto h-14 w-14 rounded-full bg-muted flex items-center justify-center">
+              <Bell className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <p className="mt-4 text-sm text-muted-foreground">You're all caught up.</p>
+          </div>
+        )}
         {rows.map((n) => {
           const p = n.actor_id ? profiles[n.actor_id] : null;
           const name = p?.full_name ?? "Someone";
