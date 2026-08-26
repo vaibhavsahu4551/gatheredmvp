@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { listNotifications, markAllRead, type Notification } from "@/lib/notifications";
+import { listNotifications, markAllRead, NOTIFICATIONS_PAGE, type Notification } from "@/lib/notifications";
+import { ListSkeleton } from "@/components/Skeletons";
 import { getProfilesLite } from "@/lib/events";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar } from "@/components/Avatar";
@@ -49,18 +50,41 @@ function Notifications() {
   const [rows, setRows] = useState<Notification[]>([]);
   const [profiles, setProfiles] = useState<Record<string, { full_name: string | null; photo: string | null }>>({});
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [done, setDone] = useState(false);
   const [celebrate, setCelebrate] = useState<{ me: LinkupPeer; other: LinkupPeer } | null>(null);
+
+  const hydrate = async (r: Notification[]) => {
+    const ids = Array.from(new Set(r.map((x) => x.actor_id).filter(Boolean) as string[]));
+    if (ids.length) {
+      const p = (await getProfilesLite(ids)) as any;
+      setProfiles((prev) => ({ ...prev, ...p }));
+    }
+  };
 
   useEffect(() => {
     (async () => {
-      const r = await listNotifications();
+      const r = await listNotifications({ limit: NOTIFICATIONS_PAGE, offset: 0 });
       setRows(r);
-      const ids = Array.from(new Set(r.map((x) => x.actor_id).filter(Boolean) as string[]));
-      if (ids.length) setProfiles(await getProfilesLite(ids) as any);
+      setDone(r.length < NOTIFICATIONS_PAGE);
+      await hydrate(r);
       setLoading(false);
       await markAllRead();
     })();
   }, []);
+
+  const loadMore = async () => {
+    if (loadingMore || done) return;
+    setLoadingMore(true);
+    try {
+      const r = await listNotifications({ limit: NOTIFICATIONS_PAGE, offset: rows.length });
+      setRows((prev) => [...prev, ...r]);
+      if (r.length < NOTIFICATIONS_PAGE) setDone(true);
+      await hydrate(r);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const openAccepted = async (actorId: string) => {
     try {
@@ -82,7 +106,7 @@ function Notifications() {
         <h1 className="text-2xl font-semibold tracking-tight">Notifications</h1>
       </header>
       <div className="px-5 space-y-2">
-        {loading && <div className="text-sm text-muted-foreground text-center py-8">Loading…</div>}
+        {loading && <ListSkeleton rows={6} />}
         {!loading && rows.length === 0 && (
           <div className="px-6 py-16 text-center">
             <div className="mx-auto h-14 w-14 rounded-full bg-muted flex items-center justify-center">
@@ -162,6 +186,15 @@ function Notifications() {
             </Link>
           );
         })}
+        {!loading && rows.length > 0 && !done && (
+          <button
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="w-full rounded-full border border-border py-2 text-sm font-medium disabled:opacity-60"
+          >
+            {loadingMore ? "Loading…" : "Load more"}
+          </button>
+        )}
       </div>
 
       {celebrate && (

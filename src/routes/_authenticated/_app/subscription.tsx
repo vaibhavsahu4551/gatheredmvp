@@ -1,3 +1,4 @@
+import { invalidateEntitlements } from "@/lib/entitlements";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -29,7 +30,7 @@ function ManageSubscription() {
   const [busy, setBusy] = useState(false);
   const cancel = useServerFn(cancelRazorpaySubscription);
 
-  const refresh = () => getMySubscriptionState().then(setState);
+  const refresh = () => { invalidateEntitlements(); return getMySubscriptionState().then(setState); };
   useEffect(() => { refresh(); }, []);
 
   const onCancel = async () => {

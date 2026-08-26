@@ -1,3 +1,4 @@
+import { invalidateEntitlements } from "@/lib/entitlements";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -101,8 +102,10 @@ function PremiumScreen() {
         },
         handler: async () => {
           toast.success("Payment received! Activating premium…");
+          invalidateEntitlements();
           // Webhook flips subscription_tier; refresh state after a beat.
           setTimeout(async () => {
+            invalidateEntitlements();
             const next = await getMySubscriptionState();
             setState(next);
             navigate({ to: "/subscription" });

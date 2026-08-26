@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { INTERESTS, loadMe, signedPhotoUrl } from "@/lib/huddl";
+import { INTERESTS, loadMe, invalidateMe, signedPhotoUrl } from "@/lib/huddl";
+import { invalidate } from "@/lib/cache";
 import { normalizeHandle, normalizeSpotify } from "@/lib/socials";
 import { PhotoCropModal } from "@/components/PhotoCropModal";
 import { toast } from "sonner";
@@ -132,6 +133,8 @@ function EditProfile() {
 
     setSaving(false);
     if (error) return toast.error(error.message);
+    invalidateMe();
+    invalidate("photo:*");
     toast.success("Profile updated");
     navigate({ to: "/profile" });
   };
