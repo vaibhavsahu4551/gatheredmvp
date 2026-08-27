@@ -51,7 +51,10 @@ function DmRoom() {
           await hydrateShares([m]);
           markDmRead(threadId).catch(() => {});
         }).subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+      markDmRead(threadId).catch(() => {});
+    };
   }, [threadId]);
 
   const hydrateShares = async (msgs: any[]) => {
