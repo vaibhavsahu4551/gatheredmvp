@@ -73,7 +73,7 @@ function Chat() {
           </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-border p-3 text-[11px] text-muted-foreground">
-            Group chats unlock when your Gathr confirms.
+            Group chats appear here once you're approved for a Gathr.
           </div>
         )}
 
