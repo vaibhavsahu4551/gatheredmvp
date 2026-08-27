@@ -7,6 +7,7 @@ import { Avatar } from "@/components/Avatar";
 import { MessageCircle, Users, Plus } from "lucide-react";
 import { useDmUnread } from "@/hooks/useDmUnread";
 import { listMyCircles, type CircleWithMeta } from "@/lib/circles";
+import { ListSkeleton } from "@/components/Skeletons";
 
 export const Route = createFileRoute("/_authenticated/_app/chat/")({
   component: Chat,
