@@ -76,7 +76,7 @@ function Chat() {
           </div>
         )}
 
-        {loading && <div className="text-sm text-muted-foreground text-center py-8">Loading…</div>}
+        {loading && <ListSkeleton rows={5} />}
         {!loading && threads.length === 0 && (
           <div className="px-6 py-16 text-center">
             <div className="mx-auto h-14 w-14 rounded-full bg-muted flex items-center justify-center">
