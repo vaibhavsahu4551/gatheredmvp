@@ -7,6 +7,7 @@ import { Avatar } from "@/components/Avatar";
 import { MessageCircle, Users, Plus } from "lucide-react";
 import { useDmUnread } from "@/hooks/useDmUnread";
 import { listMyCircles, type CircleWithMeta } from "@/lib/circles";
+import { ListSkeleton } from "@/components/Skeletons";
 
 export const Route = createFileRoute("/_authenticated/_app/chat/")({
   component: Chat,
@@ -76,7 +77,7 @@ function Chat() {
           </div>
         )}
 
-        {loading && <div className="text-sm text-muted-foreground text-center py-8">Loading…</div>}
+        {loading && <ListSkeleton rows={5} />}
         {!loading && threads.length === 0 && (
           <div className="px-6 py-16 text-center">
             <div className="mx-auto h-14 w-14 rounded-full bg-muted flex items-center justify-center">

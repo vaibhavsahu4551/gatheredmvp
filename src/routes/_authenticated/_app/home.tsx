@@ -234,11 +234,11 @@ function HomeFeed() {
     const el = sentinelRef.current;
     if (!el) return;
     const io = new IntersectionObserver((entries) => {
-      if (entries[0]?.isIntersecting) loadMore();
+      if (entries[0]?.isIntersecting) { loadMore(); loadMoreEvents(); }
     }, { rootMargin: "600px" });
     io.observe(el);
     return () => io.disconnect();
-  }, [loadMore]);
+  }, [loadMore, loadMoreEvents]);
 
   // Optimistic like — no full-feed refresh.
   const onLike = useCallback(async (postId: string) => {
