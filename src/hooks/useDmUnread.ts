@@ -23,8 +23,13 @@ export function useDmUnread() {
   useEffect(() => {
     let alive = true;
     let channel: any;
-    const onLocal = () => { refreshSoon(); };
-    if (typeof window !== "undefined") window.addEventListener("dm-unread-refresh", onLocal);
+    // Local mark-as-read must clear the badge immediately (no debounce).
+    const onLocal = () => { refresh().catch(() => {}); };
+    const onFocus = () => { refresh().catch(() => {}); };
+    if (typeof window !== "undefined") {
+      window.addEventListener("dm-unread-refresh", onLocal);
+      window.addEventListener("focus", onFocus);
+    }
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!alive || !user) return;
