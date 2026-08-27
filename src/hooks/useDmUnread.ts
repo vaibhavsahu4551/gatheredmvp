@@ -44,7 +44,10 @@ export function useDmUnread() {
       alive = false;
       if (timer.current) clearTimeout(timer.current);
       if (channel) supabase.removeChannel(channel);
-      if (typeof window !== "undefined") window.removeEventListener("dm-unread-refresh", onLocal);
+      if (typeof window !== "undefined") {
+        window.removeEventListener("dm-unread-refresh", onLocal);
+        window.removeEventListener("focus", onFocus);
+      }
     };
   }, [refresh, refreshSoon]);
 
