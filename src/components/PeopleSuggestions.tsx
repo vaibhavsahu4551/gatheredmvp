@@ -19,6 +19,7 @@ export function PeopleSuggestions({ variant = "rail" }: { variant?: "rail" | "gr
   const [sent, setSent] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
+  const [tag, setTag] = useState<string>("All");
 
   useEffect(() => {
     (async () => {
