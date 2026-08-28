@@ -47,9 +47,17 @@ export async function getDmUnread(): Promise<Record<string, { unread: number; la
 }
 
 export async function markDmRead(threadId: string) {
-  await sb.rpc("mark_dm_read", { _thread: threadId });
+  // Clear this thread's badge instantly, then reconcile with the server.
   if (typeof window !== "undefined") {
-    window.dispatchEvent(new CustomEvent("dm-unread-refresh"));
+    window.dispatchEvent(new CustomEvent("dm-unread-refresh", { detail: { threadId } }));
+  }
+  try {
+    await sb.rpc("mark_dm_read", { _thread: threadId });
+  } catch {
+    // reconcile on next refresh
+  }
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("dm-unread-refresh", { detail: { threadId } }));
   }
 }
 
