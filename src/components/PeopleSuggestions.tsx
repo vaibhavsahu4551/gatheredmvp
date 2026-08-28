@@ -45,9 +45,20 @@ export function PeopleSuggestions({ variant = "rail" }: { variant?: "rail" | "gr
     try { await dismissSuggestion(id); } catch { /* ignore */ }
   };
 
+  const interestTags = useMemo(() => {
+    const counts: Record<string, number> = {};
+    items.forEach((s) => s.sharedInterests.forEach((t) => { counts[t] = (counts[t] ?? 0) + 1; }));
+    return Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  }, [items]);
+
+  const filtered = useMemo(
+    () => (tag === "All" ? items : items.filter((s) => s.sharedInterests.includes(tag))),
+    [items, tag],
+  );
+
   if (loading || items.length === 0) return null;
 
-  const shown = variant === "rail" ? items.slice(0, 12) : items;
+  const shown = variant === "rail" ? filtered.slice(0, 12) : filtered;
 
   const Card = (s: Suggestion) => (
     <div className="relative shrink-0 w-[150px] rounded-2xl border border-border bg-card p-3 shadow-sm">
