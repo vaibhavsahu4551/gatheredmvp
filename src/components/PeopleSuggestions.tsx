@@ -89,10 +89,32 @@ export function PeopleSuggestions({ variant = "rail" }: { variant?: "rail" | "gr
     </div>
   );
 
+  const Filters = ({ pad }: { pad: string }) =>
+    interestTags.length === 0 ? null : (
+      <div className={`mt-2 flex gap-2 overflow-x-auto pb-1 ${pad} [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}>
+        {["All", ...interestTags].map((t) => (
+          <button
+            key={t}
+            onClick={() => setTag(t)}
+            className={`shrink-0 rounded-full px-3 py-1 text-[12px] font-medium border ${
+              tag === t ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"
+            }`}
+          >
+            {t === "All" ? "All" : t}
+          </button>
+        ))}
+      </div>
+    );
+
   if (variant === "grid") {
     return (
-      <div className="flex flex-wrap gap-3">
-        {shown.map((s) => <Card key={s.id} {...s} />)}
+      <div>
+        <Filters pad="" />
+        <div className="mt-2 flex flex-wrap gap-3">
+          {shown.length === 0
+            ? <div className="text-xs text-muted-foreground py-2">No suggestions for this interest.</div>
+            : shown.map((s) => <Card key={s.id} {...s} />)}
+        </div>
       </div>
     );
   }
@@ -101,12 +123,15 @@ export function PeopleSuggestions({ variant = "rail" }: { variant?: "rail" | "gr
     <section className="mt-2">
       <div className="px-5 flex items-center justify-between">
         <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-          <Users className="h-3.5 w-3.5" /> PEOPLE YOU MAY KNOW
+          <Users className="h-3.5 w-3.5" /> SUGGESTED PEOPLE
         </div>
         <Link to="/discover" className="text-xs font-semibold text-primary">See all</Link>
       </div>
+      <Filters pad="px-5" />
       <div className="mt-2 flex gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {shown.map((s) => <Card key={s.id} {...s} />)}
+        {shown.length === 0
+          ? <div className="text-xs text-muted-foreground py-2">No suggestions for this interest.</div>
+          : shown.map((s) => <Card key={s.id} {...s} />)}
       </div>
     </section>
   );
