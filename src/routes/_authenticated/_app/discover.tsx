@@ -126,7 +126,7 @@ function Discover() {
 
       <div className="max-w-md mx-auto">
         <div className="px-4 mt-4">
-          <div className="text-xs font-semibold text-muted-foreground mb-2">PEOPLE YOU MAY KNOW</div>
+          <div className="text-xs font-semibold text-muted-foreground mb-2">SUGGESTED PEOPLE</div>
           <PeopleSuggestions variant="grid" />
         </div>
 
