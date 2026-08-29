@@ -6,10 +6,11 @@ import { ArrowLeft, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import {
   getMySubscriptionState,
-  PREMIUM_PRICE_INR,
   type SubscriptionState,
 } from "@/lib/subscription";
 import { cancelRazorpaySubscription } from "@/lib/razorpay.functions";
+import { getPlan } from "@/lib/plans";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/_app/subscription")({
   component: ManageSubscription,
@@ -24,14 +25,56 @@ function fmt(d: string | null) {
   } catch { return d; }
 }
 
+function isOneTime(s: SubscriptionState) {
+  return s.subscription?.status === "paid" || !!getPlan(s.subscription?.plan_id ?? "");
+}
+
+function planLabel(s: SubscriptionState) {
+  const p = getPlan(s.subscription?.plan_id ?? "");
+  if (p) return `${p.label} · ₹${p.priceInr}`;
+  return s.tier === "premium" ? "Gathr Premium" : "Free";
+}
+
+function expired(s: SubscriptionState) {
+  const end = s.expiresAt ?? s.subscription?.current_end ?? null;
+  return !!end && new Date(end).getTime() < Date.now();
+}
+
 function ManageSubscription() {
   const navigate = useNavigate();
   const [state, setState] = useState<SubscriptionState | null>(null);
   const [busy, setBusy] = useState(false);
+  const [boosts, setBoosts] = useState(0);
   const cancel = useServerFn(cancelRazorpaySubscription);
 
-  const refresh = () => { invalidateEntitlements(); return getMySubscriptionState().then(setState); };
+  const loadBoosts = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await (supabase as any)
+      .from("profiles").select("boost_credits").eq("id", user.id).maybeSingle();
+    setBoosts(data?.boost_credits ?? 0);
+  };
+
+  const refresh = () => {
+    invalidateEntitlements();
+    loadBoosts();
+    return getMySubscriptionState().then(setState);
+  };
   useEffect(() => { refresh(); }, []);
+
+  const onUseBoost = async () => {
+    setBusy(true);
+    try {
+      const { error } = await (supabase as any).rpc("use_boost_credit", { _event: null });
+      if (error) throw new Error(error.message);
+      toast.success("Your next event is boosted!");
+      await refresh();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Couldn't use the boost");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const onCancel = async () => {
     if (!confirm("Cancel your Gathr Premium subscription? You'll keep access until the end of the current billing cycle.")) return;
@@ -96,8 +139,10 @@ function ManageSubscription() {
 
               <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <dt className="text-muted-foreground text-xs">Price</dt>
-                  <dd className="font-medium">₹{PREMIUM_PRICE_INR} / month</dd>
+                  <dt className="text-muted-foreground text-xs">Plan</dt>
+                  <dd className="font-medium">
+                    {planLabel(state) ?? "—"}
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground text-xs">Status</dt>
@@ -107,7 +152,7 @@ function ManageSubscription() {
                 </div>
                 <div>
                   <dt className="text-muted-foreground text-xs">
-                    {state.subscription?.cancelled_at ? "Ends on" : "Renews on"}
+                    {isOneTime(state) ? "Access until" : state.subscription?.cancelled_at ? "Ends on" : "Renews on"}
                   </dt>
                   <dd className="font-medium">
                     {fmt(state.expiresAt ?? state.subscription?.current_end ?? null)}
@@ -122,7 +167,38 @@ function ManageSubscription() {
               </dl>
             </div>
 
-            {state.tier === "premium" && !state.subscription?.cancelled_at && (
+            {boosts > 0 && (
+              <div className="rounded-2xl border border-border p-4 bg-card">
+                <div className="text-sm font-semibold">
+                  {boosts} free event boost{boosts > 1 ? "s" : ""} available
+                </div>
+                <button
+                  disabled={busy}
+                  onClick={onUseBoost}
+                  className="mt-3 w-full rounded-full bg-gradient-brand text-white py-2.5 text-sm font-semibold shadow-glow disabled:opacity-60"
+                >
+                  Boost my next event
+                </button>
+              </div>
+            )}
+
+            {isOneTime(state) && (
+              <div className="rounded-2xl border border-border bg-muted/50 p-3 text-[12px]">
+                This is a one-time plan — it will not auto-renew. We'll prompt
+                you to resubscribe at any price you choose when it ends.
+              </div>
+            )}
+
+            {state.tier === "premium" && state.subscriptionsEnabled && (
+              <Link
+                to="/premium"
+                className="block w-full text-center rounded-full border border-border py-3 text-sm font-semibold"
+              >
+                {expired(state) ? "Resubscribe" : "Extend or change plan"}
+              </Link>
+            )}
+
+            {state.tier === "premium" && !isOneTime(state) && !state.subscription?.cancelled_at && (
               <button
                 disabled={busy}
                 onClick={onCancel}

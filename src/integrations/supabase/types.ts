@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -1037,6 +1037,7 @@ export type Database = {
       profiles: {
         Row: {
           bio: string | null
+          boost_credits: number
           city: string | null
           created_at: string
           dob: string | null
@@ -1073,6 +1074,7 @@ export type Database = {
         }
         Insert: {
           bio?: string | null
+          boost_credits?: number
           city?: string | null
           created_at?: string
           dob?: string | null
@@ -1109,6 +1111,7 @@ export type Database = {
         }
         Update: {
           bio?: string | null
+          boost_credits?: number
           city?: string | null
           created_at?: string
           dob?: string | null
@@ -1923,6 +1926,17 @@ export type Database = {
         Returns: string
       }
       announce_daily_icebreaker: { Args: never; Returns: undefined }
+      apply_premium_purchase: {
+        Args: {
+          _bonus_points: number
+          _boosts: number
+          _founding: boolean
+          _months: number
+          _plan: string
+          _user: string
+        }
+        Returns: string
+      }
       claim_referral: { Args: { _code: string }; Returns: boolean }
       claim_weekly_challenge: { Args: never; Returns: string }
       cleanup_expired_stories: { Args: never; Returns: undefined }
@@ -2064,6 +2078,7 @@ export type Database = {
       roll_weekly_challenge: { Args: never; Returns: string }
       submit_verification: { Args: { _path: string }; Returns: undefined }
       sweep_empty_events: { Args: never; Returns: undefined }
+      use_boost_credit: { Args: { _event?: string }; Returns: string }
     }
     Enums: {
       app_role: "admin"
