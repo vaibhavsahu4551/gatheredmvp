@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getAppSettingsCached } from "@/lib/admin";
 
-export const PREMIUM_PRICE_INR = 199;
+export const PREMIUM_PRICE_INR = 79;
 
 export type SubscriptionRecord = {
   id: string;
