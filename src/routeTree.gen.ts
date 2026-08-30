@@ -65,6 +65,7 @@ import { Route as AuthenticatedAppPrideResourcesRouteImport } from './routes/_au
 import { Route as AuthenticatedAppPrideNotificationsRouteImport } from './routes/_authenticated/_app/pride.notifications'
 import { Route as AuthenticatedAppPrideGuidelinesRouteImport } from './routes/_authenticated/_app/pride.guidelines'
 import { Route as AuthenticatedAppPostsPostIdRouteImport } from './routes/_authenticated/_app/posts.$postId'
+import { Route as AuthenticatedAppOfficialOfficialIdRouteImport } from './routes/_authenticated/_app/official.$officialId'
 import { Route as AuthenticatedAppMessagesThreadIdRouteImport } from './routes/_authenticated/_app/messages.$threadId'
 import { Route as AuthenticatedAppCirclesCircleIdRouteImport } from './routes/_authenticated/_app/circles.$circleId'
 import { Route as AuthenticatedAppChatGroupIdRouteImport } from './routes/_authenticated/_app/chat.$groupId'
@@ -377,6 +378,12 @@ const AuthenticatedAppPostsPostIdRoute =
     path: '/posts/$postId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppOfficialOfficialIdRoute =
+  AuthenticatedAppOfficialOfficialIdRouteImport.update({
+    id: '/official/$officialId',
+    path: '/official/$officialId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppMessagesThreadIdRoute =
   AuthenticatedAppMessagesThreadIdRouteImport.update({
     id: '/messages/$threadId',
@@ -450,6 +457,7 @@ export interface FileRoutesByFullPath {
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
+  '/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
   '/pride/notifications': typeof AuthenticatedAppPrideNotificationsRoute
@@ -511,6 +519,7 @@ export interface FileRoutesByTo {
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
+  '/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
   '/pride/notifications': typeof AuthenticatedAppPrideNotificationsRoute
@@ -576,6 +585,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/_authenticated/_app/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/_authenticated/_app/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
+  '/_authenticated/_app/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRoute
   '/_authenticated/_app/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/_authenticated/_app/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
   '/_authenticated/_app/pride/notifications': typeof AuthenticatedAppPrideNotificationsRoute
@@ -640,6 +650,7 @@ export interface FileRouteTypes {
     | '/chat/$groupId'
     | '/circles/$circleId'
     | '/messages/$threadId'
+    | '/official/$officialId'
     | '/posts/$postId'
     | '/pride/guidelines'
     | '/pride/notifications'
@@ -701,6 +712,7 @@ export interface FileRouteTypes {
     | '/chat/$groupId'
     | '/circles/$circleId'
     | '/messages/$threadId'
+    | '/official/$officialId'
     | '/posts/$postId'
     | '/pride/guidelines'
     | '/pride/notifications'
@@ -765,6 +777,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/chat/$groupId'
     | '/_authenticated/_app/circles/$circleId'
     | '/_authenticated/_app/messages/$threadId'
+    | '/_authenticated/_app/official/$officialId'
     | '/_authenticated/_app/posts/$postId'
     | '/_authenticated/_app/pride/guidelines'
     | '/_authenticated/_app/pride/notifications'
@@ -1197,6 +1210,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppPostsPostIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/official/$officialId': {
+      id: '/_authenticated/_app/official/$officialId'
+      path: '/official/$officialId'
+      fullPath: '/official/$officialId'
+      preLoaderRoute: typeof AuthenticatedAppOfficialOfficialIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/messages/$threadId': {
       id: '/_authenticated/_app/messages/$threadId'
       path: '/messages/$threadId'
@@ -1255,6 +1275,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppChatGroupIdRoute: typeof AuthenticatedAppChatGroupIdRoute
   AuthenticatedAppCirclesCircleIdRoute: typeof AuthenticatedAppCirclesCircleIdRoute
   AuthenticatedAppMessagesThreadIdRoute: typeof AuthenticatedAppMessagesThreadIdRoute
+  AuthenticatedAppOfficialOfficialIdRoute: typeof AuthenticatedAppOfficialOfficialIdRoute
   AuthenticatedAppPostsPostIdRoute: typeof AuthenticatedAppPostsPostIdRoute
   AuthenticatedAppPrideGuidelinesRoute: typeof AuthenticatedAppPrideGuidelinesRoute
   AuthenticatedAppPrideNotificationsRoute: typeof AuthenticatedAppPrideNotificationsRoute
@@ -1295,6 +1316,8 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppChatGroupIdRoute: AuthenticatedAppChatGroupIdRoute,
   AuthenticatedAppCirclesCircleIdRoute: AuthenticatedAppCirclesCircleIdRoute,
   AuthenticatedAppMessagesThreadIdRoute: AuthenticatedAppMessagesThreadIdRoute,
+  AuthenticatedAppOfficialOfficialIdRoute:
+    AuthenticatedAppOfficialOfficialIdRoute,
   AuthenticatedAppPostsPostIdRoute: AuthenticatedAppPostsPostIdRoute,
   AuthenticatedAppPrideGuidelinesRoute: AuthenticatedAppPrideGuidelinesRoute,
   AuthenticatedAppPrideNotificationsRoute:
