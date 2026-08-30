@@ -21,19 +21,30 @@ export type AppSettings = {
   subscription_enabled: boolean;
   maintenance_enabled: boolean;
   maintenance_message: string | null;
+  default_booking_whatsapp: string | null;
 };
 
 export async function getAppSettings(): Promise<AppSettings> {
   const { data } = await supabase
     .from("app_settings" as any)
-    .select("subscription_enabled, maintenance_enabled, maintenance_message")
+    .select("subscription_enabled, maintenance_enabled, maintenance_message, default_booking_whatsapp")
     .eq("id", 1)
     .maybeSingle();
   return {
     subscription_enabled: !!(data as any)?.subscription_enabled,
     maintenance_enabled: !!(data as any)?.maintenance_enabled,
     maintenance_message: ((data as any)?.maintenance_message as string) ?? null,
+    default_booking_whatsapp: ((data as any)?.default_booking_whatsapp as string) ?? null,
   };
+}
+
+export async function setDefaultBookingWhatsapp(number: string | null) {
+  clearAppSettingsCache();
+  const { error } = await supabase
+    .from("app_settings" as any)
+    .update({ default_booking_whatsapp: number, updated_at: new Date().toISOString() })
+    .eq("id", 1);
+  if (error) throw error;
 }
 
 let _settingsCache: Promise<AppSettings> | null = null;
