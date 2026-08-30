@@ -25,6 +25,7 @@ import { Route as AdminRevenueRouteImport } from './routes/admin.revenue'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
 import { Route as AdminPostsRouteImport } from './routes/admin.posts'
+import { Route as AdminOfficialRouteImport } from './routes/admin.official'
 import { Route as AdminMusicRouteImport } from './routes/admin.music'
 import { Route as AdminFlaggedRouteImport } from './routes/admin.flagged'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
@@ -150,6 +151,11 @@ const AdminReferralsRoute = AdminReferralsRouteImport.update({
 const AdminPostsRoute = AdminPostsRouteImport.update({
   id: '/posts',
   path: '/posts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOfficialRoute = AdminOfficialRouteImport.update({
+  id: '/official',
+  path: '/official',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminMusicRoute = AdminMusicRouteImport.update({
@@ -433,6 +439,7 @@ export interface FileRoutesByFullPath {
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
   '/admin/music': typeof AdminMusicRoute
+  '/admin/official': typeof AdminOfficialRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -495,6 +502,7 @@ export interface FileRoutesByTo {
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
   '/admin/music': typeof AdminMusicRoute
+  '/admin/official': typeof AdminOfficialRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -561,6 +569,7 @@ export interface FileRoutesById {
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
   '/admin/music': typeof AdminMusicRoute
+  '/admin/official': typeof AdminOfficialRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -626,6 +635,7 @@ export interface FileRouteTypes {
     | '/admin/events'
     | '/admin/flagged'
     | '/admin/music'
+    | '/admin/official'
     | '/admin/posts'
     | '/admin/referrals'
     | '/admin/reports'
@@ -688,6 +698,7 @@ export interface FileRouteTypes {
     | '/admin/events'
     | '/admin/flagged'
     | '/admin/music'
+    | '/admin/official'
     | '/admin/posts'
     | '/admin/referrals'
     | '/admin/reports'
@@ -753,6 +764,7 @@ export interface FileRouteTypes {
     | '/admin/events'
     | '/admin/flagged'
     | '/admin/music'
+    | '/admin/official'
     | '/admin/posts'
     | '/admin/referrals'
     | '/admin/reports'
@@ -928,6 +940,13 @@ declare module '@tanstack/react-router' {
       path: '/posts'
       fullPath: '/admin/posts'
       preLoaderRoute: typeof AdminPostsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/official': {
+      id: '/admin/official'
+      path: '/official'
+      fullPath: '/admin/official'
+      preLoaderRoute: typeof AdminOfficialRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/music': {
@@ -1370,6 +1389,7 @@ interface AdminRouteChildren {
   AdminEventsRoute: typeof AdminEventsRoute
   AdminFlaggedRoute: typeof AdminFlaggedRoute
   AdminMusicRoute: typeof AdminMusicRoute
+  AdminOfficialRoute: typeof AdminOfficialRoute
   AdminPostsRoute: typeof AdminPostsRoute
   AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
@@ -1388,6 +1408,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEventsRoute: AdminEventsRoute,
   AdminFlaggedRoute: AdminFlaggedRoute,
   AdminMusicRoute: AdminMusicRoute,
+  AdminOfficialRoute: AdminOfficialRoute,
   AdminPostsRoute: AdminPostsRoute,
   AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,
