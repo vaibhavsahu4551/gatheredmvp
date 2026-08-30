@@ -54,7 +54,7 @@ function ForgotPassword() {
       if (!app) throw new Error("Phone verification isn't configured yet");
       const { getAuth, RecaptchaVerifier, signInWithPhoneNumber } = await import("firebase/auth");
       const auth = getAuth(app);
-      if (!verifierRef.current) {
+      if (verifierRef.current) {
         verifierRef.current.clear();
         verifierRef.current=null;
       }
