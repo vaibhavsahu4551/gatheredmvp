@@ -56,6 +56,7 @@ export function getAppSettingsCached(): Promise<AppSettings> {
       subscription_enabled: false,
       maintenance_enabled: false,
       maintenance_message: null,
+      default_booking_whatsapp: null,
     }));
   }
   return _settingsCache;
