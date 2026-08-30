@@ -55,6 +55,9 @@ function ForgotPassword() {
       const { getAuth, RecaptchaVerifier, signInWithPhoneNumber } = await import("firebase/auth");
       const auth = getAuth(app);
       if (!verifierRef.current) {
+        verifierRef.current.clear();
+        verifierRef.current=null;
+      }
         verifierRef.current = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
       }
       const full = `${country}${digits}`;
