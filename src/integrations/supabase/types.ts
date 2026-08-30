@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       app_settings: {
         Row: {
+          default_booking_whatsapp: string | null
           id: number
           maintenance_enabled: boolean
           maintenance_message: string | null
@@ -23,6 +24,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          default_booking_whatsapp?: string | null
           id?: number
           maintenance_enabled?: boolean
           maintenance_message?: string | null
@@ -30,6 +32,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          default_booking_whatsapp?: string | null
           id?: number
           maintenance_enabled?: boolean
           maintenance_message?: string | null
@@ -829,6 +832,78 @@ export type Database = {
           read_at?: string | null
           target_id?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      official_events: {
+        Row: {
+          booking_whatsapp: string | null
+          category: string
+          city: string
+          cover_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          ends_at: string | null
+          id: string
+          is_featured: boolean
+          is_pinned: boolean
+          organizer_logo: string | null
+          organizer_name: string
+          price_text: string | null
+          published: boolean
+          starts_at: string
+          terms: string | null
+          ticket_url: string | null
+          title: string
+          updated_at: string
+          venue: string
+        }
+        Insert: {
+          booking_whatsapp?: string | null
+          category?: string
+          city?: string
+          cover_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          is_featured?: boolean
+          is_pinned?: boolean
+          organizer_logo?: string | null
+          organizer_name?: string
+          price_text?: string | null
+          published?: boolean
+          starts_at: string
+          terms?: string | null
+          ticket_url?: string | null
+          title: string
+          updated_at?: string
+          venue?: string
+        }
+        Update: {
+          booking_whatsapp?: string | null
+          category?: string
+          city?: string
+          cover_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          is_featured?: boolean
+          is_pinned?: boolean
+          organizer_logo?: string | null
+          organizer_name?: string
+          price_text?: string | null
+          published?: boolean
+          starts_at?: string
+          terms?: string | null
+          ticket_url?: string | null
+          title?: string
+          updated_at?: string
+          venue?: string
         }
         Relationships: []
       }

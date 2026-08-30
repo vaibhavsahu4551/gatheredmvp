@@ -25,6 +25,7 @@ import { Route as AdminRevenueRouteImport } from './routes/admin.revenue'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
 import { Route as AdminPostsRouteImport } from './routes/admin.posts'
+import { Route as AdminOfficialRouteImport } from './routes/admin.official'
 import { Route as AdminMusicRouteImport } from './routes/admin.music'
 import { Route as AdminFlaggedRouteImport } from './routes/admin.flagged'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
@@ -65,6 +66,7 @@ import { Route as AuthenticatedAppPrideResourcesRouteImport } from './routes/_au
 import { Route as AuthenticatedAppPrideNotificationsRouteImport } from './routes/_authenticated/_app/pride.notifications'
 import { Route as AuthenticatedAppPrideGuidelinesRouteImport } from './routes/_authenticated/_app/pride.guidelines'
 import { Route as AuthenticatedAppPostsPostIdRouteImport } from './routes/_authenticated/_app/posts.$postId'
+import { Route as AuthenticatedAppOfficialOfficialIdRouteImport } from './routes/_authenticated/_app/official.$officialId'
 import { Route as AuthenticatedAppMessagesThreadIdRouteImport } from './routes/_authenticated/_app/messages.$threadId'
 import { Route as AuthenticatedAppCirclesCircleIdRouteImport } from './routes/_authenticated/_app/circles.$circleId'
 import { Route as AuthenticatedAppChatGroupIdRouteImport } from './routes/_authenticated/_app/chat.$groupId'
@@ -149,6 +151,11 @@ const AdminReferralsRoute = AdminReferralsRouteImport.update({
 const AdminPostsRoute = AdminPostsRouteImport.update({
   id: '/posts',
   path: '/posts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOfficialRoute = AdminOfficialRouteImport.update({
+  id: '/official',
+  path: '/official',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminMusicRoute = AdminMusicRouteImport.update({
@@ -377,6 +384,12 @@ const AuthenticatedAppPostsPostIdRoute =
     path: '/posts/$postId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppOfficialOfficialIdRoute =
+  AuthenticatedAppOfficialOfficialIdRouteImport.update({
+    id: '/official/$officialId',
+    path: '/official/$officialId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppMessagesThreadIdRoute =
   AuthenticatedAppMessagesThreadIdRouteImport.update({
     id: '/messages/$threadId',
@@ -426,6 +439,7 @@ export interface FileRoutesByFullPath {
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
   '/admin/music': typeof AdminMusicRoute
+  '/admin/official': typeof AdminOfficialRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -450,6 +464,7 @@ export interface FileRoutesByFullPath {
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
+  '/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
   '/pride/notifications': typeof AuthenticatedAppPrideNotificationsRoute
@@ -487,6 +502,7 @@ export interface FileRoutesByTo {
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
   '/admin/music': typeof AdminMusicRoute
+  '/admin/official': typeof AdminOfficialRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -511,6 +527,7 @@ export interface FileRoutesByTo {
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
+  '/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
   '/pride/notifications': typeof AuthenticatedAppPrideNotificationsRoute
@@ -552,6 +569,7 @@ export interface FileRoutesById {
   '/admin/events': typeof AdminEventsRoute
   '/admin/flagged': typeof AdminFlaggedRoute
   '/admin/music': typeof AdminMusicRoute
+  '/admin/official': typeof AdminOfficialRoute
   '/admin/posts': typeof AdminPostsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -576,6 +594,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/_authenticated/_app/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/_authenticated/_app/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
+  '/_authenticated/_app/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRoute
   '/_authenticated/_app/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/_authenticated/_app/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
   '/_authenticated/_app/pride/notifications': typeof AuthenticatedAppPrideNotificationsRoute
@@ -616,6 +635,7 @@ export interface FileRouteTypes {
     | '/admin/events'
     | '/admin/flagged'
     | '/admin/music'
+    | '/admin/official'
     | '/admin/posts'
     | '/admin/referrals'
     | '/admin/reports'
@@ -640,6 +660,7 @@ export interface FileRouteTypes {
     | '/chat/$groupId'
     | '/circles/$circleId'
     | '/messages/$threadId'
+    | '/official/$officialId'
     | '/posts/$postId'
     | '/pride/guidelines'
     | '/pride/notifications'
@@ -677,6 +698,7 @@ export interface FileRouteTypes {
     | '/admin/events'
     | '/admin/flagged'
     | '/admin/music'
+    | '/admin/official'
     | '/admin/posts'
     | '/admin/referrals'
     | '/admin/reports'
@@ -701,6 +723,7 @@ export interface FileRouteTypes {
     | '/chat/$groupId'
     | '/circles/$circleId'
     | '/messages/$threadId'
+    | '/official/$officialId'
     | '/posts/$postId'
     | '/pride/guidelines'
     | '/pride/notifications'
@@ -741,6 +764,7 @@ export interface FileRouteTypes {
     | '/admin/events'
     | '/admin/flagged'
     | '/admin/music'
+    | '/admin/official'
     | '/admin/posts'
     | '/admin/referrals'
     | '/admin/reports'
@@ -765,6 +789,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/chat/$groupId'
     | '/_authenticated/_app/circles/$circleId'
     | '/_authenticated/_app/messages/$threadId'
+    | '/_authenticated/_app/official/$officialId'
     | '/_authenticated/_app/posts/$postId'
     | '/_authenticated/_app/pride/guidelines'
     | '/_authenticated/_app/pride/notifications'
@@ -915,6 +940,13 @@ declare module '@tanstack/react-router' {
       path: '/posts'
       fullPath: '/admin/posts'
       preLoaderRoute: typeof AdminPostsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/official': {
+      id: '/admin/official'
+      path: '/official'
+      fullPath: '/admin/official'
+      preLoaderRoute: typeof AdminOfficialRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/music': {
@@ -1197,6 +1229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppPostsPostIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/official/$officialId': {
+      id: '/_authenticated/_app/official/$officialId'
+      path: '/official/$officialId'
+      fullPath: '/official/$officialId'
+      preLoaderRoute: typeof AuthenticatedAppOfficialOfficialIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/messages/$threadId': {
       id: '/_authenticated/_app/messages/$threadId'
       path: '/messages/$threadId'
@@ -1255,6 +1294,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppChatGroupIdRoute: typeof AuthenticatedAppChatGroupIdRoute
   AuthenticatedAppCirclesCircleIdRoute: typeof AuthenticatedAppCirclesCircleIdRoute
   AuthenticatedAppMessagesThreadIdRoute: typeof AuthenticatedAppMessagesThreadIdRoute
+  AuthenticatedAppOfficialOfficialIdRoute: typeof AuthenticatedAppOfficialOfficialIdRoute
   AuthenticatedAppPostsPostIdRoute: typeof AuthenticatedAppPostsPostIdRoute
   AuthenticatedAppPrideGuidelinesRoute: typeof AuthenticatedAppPrideGuidelinesRoute
   AuthenticatedAppPrideNotificationsRoute: typeof AuthenticatedAppPrideNotificationsRoute
@@ -1295,6 +1335,8 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppChatGroupIdRoute: AuthenticatedAppChatGroupIdRoute,
   AuthenticatedAppCirclesCircleIdRoute: AuthenticatedAppCirclesCircleIdRoute,
   AuthenticatedAppMessagesThreadIdRoute: AuthenticatedAppMessagesThreadIdRoute,
+  AuthenticatedAppOfficialOfficialIdRoute:
+    AuthenticatedAppOfficialOfficialIdRoute,
   AuthenticatedAppPostsPostIdRoute: AuthenticatedAppPostsPostIdRoute,
   AuthenticatedAppPrideGuidelinesRoute: AuthenticatedAppPrideGuidelinesRoute,
   AuthenticatedAppPrideNotificationsRoute:
@@ -1347,6 +1389,7 @@ interface AdminRouteChildren {
   AdminEventsRoute: typeof AdminEventsRoute
   AdminFlaggedRoute: typeof AdminFlaggedRoute
   AdminMusicRoute: typeof AdminMusicRoute
+  AdminOfficialRoute: typeof AdminOfficialRoute
   AdminPostsRoute: typeof AdminPostsRoute
   AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
@@ -1365,6 +1408,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEventsRoute: AdminEventsRoute,
   AdminFlaggedRoute: AdminFlaggedRoute,
   AdminMusicRoute: AdminMusicRoute,
+  AdminOfficialRoute: AdminOfficialRoute,
   AdminPostsRoute: AdminPostsRoute,
   AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,
