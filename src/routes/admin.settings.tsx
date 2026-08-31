@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getAppSettings, setSubscriptionEnabled, setMaintenance, DEFAULT_MAINTENANCE_MESSAGE, listBanners, createBanner, updateBanner, deleteBanner, type HomeBanner } from "@/lib/admin";
+import { getAppSettings, setDefaultBookingWhatsapp, setSubscriptionEnabled, setMaintenance, DEFAULT_MAINTENANCE_MESSAGE, listBanners, createBanner, updateBanner, deleteBanner, type HomeBanner } from "@/lib/admin";
 import { MaintenanceScreen } from "@/components/MaintenanceScreen";
 import { toast } from "sonner";
 
@@ -15,12 +15,14 @@ function AdminSettings() {
   const [maintEnabled, setMaintEnabled] = useState(false);
   const [maintMessage, setMaintMessage] = useState("");
   const [preview, setPreview] = useState(false);
+  const [waNumber, setWaNumber] = useState("");
 
   async function refresh() {
     const s = await getAppSettings();
     setSubEnabled(s.subscription_enabled);
     setMaintEnabled(s.maintenance_enabled);
     setMaintMessage(s.maintenance_message ?? "");
+    setWaNumber(s.default_booking_whatsapp ?? "");
     setBanners(await listBanners());
   }
   useEffect(() => { refresh(); }, []);
@@ -43,6 +45,11 @@ function AdminSettings() {
     catch (e: any) { toast.error(e.message); }
   }
 
+  async function saveWhatsapp() {
+    try { await setDefaultBookingWhatsapp(waNumber.trim() || null); toast.success("Default WhatsApp number saved"); }
+    catch (e: any) { toast.error(e.message); }
+  }
+
   return (
     <div className="space-y-8">
       <section>
@@ -59,6 +66,18 @@ function AdminSettings() {
             <input type="checkbox" checked={subEnabled} onChange={(e) => toggleSub(e.target.checked)} className="sr-only peer" />
             <div className="w-11 h-6 bg-muted rounded-full peer-checked:bg-foreground transition after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:h-5 after:w-5 after:bg-background after:rounded-full after:transition peer-checked:after:translate-x-5" />
           </label>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-border p-4 space-y-3">
+        <div>
+          <div className="font-medium">Default booking WhatsApp number</div>
+          <div className="text-xs text-muted-foreground">Used for official events that don't have their own booking number.</div>
+        </div>
+        <div className="flex gap-2">
+          <input value={waNumber} onChange={(e) => setWaNumber(e.target.value)} placeholder="e.g. 919876543210"
+            className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm" />
+          <button onClick={saveWhatsapp} className="rounded-lg bg-foreground text-background px-3 py-2 text-sm">Save</button>
         </div>
       </section>
 
