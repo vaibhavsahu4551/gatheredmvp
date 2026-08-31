@@ -56,10 +56,10 @@ function ForgotPassword() {
       const auth = getAuth(app);
       if (verifierRef.current) {
         verifierRef.current.clear();
-        verifierRef.current=null;
+        verifierRef.current = null;
       }
-        verifierRef.current = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
-      }
+      verifierRef.current = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
+
       const full = `${country}${digits}`;
       confirmationRef.current = await signInWithPhoneNumber(auth, full, verifierRef.current);
       setStep("otp");
