@@ -18,6 +18,8 @@ import { sortEventsByStatus } from "@/lib/event-status";
 
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { StoryRail } from "@/components/StoryRail";
+import { OfficialEventCard } from "@/components/OfficialEventCard";
+import { listPublishedOfficialEvents, type OfficialEvent } from "@/lib/official-events";
 import { PeopleSuggestions } from "@/components/PeopleSuggestions";
 import { IcebreakerCard } from "@/components/IcebreakerCard";
 import { WeeklyChallengeCard } from "@/components/WeeklyChallengeCard";
@@ -48,6 +50,9 @@ function HomeFeed() {
     getActiveBanner().then(setBanner).catch(() => {});
     getAppSettings().then((s) => setPremium(s.subscription_enabled)).catch(() => {});
   }, []);
+
+  const [official, setOfficial] = useState<OfficialEvent[]>([]);
+  useEffect(() => { listPublishedOfficialEvents({ limit: 10 }).then(setOfficial).catch(() => {}); }, []);
 
   const [events, setEvents] = useState<EventRow[]>([]);
   const [eventsOffset, setEventsOffset] = useState(0);
@@ -337,6 +342,21 @@ function HomeFeed() {
 
 
       <div className="mt-3 px-5 space-y-3 pb-4">
+        {official.length > 0 && (
+          <section>
+            <div className="mb-2">
+              <div className="text-sm font-semibold">📌 Official Events</div>
+              <div className="text-xs text-muted-foreground">Curated concerts, festivals and partner nights</div>
+            </div>
+            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x pb-1">
+              {official.map((e) => (
+                <div key={"o" + e.id} className="snap-start">
+                  <OfficialEventCard e={e} compact />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
         <IcebreakerCard city={city} />
         <WeeklyChallengeCard />
         {banner && (

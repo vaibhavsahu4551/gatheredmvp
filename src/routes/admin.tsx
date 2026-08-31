@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useLocation } from "@tansta
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { isCurrentUserAdmin } from "@/lib/admin";
-import { LayoutDashboard, Users, Calendar, Flag, Settings, LogOut, Gift, Image as ImageIcon, BadgeCheck, ShieldAlert, Sparkles, IndianRupee, Clapperboard, Share2, Music, Award } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, Flag, Settings, LogOut, Gift, Image as ImageIcon, BadgeCheck, ShieldAlert, Sparkles, IndianRupee, Clapperboard, Share2, Music, Award, Ticket } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
@@ -52,6 +52,7 @@ function AdminLayout() {
     { to: "/admin", label: "Overview", icon: LayoutDashboard },
     { to: "/admin/users", label: "Users", icon: Users },
     { to: "/admin/events", label: "Events", icon: Calendar },
+    { to: "/admin/official", label: "Official Events", icon: Ticket },
     { to: "/admin/posts", label: "Posts", icon: ImageIcon },
     { to: "/admin/verification", label: "Verification", icon: BadgeCheck },
     { to: "/admin/reports", label: "Reports", icon: Flag },
