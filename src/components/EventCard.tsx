@@ -142,12 +142,12 @@ export function EventCard({
         </div>
 
         {/* Right: cover thumbnail */}
-        <div className="relative shrink-0" style={{ width: "38%", aspectRatio: "1 / 1" }}>
+        <div className="relative shrink-0 overflow-hidden rounded-2xl bg-card" style={{ width: "38%", aspectRatio: "1 / 1" }}>
           <img
             src={coverUrl}
             alt=""
             loading="lazy"
-            className={`absolute inset-0 h-full w-full object-cover rounded-2xl ${phase === "closed" ? "grayscale" : ""}`}
+            className={`absolute inset-0 h-full w-full object-contain rounded-2xl bg-card ${phase === "closed" ? "grayscale" : ""}`}
           />
           <div
             className="absolute inset-0 rounded-2xl pointer-events-none"
