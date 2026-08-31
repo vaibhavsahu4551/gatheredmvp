@@ -5,12 +5,26 @@ type Props = {
   file: File;
   onCancel: () => void;
   onConfirm: (cropped: File) => void;
-  /** Output size in px (square). */
+  /** Output width in px. */
   size?: number;
+  /** Crop aspect ratio (width / height). 1 = square. */
+  aspect?: number;
+  /** Circular mask (avatars). Set false for banners. */
+  round?: boolean;
+  /** Header label. */
+  title?: string;
 };
 
 /** Circular crop tool: pan by dragging, zoom with the slider / wheel / pinch. */
-export function PhotoCropModal({ file, onCancel, onConfirm, size = 720 }: Props) {
+export function PhotoCropModal({
+  file,
+  onCancel,
+  onConfirm,
+  size = 720,
+  aspect = 1,
+  round = true,
+  title = "Adjust your photo",
+}: Props) {
   const [src, setSrc] = useState<string>("");
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [zoom, setZoom] = useState(1);
@@ -42,16 +56,20 @@ export function PhotoCropModal({ file, onCancel, onConfirm, size = 720 }: Props)
     return () => el.removeEventListener("wheel", onWheel);
   }, [img]);
 
-  const viewport = 288; // px, matches the on-screen crop box
+  const viewportW = 288; // px, matches the on-screen crop box
+  const viewportH = Math.round(viewportW / aspect);
+  const outW = size;
+  const outH = Math.round(size / aspect);
+  const baseScale = (i: HTMLImageElement) => Math.max(viewportW / i.width, viewportH / i.height);
 
   function clampOffset(next: { x: number; y: number }, z: number) {
     if (!img) return next;
     // base scale = cover the viewport
-    const base = viewport / Math.min(img.width, img.height);
+    const base = baseScale(img);
     const w = img.width * base * z;
     const h = img.height * base * z;
-    const maxX = Math.max(0, (w - viewport) / 2);
-    const maxY = Math.max(0, (h - viewport) / 2);
+    const maxX = Math.max(0, (w - viewportW) / 2);
+    const maxY = Math.max(0, (h - viewportH) / 2);
     return { x: clamp(next.x, -maxX, maxX), y: clamp(next.y, -maxY, maxY) };
   }
 
@@ -85,28 +103,28 @@ export function PhotoCropModal({ file, onCancel, onConfirm, size = 720 }: Props)
     setBusy(true);
     try {
       const canvas = document.createElement("canvas");
-      canvas.width = size;
-      canvas.height = size;
+      canvas.width = outW;
+      canvas.height = outH;
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Canvas unavailable");
-      const ratio = size / viewport;
-      const base = viewport / Math.min(img.width, img.height);
+      const ratio = outW / viewportW;
+      const base = baseScale(img);
       const w = img.width * base * zoom * ratio;
       const h = img.height * base * zoom * ratio;
-      const x = size / 2 - w / 2 + offset.x * ratio;
-      const y = size / 2 - h / 2 + offset.y * ratio;
+      const x = outW / 2 - w / 2 + offset.x * ratio;
+      const y = outH / 2 - h / 2 + offset.y * ratio;
       ctx.fillStyle = "#000";
-      ctx.fillRect(0, 0, size, size);
+      ctx.fillRect(0, 0, outW, outH);
       ctx.drawImage(img, x, y, w, h);
       const blob: Blob | null = await new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.9));
       if (!blob) throw new Error("Couldn't process the image");
-      onConfirm(new File([blob], "avatar.jpg", { type: "image/jpeg" }));
+      onConfirm(new File([blob], round ? "avatar.jpg" : "cover.jpg", { type: "image/jpeg" }));
     } finally {
       setBusy(false);
     }
   }
 
-  const base = img ? viewport / Math.min(img.width, img.height) : 1;
+  const base = img ? baseScale(img) : 1;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/90 flex flex-col">
@@ -114,15 +132,15 @@ export function PhotoCropModal({ file, onCancel, onConfirm, size = 720 }: Props)
         <button onClick={onCancel} aria-label="Cancel" className="h-9 w-9 rounded-full bg-white/10 flex items-center justify-center">
           <X className="h-4 w-4" />
         </button>
-        <span className="text-sm font-medium">Adjust your photo</span>
+        <span className="text-sm font-medium">{title}</span>
         <span className="w-9" />
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-6">
         <div
           ref={boxRef}
-          className="relative overflow-hidden rounded-full touch-none bg-black select-none"
-          style={{ width: viewport, height: viewport }}
+          className={`relative overflow-hidden touch-none bg-black select-none ${round ? "rounded-full" : "rounded-xl"}`}
+          style={{ width: viewportW, height: viewportH }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
@@ -143,7 +161,7 @@ export function PhotoCropModal({ file, onCancel, onConfirm, size = 720 }: Props)
               }}
             />
           )}
-          <div className="pointer-events-none absolute inset-0 rounded-full ring-2 ring-white/70" />
+          <div className={`pointer-events-none absolute inset-0 ring-2 ring-white/70 ${round ? "rounded-full" : "rounded-xl"}`} />
         </div>
 
         <div className="mt-6 w-full max-w-xs flex items-center gap-3 text-white/80">
