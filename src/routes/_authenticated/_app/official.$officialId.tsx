@@ -113,10 +113,8 @@ function OfficialEventDetail() {
             Book tickets online <ExternalLink className="h-3.5 w-3.5" />
           </a>
         )}
-      </div>
 
-      {wa && (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur">
+        {wa && (
           <a
             href={wa}
             target="_blank"
@@ -125,6 +123,21 @@ function OfficialEventDetail() {
           >
             <MessageCircle className="h-5 w-5" /> Get Pass on WhatsApp
           </a>
+        )}
+      </div>
+
+      {wa && (
+        <div className="fixed inset-x-0 bottom-16 z-50 border-t border-border bg-background/95 p-3 pb-3 backdrop-blur">
+          <div className="mx-auto max-w-md">
+            <a
+              href={wa}
+              target="_blank"
+              rel="noreferrer"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] py-3.5 text-[15px] font-bold text-white shadow-sm active:scale-[0.99]"
+            >
+              <MessageCircle className="h-5 w-5" /> Get Pass on WhatsApp
+            </a>
+          </div>
         </div>
       )}
     </div>
