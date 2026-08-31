@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { PhotoCropModal } from "@/components/PhotoCropModal";
 import {
   OFFICIAL_CATEGORIES,
   adminCreateOfficialEvent,
@@ -178,7 +179,15 @@ function OfficialForm({
 }) {
   const [f, setF] = useState<Form>(initial);
   const [busy, setBusy] = useState(false);
+  const [cropFile, setCropFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState("");
   const set = (k: keyof Form, v: any) => setF((p) => ({ ...p, [k]: v }));
+
+  useEffect(() => {
+    let alive = true;
+    resolveOfficialMedia(f.cover_url).then((u) => alive && setCoverPreview(u)).catch(() => {});
+    return () => { alive = false; };
+  }, [f.cover_url]);
 
   async function pick(key: "cover_url" | "organizer_logo", file?: File | null) {
     if (!file) return;
@@ -237,10 +246,34 @@ function OfficialForm({
       </div>
 
       <Field label="Cover / banner">
-        <div className="flex items-center gap-2">
-          <input type="file" accept="image/*" onChange={(e) => pick("cover_url", e.target.files?.[0])} className="text-xs" />
+        <div className="overflow-hidden rounded-xl border border-border bg-muted aspect-[16/10] w-full max-w-sm">
+          {coverPreview ? (
+            <img src={coverPreview} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full items-center justify-center text-[11px] text-muted-foreground">No cover yet</div>
+          )}
         </div>
+        <div className="mt-2 flex items-center gap-2">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => { const file = e.target.files?.[0]; if (file) setCropFile(file); e.target.value = ""; }}
+            className="text-xs"
+          />
+        </div>
+        <p className="mt-1 text-[11px] text-muted-foreground">You can zoom, drag and crop the banner after picking a file.</p>
         <input value={f.cover_url} onChange={(e) => set("cover_url", e.target.value)} placeholder="or paste an image URL" className={`${inputCls} mt-1`} />
+        {cropFile && (
+          <PhotoCropModal
+            file={cropFile}
+            aspect={16 / 10}
+            round={false}
+            size={1440}
+            title="Crop the event banner"
+            onCancel={() => setCropFile(null)}
+            onConfirm={async (cropped) => { setCropFile(null); await pick("cover_url", cropped); }}
+          />
+        )}
       </Field>
 
       <Field label="Organizer logo (optional)">
