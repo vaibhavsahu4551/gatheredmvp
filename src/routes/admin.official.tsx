@@ -275,7 +275,6 @@ function OfficialForm({
         <Field label="Organizer name"><input value={f.organizer_name} onChange={(e) => set("organizer_name", e.target.value)} className={inputCls} /></Field>
         <Field label="Pass price (₹)"><input type="number" min="0" value={f.pass_price} onChange={(e) => set("pass_price", e.target.value)} className={inputCls} /></Field>
         <Field label="Passes available"><input type="number" min="0" value={f.pass_quantity} onChange={(e) => set("pass_quantity", e.target.value)} className={inputCls} /></Field>
-        <Field label="Price label (optional)"><input value={f.price_text} onChange={(e) => set("price_text", e.target.value)} placeholder="e.g. ₹499 onwards" className={inputCls} /></Field>
         <Field label="Event contact number"><input value={f.contact_phone} onChange={(e) => set("contact_phone", e.target.value)} className={inputCls} /></Field>
         <Field label="WhatsApp booking number"><input value={f.booking_whatsapp} onChange={(e) => set("booking_whatsapp", e.target.value)} placeholder="Leave blank to use default" className={inputCls} /></Field>
       </div>
