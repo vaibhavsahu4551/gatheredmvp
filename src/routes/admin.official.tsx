@@ -9,6 +9,7 @@ import {
   adminDeleteOfficialEvent,
   adminListOfficialEvents,
   adminUpdateOfficialEvent,
+  officialStats,
   resolveOfficialMedia,
   uploadOfficialMedia,
   type OfficialEvent,
@@ -26,9 +27,15 @@ const emptyForm = {
   cover_url: "",
   date: "",
   time: "19:00",
+  end_time: "",
   venue: "",
   city: "",
   price_text: "",
+  pass_price: "",
+  pass_quantity: "",
+  pass_info: "",
+  contact_phone: "",
+  instructions: "",
   organizer_name: "",
   organizer_logo: "",
   booking_whatsapp: "",
@@ -50,9 +57,15 @@ function toForm(e: OfficialEvent): Form {
     cover_url: e.cover_url ?? "",
     date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
     time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+    end_time: e.ends_at ? `${pad(new Date(e.ends_at).getHours())}:${pad(new Date(e.ends_at).getMinutes())}` : "",
     venue: e.venue,
     city: e.city,
     price_text: e.price_text ?? "",
+    pass_price: e.pass_price != null ? String(e.pass_price) : "",
+    pass_quantity: e.pass_quantity != null ? String(e.pass_quantity) : "",
+    pass_info: e.pass_info ?? "",
+    contact_phone: e.contact_phone ?? "",
+    instructions: e.instructions ?? "",
     organizer_name: e.organizer_name,
     organizer_logo: e.organizer_logo ?? "",
     booking_whatsapp: e.booking_whatsapp ?? "",
@@ -103,6 +116,17 @@ function AdminOfficialEvents() {
         >
           {showForm && !editing ? "Cancel" : "New official event"}
         </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+        {(() => { const st = officialStats(rows); return ([
+          ["Total", st.total], ["Published", st.published], ["Draft", st.draft], ["Pinned", st.pinned], ["Featured", st.featured],
+        ] as const).map(([label, v]) => (
+          <div key={label} className="rounded-xl border border-border p-3">
+            <div className="text-lg font-semibold">{v}</div>
+            <div className="text-[11px] text-muted-foreground">{label}</div>
+          </div>
+        )); })()}
       </div>
 
       {showForm && (
@@ -214,6 +238,12 @@ function OfficialForm({
         venue: f.venue.trim(),
         city: f.city.trim(),
         price_text: f.price_text.trim() || null,
+        ends_at: f.end_time ? new Date(`${f.date}T${f.end_time}`).toISOString() : null,
+        pass_price: f.pass_price.trim() ? Number(f.pass_price) : null,
+        pass_quantity: f.pass_quantity.trim() ? Number(f.pass_quantity) : null,
+        pass_info: f.pass_info.trim() || null,
+        contact_phone: f.contact_phone.trim() || null,
+        instructions: f.instructions.trim() || null,
         organizer_name: f.organizer_name.trim(),
         organizer_logo: f.organizer_logo.trim() || null,
         booking_whatsapp: f.booking_whatsapp.trim() || null,
@@ -238,10 +268,15 @@ function OfficialForm({
         </Field>
         <Field label="Price / pass price"><input value={f.price_text} onChange={(e) => set("price_text", e.target.value)} placeholder="₹499 onwards" className={inputCls} /></Field>
         <Field label="Date"><input required type="date" value={f.date} onChange={(e) => set("date", e.target.value)} className={inputCls} /></Field>
-        <Field label="Time"><input type="time" value={f.time} onChange={(e) => set("time", e.target.value)} className={inputCls} /></Field>
+        <Field label="Start time"><input type="time" value={f.time} onChange={(e) => set("time", e.target.value)} className={inputCls} /></Field>
+        <Field label="End time (optional)"><input type="time" value={f.end_time} onChange={(e) => set("end_time", e.target.value)} className={inputCls} /></Field>
         <Field label="Venue"><input value={f.venue} onChange={(e) => set("venue", e.target.value)} className={inputCls} /></Field>
         <Field label="City"><input value={f.city} onChange={(e) => set("city", e.target.value)} className={inputCls} /></Field>
         <Field label="Organizer name"><input value={f.organizer_name} onChange={(e) => set("organizer_name", e.target.value)} className={inputCls} /></Field>
+        <Field label="Pass price (₹)"><input type="number" min="0" value={f.pass_price} onChange={(e) => set("pass_price", e.target.value)} className={inputCls} /></Field>
+        <Field label="Passes available"><input type="number" min="0" value={f.pass_quantity} onChange={(e) => set("pass_quantity", e.target.value)} className={inputCls} /></Field>
+        <Field label="Price label (optional)"><input value={f.price_text} onChange={(e) => set("price_text", e.target.value)} placeholder="e.g. ₹499 onwards" className={inputCls} /></Field>
+        <Field label="Event contact number"><input value={f.contact_phone} onChange={(e) => set("contact_phone", e.target.value)} className={inputCls} /></Field>
         <Field label="WhatsApp booking number"><input value={f.booking_whatsapp} onChange={(e) => set("booking_whatsapp", e.target.value)} placeholder="Leave blank to use default" className={inputCls} /></Field>
       </div>
 
@@ -283,6 +318,8 @@ function OfficialForm({
 
       <Field label="Ticket booking URL (optional)"><input value={f.ticket_url} onChange={(e) => set("ticket_url", e.target.value)} className={inputCls} /></Field>
       <Field label="Description"><textarea rows={3} value={f.description} onChange={(e) => set("description", e.target.value)} className={inputCls} /></Field>
+      <Field label="Pass / ticket information"><textarea rows={2} value={f.pass_info} onChange={(e) => set("pass_info", e.target.value)} className={inputCls} /></Field>
+      <Field label="Event instructions"><textarea rows={2} value={f.instructions} onChange={(e) => set("instructions", e.target.value)} className={inputCls} /></Field>
       <Field label="Terms / information"><textarea rows={3} value={f.terms} onChange={(e) => set("terms", e.target.value)} className={inputCls} /></Field>
 
       <div className="flex flex-wrap gap-4 text-xs">
