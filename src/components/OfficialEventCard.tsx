@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { BadgeCheck, CalendarDays, MapPin, Ticket } from "lucide-react";
-import { resolveOfficialMedia, type OfficialEvent } from "@/lib/official-events";
+import { priceLabel, resolveOfficialMedia, type OfficialEvent } from "@/lib/official-events";
 
 function dateParts(iso: string) {
   const d = new Date(iso);
@@ -29,7 +29,7 @@ export function OfficialEventCard({ e, compact }: { e: OfficialEvent; compact?: 
     <Link
       to="/official/$officialId"
       params={{ officialId: e.id }}
-      className={`block overflow-hidden rounded-3xl bg-card shadow-card ring-1 ring-border/60 transition active:scale-[0.995] ${compact ? "w-[280px] shrink-0" : ""}`}
+      className={`group block overflow-hidden rounded-3xl bg-card shadow-card ring-1 ring-border/60 transition active:scale-[0.995] ${compact ? "w-[280px] shrink-0" : ""}`}
     >
       <div className="relative aspect-[16/10] w-full bg-muted">
         {cover && <img src={cover} alt="" loading="lazy" className="h-full w-full object-cover" />}
@@ -87,11 +87,15 @@ export function OfficialEventCard({ e, compact }: { e: OfficialEvent; compact?: 
               <div className="text-[10px] text-muted-foreground">Organizer</div>
             </div>
           </div>
-          {e.price_text && (
+          {priceLabel(e) && (
             <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[11px] font-bold">
-              <Ticket className="h-3 w-3" /> {e.price_text}
+              <Ticket className="h-3 w-3" /> {priceLabel(e)}
             </span>
           )}
+        </div>
+
+        <div className="flex w-full items-center justify-center rounded-full bg-gradient-brand py-2.5 text-[13px] font-bold text-white shadow-sm transition group-active:scale-[0.99]">
+          Get Pass
         </div>
       </div>
     </Link>

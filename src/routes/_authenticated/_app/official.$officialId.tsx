@@ -4,6 +4,7 @@ import { ArrowLeft, BadgeCheck, CalendarDays, ExternalLink, MapPin, MessageCircl
 import {
   defaultBookingWhatsapp,
   getOfficialEvent,
+  priceLabel,
   resolveOfficialMedia,
   whatsappBookingLink,
   type OfficialEvent,
@@ -72,8 +73,23 @@ function OfficialEventDetail() {
         <div className="rounded-2xl border border-border bg-card p-4 space-y-2.5">
           <Row icon={CalendarDays} label={when} />
           <Row icon={MapPin} label={[e.venue, e.city].filter(Boolean).join(", ") || "Venue TBA"} />
-          {e.price_text && <Row icon={Ticket} label={e.price_text} />}
+          {priceLabel(e) && <Row icon={Ticket} label={priceLabel(e)} />}
+          {e.ends_at && <Row icon={CalendarDays} label={`Ends ${new Date(e.ends_at).toLocaleString([], { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}`} />}
+          {e.contact_phone && <Row icon={MessageCircle} label={e.contact_phone} />}
         </div>
+
+        {(e.pass_info || e.pass_price != null || e.pass_quantity != null) && (
+          <section className="rounded-2xl border border-border bg-card p-4">
+            <h2 className="text-sm font-semibold">Passes</h2>
+            {e.pass_price != null && (
+              <div className="mt-1 text-[15px] font-extrabold">₹{Number(e.pass_price).toLocaleString("en-IN")} <span className="text-xs font-medium text-muted-foreground">per pass</span></div>
+            )}
+            {e.pass_quantity != null && (
+              <div className="text-[12px] text-muted-foreground">{e.pass_quantity} passes available</div>
+            )}
+            {e.pass_info && <p className="mt-1 whitespace-pre-wrap text-[13px] leading-relaxed text-muted-foreground">{e.pass_info}</p>}
+          </section>
+        )}
 
         <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
           {logo ? (
@@ -93,6 +109,13 @@ function OfficialEventDetail() {
           <section>
             <h2 className="text-sm font-semibold">About this event</h2>
             <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{e.description}</p>
+          </section>
+        )}
+
+        {e.instructions && (
+          <section>
+            <h2 className="text-sm font-semibold">Important information</h2>
+            <p className="mt-1 whitespace-pre-wrap text-[13px] leading-relaxed text-muted-foreground">{e.instructions}</p>
           </section>
         )}
 
@@ -121,7 +144,7 @@ function OfficialEventDetail() {
             rel="noreferrer"
             className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] py-3.5 text-[15px] font-bold text-white shadow-sm active:scale-[0.99]"
           >
-            <MessageCircle className="h-5 w-5" /> Get Pass on WhatsApp
+            <MessageCircle className="h-5 w-5" /> Get Pass
           </a>
         )}
       </div>
@@ -135,7 +158,7 @@ function OfficialEventDetail() {
               rel="noreferrer"
               className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] py-3.5 text-[15px] font-bold text-white shadow-sm active:scale-[0.99]"
             >
-              <MessageCircle className="h-5 w-5" /> Get Pass on WhatsApp
+              <MessageCircle className="h-5 w-5" /> Get Pass
             </a>
           </div>
         </div>

@@ -840,16 +840,23 @@ export type Database = {
           booking_whatsapp: string | null
           category: string
           city: string
+          contact_phone: string | null
           cover_url: string | null
           created_at: string
           created_by: string | null
+          created_by_type: string
           description: string | null
           ends_at: string | null
           id: string
+          instructions: string | null
           is_featured: boolean
+          is_official: boolean
           is_pinned: boolean
           organizer_logo: string | null
           organizer_name: string
+          pass_info: string | null
+          pass_price: number | null
+          pass_quantity: number | null
           price_text: string | null
           published: boolean
           starts_at: string
@@ -863,16 +870,23 @@ export type Database = {
           booking_whatsapp?: string | null
           category?: string
           city?: string
+          contact_phone?: string | null
           cover_url?: string | null
           created_at?: string
           created_by?: string | null
+          created_by_type?: string
           description?: string | null
           ends_at?: string | null
           id?: string
+          instructions?: string | null
           is_featured?: boolean
+          is_official?: boolean
           is_pinned?: boolean
           organizer_logo?: string | null
           organizer_name?: string
+          pass_info?: string | null
+          pass_price?: number | null
+          pass_quantity?: number | null
           price_text?: string | null
           published?: boolean
           starts_at: string
@@ -886,16 +900,23 @@ export type Database = {
           booking_whatsapp?: string | null
           category?: string
           city?: string
+          contact_phone?: string | null
           cover_url?: string | null
           created_at?: string
           created_by?: string | null
+          created_by_type?: string
           description?: string | null
           ends_at?: string | null
           id?: string
+          instructions?: string | null
           is_featured?: boolean
+          is_official?: boolean
           is_pinned?: boolean
           organizer_logo?: string | null
           organizer_name?: string
+          pass_info?: string | null
+          pass_price?: number | null
+          pass_quantity?: number | null
           price_text?: string | null
           published?: boolean
           starts_at?: string
