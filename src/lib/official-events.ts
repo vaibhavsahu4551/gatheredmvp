@@ -3,12 +3,18 @@ import { isRemoteCover, signedEventCoverUrl } from "@/lib/event-cover";
 import { getAppSettings } from "@/lib/admin";
 
 export const OFFICIAL_CATEGORIES = [
-  "Dandiya / Garba",
+  "Garba & Dandiya",
+  "Music",
   "Concert",
   "Club",
+  "Movie",
+  "Food & Dining",
+  "Gaming",
+  "Sports",
+  "Meetup",
   "Festival",
-  "College",
-  "Food",
+  "House Party",
+  "College Event",
   "Other",
 ] as const;
 
@@ -28,6 +34,13 @@ export type OfficialEvent = {
   booking_whatsapp: string | null;
   ticket_url: string | null;
   terms: string | null;
+  pass_price: number | null;
+  pass_quantity: number | null;
+  pass_info: string | null;
+  contact_phone: string | null;
+  instructions: string | null;
+  is_official: boolean;
+  created_by_type: "user" | "admin";
   published: boolean;
   is_featured: boolean;
   is_pinned: boolean;
@@ -53,6 +66,12 @@ export async function listPublishedOfficialEvents(opts: { city?: string; limit?:
   return (data ?? []) as unknown as OfficialEvent[];
 }
 
+/** Human-readable starting price for cards / detail header. */
+export function priceLabel(e: Pick<OfficialEvent, "pass_price" | "price_text">) {
+  if (e.pass_price != null) return `From ₹${Number(e.pass_price).toLocaleString("en-IN")}`;
+  return e.price_text || "";
+}
+
 export async function getOfficialEvent(id: string) {
   const { data, error } = await supabase.from(T).select("*").eq("id", id).maybeSingle();
   if (error) throw error;
@@ -67,6 +86,18 @@ export async function adminListOfficialEvents(q = "") {
   const { data, error } = await query;
   if (error) throw error;
   return (data ?? []) as unknown as OfficialEvent[];
+}
+
+export type OfficialStats = { total: number; published: number; draft: number; pinned: number; featured: number };
+
+export function officialStats(rows: OfficialEvent[]): OfficialStats {
+  return {
+    total: rows.length,
+    published: rows.filter((r) => r.published).length,
+    draft: rows.filter((r) => !r.published).length,
+    pinned: rows.filter((r) => r.is_pinned).length,
+    featured: rows.filter((r) => r.is_featured).length,
+  };
 }
 
 export type OfficialEventInput = Partial<Omit<OfficialEvent, "id" | "created_at" | "updated_at">>;
