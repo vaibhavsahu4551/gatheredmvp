@@ -22,6 +22,8 @@ export type Database = {
           maintenance_message: string | null
           subscription_enabled: boolean
           updated_at: string
+          upi_id: string | null
+          upi_payee_name: string | null
         }
         Insert: {
           default_booking_whatsapp?: string | null
@@ -30,6 +32,8 @@ export type Database = {
           maintenance_message?: string | null
           subscription_enabled?: boolean
           updated_at?: string
+          upi_id?: string | null
+          upi_payee_name?: string | null
         }
         Update: {
           default_booking_whatsapp?: string | null
@@ -38,6 +42,8 @@ export type Database = {
           maintenance_message?: string | null
           subscription_enabled?: boolean
           updated_at?: string
+          upi_id?: string | null
+          upi_payee_name?: string | null
         }
         Relationships: []
       }
@@ -835,6 +841,56 @@ export type Database = {
         }
         Relationships: []
       }
+      official_event_passes: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          event_id: string
+          id: string
+          name: string
+          price: number
+          sold_quantity: number
+          sort_order: number
+          total_quantity: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          event_id: string
+          id?: string
+          name: string
+          price?: number
+          sold_quantity?: number
+          sort_order?: number
+          total_quantity?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          event_id?: string
+          id?: string
+          name?: string
+          price?: number
+          sold_quantity?: number
+          sort_order?: number
+          total_quantity?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "official_event_passes_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "official_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       official_events: {
         Row: {
           booking_whatsapp: string | null
@@ -927,6 +983,90 @@ export type Database = {
           venue?: string
         }
         Relationships: []
+      }
+      official_orders: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          event_id: string
+          id: string
+          order_code: string
+          pass_id: string | null
+          pass_name: string
+          payment_status: string
+          quantity: number
+          screenshot_path: string | null
+          ticket_status: string
+          updated_at: string
+          user_id: string
+          utr: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          created_at?: string
+          customer_email?: string | null
+          customer_name: string
+          customer_phone: string
+          event_id: string
+          id?: string
+          order_code?: string
+          pass_id?: string | null
+          pass_name: string
+          payment_status?: string
+          quantity: number
+          screenshot_path?: string | null
+          ticket_status?: string
+          updated_at?: string
+          user_id: string
+          utr: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string
+          event_id?: string
+          id?: string
+          order_code?: string
+          pass_id?: string | null
+          pass_name?: string
+          payment_status?: string
+          quantity?: number
+          screenshot_path?: string | null
+          ticket_status?: string
+          updated_at?: string
+          user_id?: string
+          utr?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "official_orders_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "official_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "official_orders_pass_id_fkey"
+            columns: ["pass_id"]
+            isOneToOne: false
+            referencedRelation: "official_event_passes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       points_transactions: {
         Row: {
