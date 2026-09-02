@@ -53,6 +53,7 @@ function AdminLayout() {
     { to: "/admin/users", label: "Users", icon: Users },
     { to: "/admin/events", label: "Events", icon: Calendar },
     { to: "/admin/official", label: "Official Events", icon: Ticket },
+    { to: "/admin/orders", label: "Pass Orders", icon: Ticket },
     { to: "/admin/posts", label: "Posts", icon: ImageIcon },
     { to: "/admin/verification", label: "Verification", icon: BadgeCheck },
     { to: "/admin/reports", label: "Reports", icon: Flag },
