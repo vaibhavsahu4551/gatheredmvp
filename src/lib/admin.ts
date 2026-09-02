@@ -22,12 +22,14 @@ export type AppSettings = {
   maintenance_enabled: boolean;
   maintenance_message: string | null;
   default_booking_whatsapp: string | null;
+  upi_id: string | null;
+  upi_payee_name: string | null;
 };
 
 export async function getAppSettings(): Promise<AppSettings> {
   const { data } = await supabase
     .from("app_settings" as any)
-    .select("subscription_enabled, maintenance_enabled, maintenance_message, default_booking_whatsapp")
+    .select("subscription_enabled, maintenance_enabled, maintenance_message, default_booking_whatsapp, upi_id, upi_payee_name")
     .eq("id", 1)
     .maybeSingle();
   return {
@@ -35,6 +37,8 @@ export async function getAppSettings(): Promise<AppSettings> {
     maintenance_enabled: !!(data as any)?.maintenance_enabled,
     maintenance_message: ((data as any)?.maintenance_message as string) ?? null,
     default_booking_whatsapp: ((data as any)?.default_booking_whatsapp as string) ?? null,
+    upi_id: ((data as any)?.upi_id as string) ?? null,
+    upi_payee_name: ((data as any)?.upi_payee_name as string) ?? null,
   };
 }
 
@@ -47,6 +51,17 @@ export async function setDefaultBookingWhatsapp(number: string | null) {
   if (error) throw error;
 }
 
+/** UPI collection details shown on the manual payment checkout screen. */
+export async function setUpiSettings(patch: { upi_id?: string | null; upi_payee_name?: string | null }) {
+  clearAppSettingsCache();
+  const { error } = await supabase
+    .from("app_settings" as any)
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq("id", 1);
+  if (error) throw error;
+}
+
+
 let _settingsCache: Promise<AppSettings> | null = null;
 
 /** Cached app settings (admin master switches). Cheap for render-path checks. */
@@ -57,6 +72,9 @@ export function getAppSettingsCached(): Promise<AppSettings> {
       maintenance_enabled: false,
       maintenance_message: null,
       default_booking_whatsapp: null,
+      upi_id: null,
+      upi_payee_name: null,
+
     }));
   }
   return _settingsCache;
