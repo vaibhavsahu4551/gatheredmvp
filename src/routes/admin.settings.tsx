@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getAppSettings, setDefaultBookingWhatsapp, setSubscriptionEnabled, setMaintenance, DEFAULT_MAINTENANCE_MESSAGE, listBanners, createBanner, updateBanner, deleteBanner, type HomeBanner } from "@/lib/admin";
+import { getAppSettings, setDefaultBookingWhatsapp, setUpiSettings, setSubscriptionEnabled, setMaintenance, DEFAULT_MAINTENANCE_MESSAGE, listBanners, createBanner, updateBanner, deleteBanner, type HomeBanner } from "@/lib/admin";
 import { MaintenanceScreen } from "@/components/MaintenanceScreen";
 import { toast } from "sonner";
 
@@ -16,6 +16,8 @@ function AdminSettings() {
   const [maintMessage, setMaintMessage] = useState("");
   const [preview, setPreview] = useState(false);
   const [waNumber, setWaNumber] = useState("");
+  const [upiId, setUpiId] = useState("");
+  const [upiName, setUpiName] = useState("");
 
   async function refresh() {
     const s = await getAppSettings();
@@ -23,6 +25,8 @@ function AdminSettings() {
     setMaintEnabled(s.maintenance_enabled);
     setMaintMessage(s.maintenance_message ?? "");
     setWaNumber(s.default_booking_whatsapp ?? "");
+    setUpiId(s.upi_id ?? "");
+    setUpiName(s.upi_payee_name ?? "");
     setBanners(await listBanners());
   }
   useEffect(() => { refresh(); }, []);
@@ -43,6 +47,13 @@ function AdminSettings() {
   async function saveMessage() {
     try { await setMaintenance({ message: maintMessage.trim() || null }); toast.success("Message saved"); }
     catch (e: any) { toast.error(e.message); }
+  }
+
+  async function saveUpi() {
+    try {
+      await setUpiSettings({ upi_id: upiId.trim() || null, upi_payee_name: upiName.trim() || null });
+      toast.success("UPI details saved");
+    } catch (e: any) { toast.error(e.message); }
   }
 
   async function saveWhatsapp() {
@@ -78,6 +89,20 @@ function AdminSettings() {
           <input value={waNumber} onChange={(e) => setWaNumber(e.target.value)} placeholder="e.g. 919876543210"
             className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm" />
           <button onClick={saveWhatsapp} className="rounded-lg bg-foreground text-background px-3 py-2 text-sm">Save</button>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-border p-4 space-y-3">
+        <div>
+          <div className="font-medium">UPI payment details</div>
+          <div className="text-xs text-muted-foreground">Shown on the official-event checkout screen for manual UPI payments.</div>
+        </div>
+        <input value={upiId} onChange={(e) => setUpiId(e.target.value)} placeholder="UPI ID e.g. gathr@upi"
+          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
+        <div className="flex gap-2">
+          <input value={upiName} onChange={(e) => setUpiName(e.target.value)} placeholder="Payee name e.g. Gathr Events"
+            className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm" />
+          <button onClick={saveUpi} className="rounded-lg bg-foreground text-background px-3 py-2 text-sm">Save</button>
         </div>
       </section>
 
