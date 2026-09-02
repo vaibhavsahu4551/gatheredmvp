@@ -72,6 +72,9 @@ export function getAppSettingsCached(): Promise<AppSettings> {
       maintenance_enabled: false,
       maintenance_message: null,
       default_booking_whatsapp: null,
+      upi_id: null,
+      upi_payee_name: null,
+
     }));
   }
   return _settingsCache;
