@@ -9,10 +9,12 @@ import {
   whatsappBookingLink,
   type OfficialEvent,
 } from "@/lib/official-events";
+import { listPasses, passRemaining, passSoldOut, type OfficialPass } from "@/lib/official-passes";
 
 export const Route = createFileRoute("/_authenticated/_app/official/$officialId")({
   component: OfficialEventDetail,
 });
+
 
 function OfficialEventDetail() {
   const { officialId } = Route.useParams();
