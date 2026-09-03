@@ -179,7 +179,7 @@ function OfficialEventDetail() {
           </a>
         )}
 
-        {wa && (
+        {wa && passes.length === 0 && (
           <a
             href={wa}
             target="_blank"
@@ -191,18 +191,28 @@ function OfficialEventDetail() {
         )}
       </div>
 
-      {wa && (
+      {(passes.length > 0 || wa) && (
         <div className="fixed inset-x-0 bottom-16 z-50 border-t border-border bg-background/95 p-3 pb-3 backdrop-blur">
           <div className="mx-auto max-w-md">
-            <a
-              href={wa}
-              target="_blank"
-              rel="noreferrer"
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] py-3.5 text-[15px] font-bold text-white shadow-sm active:scale-[0.99]"
-            >
-              <MessageCircle className="h-5 w-5" /> Get Pass
-            </a>
+            {passes.length > 0 ? (
+              <a
+                href="#passes"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-brand py-3.5 text-[15px] font-bold text-white shadow-sm active:scale-[0.99]"
+              >
+                <Ticket className="h-5 w-5" /> Get Pass
+              </a>
+            ) : (
+              <a
+                href={wa}
+                target="_blank"
+                rel="noreferrer"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] py-3.5 text-[15px] font-bold text-white shadow-sm active:scale-[0.99]"
+              >
+                <MessageCircle className="h-5 w-5" /> Get Pass
+              </a>
+            )}
           </div>
+
         </div>
       )}
     </div>
