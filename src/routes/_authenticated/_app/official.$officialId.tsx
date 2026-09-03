@@ -83,6 +83,43 @@ function OfficialEventDetail() {
           {e.contact_phone && <Row icon={MessageCircle} label={e.contact_phone} />}
         </div>
 
+        {passes.length > 0 && (
+          <section id="passes" className="rounded-2xl border border-border bg-card p-4">
+            <h2 className="text-sm font-semibold">Available passes</h2>
+            <div className="mt-2 space-y-2">
+              {passes.map((p) => {
+                const out = passSoldOut(p);
+                return (
+                  <div key={p.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-bold">{p.name}</div>
+                      <div className="text-[12px] text-muted-foreground">
+                        ₹{Number(p.price).toLocaleString("en-IN")}
+                        {p.total_quantity > 0 && ` · ${passRemaining(p)} left`}
+                      </div>
+                      {p.description && <p className="mt-0.5 text-[11px] text-muted-foreground">{p.description}</p>}
+                    </div>
+                    {out ? (
+                      <span className="rounded-full bg-muted px-3 py-1.5 text-[11px] font-bold text-muted-foreground">Sold out</span>
+                    ) : (
+                      <Link
+                        to="/official/$officialId/checkout"
+                        params={{ officialId }}
+                        search={{ passId: p.id, qty: 1 }}
+                        className="rounded-full bg-gradient-brand px-4 py-2 text-[12px] font-bold text-white"
+                      >
+                        Select
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <Link to="/passes" className="mt-2 inline-block text-[11px] font-semibold text-primary underline">My passes</Link>
+          </section>
+        )}
+
+
         {(e.pass_info || e.pass_price != null || e.pass_quantity != null) && (
           <section className="rounded-2xl border border-border bg-card p-4">
             <h2 className="text-sm font-semibold">Passes</h2>
