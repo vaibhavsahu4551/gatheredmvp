@@ -85,6 +85,8 @@ function AdminOfficialEvents() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<OfficialEvent | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [passesFor, setPassesFor] = useState<string | null>(null);
+
 
   async function refresh() {
     setLoading(true);
