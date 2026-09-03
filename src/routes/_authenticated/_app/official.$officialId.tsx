@@ -23,6 +23,7 @@ function OfficialEventDetail() {
   const [cover, setCover] = useState("");
   const [logo, setLogo] = useState("");
   const [fallbackNum, setFallbackNum] = useState("");
+  const [passes, setPasses] = useState<OfficialPass[]>([]);
 
   useEffect(() => {
     let alive = true;
@@ -37,9 +38,11 @@ function OfficialEventDetail() {
         }
       })
       .catch(() => alive && setLoading(false));
+    listPasses(officialId, { activeOnly: true }).then((p) => alive && setPasses(p)).catch(() => {});
     defaultBookingWhatsapp().then((n) => alive && setFallbackNum(n));
     return () => { alive = false; };
   }, [officialId]);
+
 
   if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
   if (!e) return <div className="p-6 text-sm text-muted-foreground">This event is no longer available.</div>;
