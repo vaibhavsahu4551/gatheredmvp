@@ -9,10 +9,12 @@ import {
   whatsappBookingLink,
   type OfficialEvent,
 } from "@/lib/official-events";
+import { listPasses, passRemaining, passSoldOut, type OfficialPass } from "@/lib/official-passes";
 
 export const Route = createFileRoute("/_authenticated/_app/official/$officialId")({
   component: OfficialEventDetail,
 });
+
 
 function OfficialEventDetail() {
   const { officialId } = Route.useParams();
@@ -21,6 +23,7 @@ function OfficialEventDetail() {
   const [cover, setCover] = useState("");
   const [logo, setLogo] = useState("");
   const [fallbackNum, setFallbackNum] = useState("");
+  const [passes, setPasses] = useState<OfficialPass[]>([]);
 
   useEffect(() => {
     let alive = true;
@@ -35,9 +38,11 @@ function OfficialEventDetail() {
         }
       })
       .catch(() => alive && setLoading(false));
+    listPasses(officialId, { activeOnly: true }).then((p) => alive && setPasses(p)).catch(() => {});
     defaultBookingWhatsapp().then((n) => alive && setFallbackNum(n));
     return () => { alive = false; };
   }, [officialId]);
+
 
   if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
   if (!e) return <div className="p-6 text-sm text-muted-foreground">This event is no longer available.</div>;
@@ -77,6 +82,43 @@ function OfficialEventDetail() {
           {e.ends_at && <Row icon={CalendarDays} label={`Ends ${new Date(e.ends_at).toLocaleString([], { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}`} />}
           {e.contact_phone && <Row icon={MessageCircle} label={e.contact_phone} />}
         </div>
+
+        {passes.length > 0 && (
+          <section id="passes" className="rounded-2xl border border-border bg-card p-4">
+            <h2 className="text-sm font-semibold">Available passes</h2>
+            <div className="mt-2 space-y-2">
+              {passes.map((p) => {
+                const out = passSoldOut(p);
+                return (
+                  <div key={p.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-bold">{p.name}</div>
+                      <div className="text-[12px] text-muted-foreground">
+                        ₹{Number(p.price).toLocaleString("en-IN")}
+                        {p.total_quantity > 0 && ` · ${passRemaining(p)} left`}
+                      </div>
+                      {p.description && <p className="mt-0.5 text-[11px] text-muted-foreground">{p.description}</p>}
+                    </div>
+                    {out ? (
+                      <span className="rounded-full bg-muted px-3 py-1.5 text-[11px] font-bold text-muted-foreground">Sold out</span>
+                    ) : (
+                      <Link
+                        to="/official/$officialId/checkout"
+                        params={{ officialId }}
+                        search={{ passId: p.id, qty: 1 }}
+                        className="rounded-full bg-gradient-brand px-4 py-2 text-[12px] font-bold text-white"
+                      >
+                        Select
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <Link to="/passes" className="mt-2 inline-block text-[11px] font-semibold text-primary underline">My passes</Link>
+          </section>
+        )}
+
 
         {(e.pass_info || e.pass_price != null || e.pass_quantity != null) && (
           <section className="rounded-2xl border border-border bg-card p-4">
@@ -137,7 +179,7 @@ function OfficialEventDetail() {
           </a>
         )}
 
-        {wa && (
+        {wa && passes.length === 0 && (
           <a
             href={wa}
             target="_blank"
@@ -149,18 +191,28 @@ function OfficialEventDetail() {
         )}
       </div>
 
-      {wa && (
+      {(passes.length > 0 || wa) && (
         <div className="fixed inset-x-0 bottom-16 z-50 border-t border-border bg-background/95 p-3 pb-3 backdrop-blur">
           <div className="mx-auto max-w-md">
-            <a
-              href={wa}
-              target="_blank"
-              rel="noreferrer"
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] py-3.5 text-[15px] font-bold text-white shadow-sm active:scale-[0.99]"
-            >
-              <MessageCircle className="h-5 w-5" /> Get Pass
-            </a>
+            {passes.length > 0 ? (
+              <a
+                href="#passes"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-brand py-3.5 text-[15px] font-bold text-white shadow-sm active:scale-[0.99]"
+              >
+                <Ticket className="h-5 w-5" /> Get Pass
+              </a>
+            ) : (
+              <a
+                href={wa}
+                target="_blank"
+                rel="noreferrer"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] py-3.5 text-[15px] font-bold text-white shadow-sm active:scale-[0.99]"
+              >
+                <MessageCircle className="h-5 w-5" /> Get Pass
+              </a>
+            )}
           </div>
+
         </div>
       )}
     </div>

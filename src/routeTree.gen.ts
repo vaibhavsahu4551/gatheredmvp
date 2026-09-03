@@ -49,6 +49,7 @@ import { Route as AuthenticatedAppSettingsIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedAppRewardsIndexRouteImport } from './routes/_authenticated/_app/rewards.index'
 import { Route as AuthenticatedAppProfileIndexRouteImport } from './routes/_authenticated/_app/profile.index'
 import { Route as AuthenticatedAppPrideIndexRouteImport } from './routes/_authenticated/_app/pride.index'
+import { Route as AuthenticatedAppPassesIndexRouteImport } from './routes/_authenticated/_app/passes.index'
 import { Route as AuthenticatedAppMessagesIndexRouteImport } from './routes/_authenticated/_app/messages.index'
 import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/_app/events.index'
 import { Route as AuthenticatedAppCirclesIndexRouteImport } from './routes/_authenticated/_app/circles.index'
@@ -72,6 +73,7 @@ import { Route as AuthenticatedAppMessagesThreadIdRouteImport } from './routes/_
 import { Route as AuthenticatedAppCirclesCircleIdRouteImport } from './routes/_authenticated/_app/circles.$circleId'
 import { Route as AuthenticatedAppChatGroupIdRouteImport } from './routes/_authenticated/_app/chat.$groupId'
 import { Route as AuthenticatedAppEventsEventIdIndexRouteImport } from './routes/_authenticated/_app/events.$eventId.index'
+import { Route as AuthenticatedAppOfficialOfficialIdCheckoutRouteImport } from './routes/_authenticated/_app/official.$officialId.checkout'
 import { Route as AuthenticatedAppEventsEventIdEditRouteImport } from './routes/_authenticated/_app/events.$eventId.edit'
 import { Route as AuthenticatedAppCirclesJoinCodeRouteImport } from './routes/_authenticated/_app/circles.join.$code'
 
@@ -283,6 +285,12 @@ const AuthenticatedAppPrideIndexRoute =
     path: '/pride/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppPassesIndexRoute =
+  AuthenticatedAppPassesIndexRouteImport.update({
+    id: '/passes/',
+    path: '/passes/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppMessagesIndexRoute =
   AuthenticatedAppMessagesIndexRouteImport.update({
     id: '/messages/',
@@ -420,6 +428,12 @@ const AuthenticatedAppEventsEventIdIndexRoute =
     path: '/events/$eventId/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppOfficialOfficialIdCheckoutRoute =
+  AuthenticatedAppOfficialOfficialIdCheckoutRouteImport.update({
+    id: '/checkout',
+    path: '/checkout',
+    getParentRoute: () => AuthenticatedAppOfficialOfficialIdRoute,
+  } as any)
 const AuthenticatedAppEventsEventIdEditRoute =
   AuthenticatedAppEventsEventIdEditRouteImport.update({
     id: '/events/$eventId/edit',
@@ -471,7 +485,7 @@ export interface FileRoutesByFullPath {
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
-  '/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRoute
+  '/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRouteWithChildren
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
   '/pride/notifications': typeof AuthenticatedAppPrideNotificationsRoute
@@ -490,12 +504,14 @@ export interface FileRoutesByFullPath {
   '/circles/': typeof AuthenticatedAppCirclesIndexRoute
   '/events/': typeof AuthenticatedAppEventsIndexRoute
   '/messages/': typeof AuthenticatedAppMessagesIndexRoute
+  '/passes/': typeof AuthenticatedAppPassesIndexRoute
   '/pride/': typeof AuthenticatedAppPrideIndexRoute
   '/profile/': typeof AuthenticatedAppProfileIndexRoute
   '/rewards/': typeof AuthenticatedAppRewardsIndexRoute
   '/settings/': typeof AuthenticatedAppSettingsIndexRoute
   '/circles/join/$code': typeof AuthenticatedAppCirclesJoinCodeRoute
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
+  '/official/$officialId/checkout': typeof AuthenticatedAppOfficialOfficialIdCheckoutRoute
   '/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -535,7 +551,7 @@ export interface FileRoutesByTo {
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
-  '/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRoute
+  '/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRouteWithChildren
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
   '/pride/notifications': typeof AuthenticatedAppPrideNotificationsRoute
@@ -554,12 +570,14 @@ export interface FileRoutesByTo {
   '/circles': typeof AuthenticatedAppCirclesIndexRoute
   '/events': typeof AuthenticatedAppEventsIndexRoute
   '/messages': typeof AuthenticatedAppMessagesIndexRoute
+  '/passes': typeof AuthenticatedAppPassesIndexRoute
   '/pride': typeof AuthenticatedAppPrideIndexRoute
   '/profile': typeof AuthenticatedAppProfileIndexRoute
   '/rewards': typeof AuthenticatedAppRewardsIndexRoute
   '/settings': typeof AuthenticatedAppSettingsIndexRoute
   '/circles/join/$code': typeof AuthenticatedAppCirclesJoinCodeRoute
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
+  '/official/$officialId/checkout': typeof AuthenticatedAppOfficialOfficialIdCheckoutRoute
   '/events/$eventId': typeof AuthenticatedAppEventsEventIdIndexRoute
 }
 export interface FileRoutesById {
@@ -603,7 +621,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/_authenticated/_app/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/_authenticated/_app/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
-  '/_authenticated/_app/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRoute
+  '/_authenticated/_app/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRouteWithChildren
   '/_authenticated/_app/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/_authenticated/_app/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
   '/_authenticated/_app/pride/notifications': typeof AuthenticatedAppPrideNotificationsRoute
@@ -622,12 +640,14 @@ export interface FileRoutesById {
   '/_authenticated/_app/circles/': typeof AuthenticatedAppCirclesIndexRoute
   '/_authenticated/_app/events/': typeof AuthenticatedAppEventsIndexRoute
   '/_authenticated/_app/messages/': typeof AuthenticatedAppMessagesIndexRoute
+  '/_authenticated/_app/passes/': typeof AuthenticatedAppPassesIndexRoute
   '/_authenticated/_app/pride/': typeof AuthenticatedAppPrideIndexRoute
   '/_authenticated/_app/profile/': typeof AuthenticatedAppProfileIndexRoute
   '/_authenticated/_app/rewards/': typeof AuthenticatedAppRewardsIndexRoute
   '/_authenticated/_app/settings/': typeof AuthenticatedAppSettingsIndexRoute
   '/_authenticated/_app/circles/join/$code': typeof AuthenticatedAppCirclesJoinCodeRoute
   '/_authenticated/_app/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
+  '/_authenticated/_app/official/$officialId/checkout': typeof AuthenticatedAppOfficialOfficialIdCheckoutRoute
   '/_authenticated/_app/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -689,12 +709,14 @@ export interface FileRouteTypes {
     | '/circles/'
     | '/events/'
     | '/messages/'
+    | '/passes/'
     | '/pride/'
     | '/profile/'
     | '/rewards/'
     | '/settings/'
     | '/circles/join/$code'
     | '/events/$eventId/edit'
+    | '/official/$officialId/checkout'
     | '/events/$eventId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -753,12 +775,14 @@ export interface FileRouteTypes {
     | '/circles'
     | '/events'
     | '/messages'
+    | '/passes'
     | '/pride'
     | '/profile'
     | '/rewards'
     | '/settings'
     | '/circles/join/$code'
     | '/events/$eventId/edit'
+    | '/official/$officialId/checkout'
     | '/events/$eventId'
   id:
     | '__root__'
@@ -820,12 +844,14 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/circles/'
     | '/_authenticated/_app/events/'
     | '/_authenticated/_app/messages/'
+    | '/_authenticated/_app/passes/'
     | '/_authenticated/_app/pride/'
     | '/_authenticated/_app/profile/'
     | '/_authenticated/_app/rewards/'
     | '/_authenticated/_app/settings/'
     | '/_authenticated/_app/circles/join/$code'
     | '/_authenticated/_app/events/$eventId/edit'
+    | '/_authenticated/_app/official/$officialId/checkout'
     | '/_authenticated/_app/events/$eventId/'
   fileRoutesById: FileRoutesById
 }
@@ -1122,6 +1148,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppPrideIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/passes/': {
+      id: '/_authenticated/_app/passes/'
+      path: '/passes'
+      fullPath: '/passes/'
+      preLoaderRoute: typeof AuthenticatedAppPassesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/messages/': {
       id: '/_authenticated/_app/messages/'
       path: '/messages'
@@ -1283,6 +1316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppEventsEventIdIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/official/$officialId/checkout': {
+      id: '/_authenticated/_app/official/$officialId/checkout'
+      path: '/checkout'
+      fullPath: '/official/$officialId/checkout'
+      preLoaderRoute: typeof AuthenticatedAppOfficialOfficialIdCheckoutRouteImport
+      parentRoute: typeof AuthenticatedAppOfficialOfficialIdRoute
+    }
     '/_authenticated/_app/events/$eventId/edit': {
       id: '/_authenticated/_app/events/$eventId/edit'
       path: '/events/$eventId/edit'
@@ -1300,6 +1340,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAppOfficialOfficialIdRouteChildren {
+  AuthenticatedAppOfficialOfficialIdCheckoutRoute: typeof AuthenticatedAppOfficialOfficialIdCheckoutRoute
+}
+
+const AuthenticatedAppOfficialOfficialIdRouteChildren: AuthenticatedAppOfficialOfficialIdRouteChildren =
+  {
+    AuthenticatedAppOfficialOfficialIdCheckoutRoute:
+      AuthenticatedAppOfficialOfficialIdCheckoutRoute,
+  }
+
+const AuthenticatedAppOfficialOfficialIdRouteWithChildren =
+  AuthenticatedAppOfficialOfficialIdRoute._addFileChildren(
+    AuthenticatedAppOfficialOfficialIdRouteChildren,
+  )
+
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppCreateRoute: typeof AuthenticatedAppCreateRoute
   AuthenticatedAppDiscoverRoute: typeof AuthenticatedAppDiscoverRoute
@@ -1313,7 +1368,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppChatGroupIdRoute: typeof AuthenticatedAppChatGroupIdRoute
   AuthenticatedAppCirclesCircleIdRoute: typeof AuthenticatedAppCirclesCircleIdRoute
   AuthenticatedAppMessagesThreadIdRoute: typeof AuthenticatedAppMessagesThreadIdRoute
-  AuthenticatedAppOfficialOfficialIdRoute: typeof AuthenticatedAppOfficialOfficialIdRoute
+  AuthenticatedAppOfficialOfficialIdRoute: typeof AuthenticatedAppOfficialOfficialIdRouteWithChildren
   AuthenticatedAppPostsPostIdRoute: typeof AuthenticatedAppPostsPostIdRoute
   AuthenticatedAppPrideGuidelinesRoute: typeof AuthenticatedAppPrideGuidelinesRoute
   AuthenticatedAppPrideNotificationsRoute: typeof AuthenticatedAppPrideNotificationsRoute
@@ -1332,6 +1387,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppCirclesIndexRoute: typeof AuthenticatedAppCirclesIndexRoute
   AuthenticatedAppEventsIndexRoute: typeof AuthenticatedAppEventsIndexRoute
   AuthenticatedAppMessagesIndexRoute: typeof AuthenticatedAppMessagesIndexRoute
+  AuthenticatedAppPassesIndexRoute: typeof AuthenticatedAppPassesIndexRoute
   AuthenticatedAppPrideIndexRoute: typeof AuthenticatedAppPrideIndexRoute
   AuthenticatedAppProfileIndexRoute: typeof AuthenticatedAppProfileIndexRoute
   AuthenticatedAppRewardsIndexRoute: typeof AuthenticatedAppRewardsIndexRoute
@@ -1355,7 +1411,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppCirclesCircleIdRoute: AuthenticatedAppCirclesCircleIdRoute,
   AuthenticatedAppMessagesThreadIdRoute: AuthenticatedAppMessagesThreadIdRoute,
   AuthenticatedAppOfficialOfficialIdRoute:
-    AuthenticatedAppOfficialOfficialIdRoute,
+    AuthenticatedAppOfficialOfficialIdRouteWithChildren,
   AuthenticatedAppPostsPostIdRoute: AuthenticatedAppPostsPostIdRoute,
   AuthenticatedAppPrideGuidelinesRoute: AuthenticatedAppPrideGuidelinesRoute,
   AuthenticatedAppPrideNotificationsRoute:
@@ -1375,6 +1431,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppCirclesIndexRoute: AuthenticatedAppCirclesIndexRoute,
   AuthenticatedAppEventsIndexRoute: AuthenticatedAppEventsIndexRoute,
   AuthenticatedAppMessagesIndexRoute: AuthenticatedAppMessagesIndexRoute,
+  AuthenticatedAppPassesIndexRoute: AuthenticatedAppPassesIndexRoute,
   AuthenticatedAppPrideIndexRoute: AuthenticatedAppPrideIndexRoute,
   AuthenticatedAppProfileIndexRoute: AuthenticatedAppProfileIndexRoute,
   AuthenticatedAppRewardsIndexRoute: AuthenticatedAppRewardsIndexRoute,

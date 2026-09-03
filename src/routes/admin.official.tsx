@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PhotoCropModal } from "@/components/PhotoCropModal";
+import { PassManager } from "@/components/PassManager";
+
 import {
   OFFICIAL_CATEGORIES,
   adminCreateOfficialEvent,
@@ -83,6 +85,8 @@ function AdminOfficialEvents() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<OfficialEvent | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [passesFor, setPassesFor] = useState<string | null>(null);
+
 
   async function refresh() {
     setLoading(true);
@@ -154,33 +158,38 @@ function AdminOfficialEvents() {
         {loading && <div className="py-6 text-center text-sm text-muted-foreground">Loading…</div>}
         {!loading && rows.length === 0 && <div className="py-6 text-center text-sm text-muted-foreground">No official events yet.</div>}
         {rows.map((r) => (
-          <div key={r.id} className="flex flex-col gap-2 rounded-xl border border-border p-3 sm:flex-row sm:items-center">
-            <Thumb path={r.cover_url} />
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="truncate font-medium">{r.title}</span>
-                {r.is_pinned && <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold">📌 Pinned</span>}
-                {r.is_featured && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">Featured</span>}
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${r.published ? "bg-green-500/20 text-green-700" : "bg-muted text-muted-foreground"}`}>
-                  {r.published ? "Published" : "Draft"}
-                </span>
+          <div key={r.id} className="rounded-xl border border-border p-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <Thumb path={r.cover_url} />
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="truncate font-medium">{r.title}</span>
+                  {r.is_pinned && <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold">📌 Pinned</span>}
+                  {r.is_featured && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">Featured</span>}
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${r.published ? "bg-green-500/20 text-green-700" : "bg-muted text-muted-foreground"}`}>
+                    {r.published ? "Published" : "Draft"}
+                  </span>
+                </div>
+                <div className="text-[11px] text-muted-foreground">
+                  {r.category} · {new Date(r.starts_at).toLocaleString()} · {[r.venue, r.city].filter(Boolean).join(", ") || "—"}
+                </div>
+                <div className="text-[11px] text-muted-foreground">
+                  {r.organizer_name || "—"} · {r.price_text || "Free / TBA"} · WhatsApp {r.booking_whatsapp || "default"}
+                </div>
               </div>
-              <div className="text-[11px] text-muted-foreground">
-                {r.category} · {new Date(r.starts_at).toLocaleString()} · {[r.venue, r.city].filter(Boolean).join(", ") || "—"}
-              </div>
-              <div className="text-[11px] text-muted-foreground">
-                {r.organizer_name || "—"} · {r.price_text || "Free / TBA"} · WhatsApp {r.booking_whatsapp || "default"}
+              <div className="flex flex-wrap gap-2 text-xs">
+                <button onClick={() => toggle(r, { published: !r.published })} className="underline">{r.published ? "Unpublish" : "Publish"}</button>
+                <button onClick={() => toggle(r, { is_pinned: !r.is_pinned })} className="underline">{r.is_pinned ? "Unpin" : "Pin"}</button>
+                <button onClick={() => toggle(r, { is_featured: !r.is_featured })} className="underline">{r.is_featured ? "Unfeature" : "Feature"}</button>
+                <button onClick={() => setPassesFor((v) => (v === r.id ? null : r.id))} className="underline">{passesFor === r.id ? "Hide passes" : "Passes"}</button>
+                <button onClick={() => { setEditing(r); setShowForm(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="underline">Edit</button>
+                <button onClick={() => remove(r)} className="text-destructive underline">Delete</button>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <button onClick={() => toggle(r, { published: !r.published })} className="underline">{r.published ? "Unpublish" : "Publish"}</button>
-              <button onClick={() => toggle(r, { is_pinned: !r.is_pinned })} className="underline">{r.is_pinned ? "Unpin" : "Pin"}</button>
-              <button onClick={() => toggle(r, { is_featured: !r.is_featured })} className="underline">{r.is_featured ? "Unfeature" : "Feature"}</button>
-              <button onClick={() => { setEditing(r); setShowForm(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="underline">Edit</button>
-              <button onClick={() => remove(r)} className="text-destructive underline">Delete</button>
-            </div>
+            {passesFor === r.id && <PassManager eventId={r.id} />}
           </div>
         ))}
+
       </div>
     </div>
   );
