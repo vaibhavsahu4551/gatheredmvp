@@ -152,6 +152,14 @@ export async function myOrders() {
   return (data ?? []) as unknown as OfficialOrder[];
 }
 
+/** One of my orders by id (RLS restricts to owner). */
+export async function myOrder(id: string) {
+  const { data, error } = await supabase.from(ORDERS).select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return (data ?? null) as unknown as OfficialOrder | null;
+}
+
+
 export async function myOrdersForEvent(eventId: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
