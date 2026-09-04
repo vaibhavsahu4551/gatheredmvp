@@ -72,6 +72,7 @@ import { Route as AuthenticatedAppOfficialOfficialIdRouteImport } from './routes
 import { Route as AuthenticatedAppMessagesThreadIdRouteImport } from './routes/_authenticated/_app/messages.$threadId'
 import { Route as AuthenticatedAppCirclesCircleIdRouteImport } from './routes/_authenticated/_app/circles.$circleId'
 import { Route as AuthenticatedAppChatGroupIdRouteImport } from './routes/_authenticated/_app/chat.$groupId'
+import { Route as AuthenticatedAppOfficialOfficialIdIndexRouteImport } from './routes/_authenticated/_app/official.$officialId.index'
 import { Route as AuthenticatedAppEventsEventIdIndexRouteImport } from './routes/_authenticated/_app/events.$eventId.index'
 import { Route as AuthenticatedAppOfficialOfficialIdCheckoutRouteImport } from './routes/_authenticated/_app/official.$officialId.checkout'
 import { Route as AuthenticatedAppEventsEventIdEditRouteImport } from './routes/_authenticated/_app/events.$eventId.edit'
@@ -422,6 +423,12 @@ const AuthenticatedAppChatGroupIdRoute =
     path: '/chat/$groupId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppOfficialOfficialIdIndexRoute =
+  AuthenticatedAppOfficialOfficialIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAppOfficialOfficialIdRoute,
+  } as any)
 const AuthenticatedAppEventsEventIdIndexRoute =
   AuthenticatedAppEventsEventIdIndexRouteImport.update({
     id: '/events/$eventId/',
@@ -513,6 +520,7 @@ export interface FileRoutesByFullPath {
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/official/$officialId/checkout': typeof AuthenticatedAppOfficialOfficialIdCheckoutRoute
   '/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
+  '/official/$officialId/': typeof AuthenticatedAppOfficialOfficialIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -551,7 +559,6 @@ export interface FileRoutesByTo {
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
-  '/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRouteWithChildren
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
   '/pride/notifications': typeof AuthenticatedAppPrideNotificationsRoute
@@ -579,6 +586,7 @@ export interface FileRoutesByTo {
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/official/$officialId/checkout': typeof AuthenticatedAppOfficialOfficialIdCheckoutRoute
   '/events/$eventId': typeof AuthenticatedAppEventsEventIdIndexRoute
+  '/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -649,6 +657,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/_authenticated/_app/official/$officialId/checkout': typeof AuthenticatedAppOfficialOfficialIdCheckoutRoute
   '/_authenticated/_app/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
+  '/_authenticated/_app/official/$officialId/': typeof AuthenticatedAppOfficialOfficialIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -718,6 +727,7 @@ export interface FileRouteTypes {
     | '/events/$eventId/edit'
     | '/official/$officialId/checkout'
     | '/events/$eventId/'
+    | '/official/$officialId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -756,7 +766,6 @@ export interface FileRouteTypes {
     | '/chat/$groupId'
     | '/circles/$circleId'
     | '/messages/$threadId'
-    | '/official/$officialId'
     | '/posts/$postId'
     | '/pride/guidelines'
     | '/pride/notifications'
@@ -784,6 +793,7 @@ export interface FileRouteTypes {
     | '/events/$eventId/edit'
     | '/official/$officialId/checkout'
     | '/events/$eventId'
+    | '/official/$officialId'
   id:
     | '__root__'
     | '/'
@@ -853,6 +863,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/events/$eventId/edit'
     | '/_authenticated/_app/official/$officialId/checkout'
     | '/_authenticated/_app/events/$eventId/'
+    | '/_authenticated/_app/official/$officialId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1309,6 +1320,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppChatGroupIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/official/$officialId/': {
+      id: '/_authenticated/_app/official/$officialId/'
+      path: '/'
+      fullPath: '/official/$officialId/'
+      preLoaderRoute: typeof AuthenticatedAppOfficialOfficialIdIndexRouteImport
+      parentRoute: typeof AuthenticatedAppOfficialOfficialIdRoute
+    }
     '/_authenticated/_app/events/$eventId/': {
       id: '/_authenticated/_app/events/$eventId/'
       path: '/events/$eventId'
@@ -1342,12 +1360,15 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAppOfficialOfficialIdRouteChildren {
   AuthenticatedAppOfficialOfficialIdCheckoutRoute: typeof AuthenticatedAppOfficialOfficialIdCheckoutRoute
+  AuthenticatedAppOfficialOfficialIdIndexRoute: typeof AuthenticatedAppOfficialOfficialIdIndexRoute
 }
 
 const AuthenticatedAppOfficialOfficialIdRouteChildren: AuthenticatedAppOfficialOfficialIdRouteChildren =
   {
     AuthenticatedAppOfficialOfficialIdCheckoutRoute:
       AuthenticatedAppOfficialOfficialIdCheckoutRoute,
+    AuthenticatedAppOfficialOfficialIdIndexRoute:
+      AuthenticatedAppOfficialOfficialIdIndexRoute,
   }
 
 const AuthenticatedAppOfficialOfficialIdRouteWithChildren =
