@@ -423,6 +423,88 @@ export type Database = {
         }
         Relationships: []
       }
+      event_application_questions: {
+        Row: {
+          choices: string[]
+          created_at: string
+          event_id: string
+          id: string
+          is_required: boolean
+          question_text: string
+          question_type: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          choices?: string[]
+          created_at?: string
+          event_id: string
+          id?: string
+          is_required?: boolean
+          question_text: string
+          question_type: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          choices?: string[]
+          created_at?: string
+          event_id?: string
+          id?: string
+          is_required?: boolean
+          question_text?: string
+          question_type?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_application_questions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_applications: {
+        Row: {
+          answers: Json
+          created_at: string
+          event_id: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          created_at?: string
+          event_id: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          event_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_applications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_checkins: {
         Row: {
           area: string
@@ -550,6 +632,7 @@ export type Database = {
         Row: {
           auto_cancel_hours: number
           beginner_friendly: boolean
+          booking_type: string
           boost_weight: number
           category: Database["public"]["Enums"]["event_category"] | null
           circle_id: string | null
@@ -586,6 +669,7 @@ export type Database = {
         Insert: {
           auto_cancel_hours?: number
           beginner_friendly?: boolean
+          booking_type?: string
           boost_weight?: number
           category?: Database["public"]["Enums"]["event_category"] | null
           circle_id?: string | null
@@ -622,6 +706,7 @@ export type Database = {
         Update: {
           auto_cancel_hours?: number
           beginner_friendly?: boolean
+          booking_type?: string
           boost_weight?: number
           category?: Database["public"]["Enums"]["event_category"] | null
           circle_id?: string | null
@@ -2310,6 +2395,24 @@ export type Database = {
       }
       pride_suspended: { Args: { _user: string }; Returns: boolean }
       redeem_reward: { Args: { _kind: string }; Returns: string }
+      respond_event_application: {
+        Args: { _application_id: string; _decision: string }
+        Returns: {
+          answers: Json
+          created_at: string
+          event_id: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "event_applications"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       roll_daily_icebreaker: { Args: never; Returns: string }
       roll_weekly_challenge: { Args: never; Returns: string }
       submit_verification: { Args: { _path: string }; Returns: undefined }
