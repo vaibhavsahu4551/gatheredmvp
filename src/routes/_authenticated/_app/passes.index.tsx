@@ -70,8 +70,8 @@ function MyPasses() {
           return (
             <Link
               key={o.id}
-              to="/official/$officialId"
-              params={{ officialId: o.o.event_id }}
+              to="/passes/$orderId"
+              params={{ orderId: o.id }}
               className="block rounded-2xl border border-border bg-card p-4"
             >
               <div className="flex items-start justify-between gap-2">
