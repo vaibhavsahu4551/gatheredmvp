@@ -348,6 +348,32 @@ function Create() {
           </p>
         </Field>
 
+        <Field label="Booking type">
+          <div className="flex gap-2">
+            {([["instant","Instant Book"],["selection","Selection Based"]] as const).map(([v, label]) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setBookingType(v)}
+                className={`flex-1 rounded-2xl px-3 py-2.5 text-[13px] font-medium border transition ${bookingType === v ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            {bookingType === "instant"
+              ? "People request to join and you approve them, as usual."
+              : "People answer your questions first. You review each application before letting them in."}
+          </p>
+        </Field>
+
+        {bookingType === "selection" && (
+          <Field label="Application questions">
+            <QuestionBuilder questions={questions} onChange={setQuestions} />
+          </Field>
+        )}
+
         <Field label="Venue type">
           <div className="flex gap-2">
             {([["public","Public venue"],["residence","Private residence"]] as const).map(([v, label]) => (
