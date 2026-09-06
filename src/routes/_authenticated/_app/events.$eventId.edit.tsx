@@ -11,6 +11,15 @@ import {
 import { toast } from "sonner";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { LocationMap } from "@/components/LocationMap";
+import { QuestionBuilder } from "@/components/QuestionBuilder";
+import {
+  emptyQuestion,
+  listEventQuestions,
+  saveEventQuestions,
+  validateQuestions,
+  type ApplicationQuestion,
+  type BookingType,
+} from "@/lib/applications";
 
 export const Route = createFileRoute("/_authenticated/_app/events/$eventId/edit")({
   component: EditEvent,
@@ -42,6 +51,8 @@ function EditEvent() {
   
   const [minGirls, setMinGirls] = useState("");
   const [minBoys, setMinBoys] = useState("");
+  const [bookingType, setBookingType] = useState<BookingType>("instant");
+  const [questions, setQuestions] = useState<ApplicationQuestion[]>([emptyQuestion(0)]);
 
   useEffect(() => {
     (async () => {
@@ -65,6 +76,14 @@ function EditEvent() {
       
       setMinGirls(ev.min_girls != null ? String(ev.min_girls) : "");
       setMinBoys(ev.min_boys != null ? String(ev.min_boys) : "");
+      const bt = ((ev as any).booking_type === "selection" ? "selection" : "instant") as BookingType;
+      setBookingType(bt);
+      if (bt === "selection") {
+        try {
+          const qs = await listEventQuestions(eventId);
+          if (qs.length) setQuestions(qs);
+        } catch { /* keep defaults */ }
+      }
       setLoading(false);
     })();
   }, [eventId]);
@@ -79,6 +98,10 @@ function EditEvent() {
     if (!city.trim()) return toast.error("Add city");
     if (minSize < 4) return toast.error("Minimum group size is 4");
     if (maxSize < minSize) return toast.error("Max must be ≥ min");
+    if (bookingType === "selection") {
+      const qErr = validateQuestions(questions);
+      if (qErr) return toast.error(qErr);
+    }
     setSaving(true);
     try {
       await updateEvent(eventId, {
@@ -97,7 +120,9 @@ function EditEvent() {
         entry_fee: null,
         min_girls: minGirls ? Number(minGirls) : null,
         min_boys: minBoys ? Number(minBoys) : null,
+        booking_type: bookingType,
       } as any);
+      if (bookingType === "selection") await saveEventQuestions(eventId, questions);
       toast.success("Event updated");
       navigate({ to: "/events/$eventId", params: { eventId } });
     } catch (e: any) {
@@ -160,6 +185,27 @@ function EditEvent() {
         <Field label="Exact meeting point (optional, private)">
           <input value={exactLocation} onChange={(e) => setExactLocation(e.target.value)} className={inputCls} />
         </Field>
+        <Field label="Booking type">
+          <div className="flex gap-2">
+            {([["instant","Instant Book"],["selection","Selection Based"]] as const).map(([v, label]) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setBookingType(v)}
+                className={`flex-1 rounded-2xl px-3 py-2.5 text-[13px] font-medium border transition ${bookingType === v ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </Field>
+
+        {bookingType === "selection" && (
+          <Field label="Application questions">
+            <QuestionBuilder questions={questions} onChange={setQuestions} />
+          </Field>
+        )}
+
         <Field label="City"><input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} /></Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Min group size">

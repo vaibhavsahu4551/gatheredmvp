@@ -14,6 +14,14 @@ import { toast } from "sonner";
 import { AlertTriangle, ImagePlus, ShieldAlert, Sparkles } from "lucide-react";
 import { pickPlaceholderCover, uploadEventCover } from "@/lib/event-cover";
 import { LocationMap } from "@/components/LocationMap";
+import { QuestionBuilder } from "@/components/QuestionBuilder";
+import {
+  emptyQuestion,
+  saveEventQuestions,
+  validateQuestions,
+  type ApplicationQuestion,
+  type BookingType,
+} from "@/lib/applications";
 
 export const Route = createFileRoute("/_authenticated/_app/create")({
   validateSearch: (s: Record<string, unknown>): { circle?: string } =>
@@ -79,6 +87,8 @@ function Create() {
   const [beginnerFriendly, setBeginnerFriendly] = useState(false);
   const [circles, setCircles] = useState<CircleWithMeta[]>([]);
   const [circleId, setCircleId] = useState<string>(search.circle ?? "");
+  const [bookingType, setBookingType] = useState<BookingType>("instant");
+  const [questions, setQuestions] = useState<ApplicationQuestion[]>([emptyQuestion(0)]);
 
   useEffect(() => {
     listMyCircles().then(setCircles).catch(() => {});
@@ -127,6 +137,10 @@ function Create() {
       if (prideSuspended) return toast.error("Your Pride access is suspended.");
       if (!hasPrideIdentity) return toast.error("Set up your Pride identity first");
     }
+    if (bookingType === "selection") {
+      const qErr = validateQuestions(questions);
+      if (qErr) return toast.error(qErr);
+    }
 
     setSaving(true);
 
@@ -172,10 +186,19 @@ function Create() {
       venue_type: venueType,
       beginner_friendly: beginnerFriendly,
       circle_id: !(prideOptIn && isPride) && circleId ? circleId : null,
+      booking_type: bookingType,
     } as any).select("id").maybeSingle();
 
+    if (error) { setSaving(false); return toast.error(error.message); }
+    if (data && bookingType === "selection") {
+      try {
+        await saveEventQuestions(data.id, questions);
+      } catch (e: any) {
+        setSaving(false);
+        return toast.error(e?.message ?? "Could not save your questions");
+      }
+    }
     setSaving(false);
-    if (error) return toast.error(error.message);
     toast.success("Event created");
     if (circleId && !(prideOptIn && isPride)) {
       postToCircleChat(circleId, `New Gathr: ${title.trim()}`).catch(() => {});
@@ -324,6 +347,32 @@ function Create() {
             Only shown to attendees you've approved.
           </p>
         </Field>
+
+        <Field label="Booking type">
+          <div className="flex gap-2">
+            {([["instant","Instant Book"],["selection","Selection Based"]] as const).map(([v, label]) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setBookingType(v)}
+                className={`flex-1 rounded-2xl px-3 py-2.5 text-[13px] font-medium border transition ${bookingType === v ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            {bookingType === "instant"
+              ? "People request to join and you approve them, as usual."
+              : "People answer your questions first. You review each application before letting them in."}
+          </p>
+        </Field>
+
+        {bookingType === "selection" && (
+          <Field label="Application questions">
+            <QuestionBuilder questions={questions} onChange={setQuestions} />
+          </Field>
+        )}
 
         <Field label="Venue type">
           <div className="flex gap-2">
