@@ -44,6 +44,9 @@ export type OfficialEvent = {
   published: boolean;
   is_featured: boolean;
   is_pinned: boolean;
+  booking_type: "instant" | "selection";
+organiser_user_id: string | null;
+selection_payment_deadline_minutes: number;
   created_at: string;
   updated_at: string;
 };
