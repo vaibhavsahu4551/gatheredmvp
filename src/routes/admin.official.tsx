@@ -46,6 +46,10 @@ const emptyForm = {
   published: true,
   is_featured: false,
   is_pinned: false,
+  
+  booking_type: "instant" as "instant" | "selection",
+  organiser_user_id: "",
+  selection_payment_deadline_minutes: "30",
 };
 type Form = typeof emptyForm;
 
@@ -76,6 +80,11 @@ function toForm(e: OfficialEvent): Form {
     published: e.published,
     is_featured: e.is_featured,
     is_pinned: e.is_pinned,
+    booking_type: e.booking_type ?? "instant",
+    organiser_user_id: e.organiser_user_id ?? "",
+    selection_payment_deadline_minutes: String(
+      e.selection_payment_deadline_minutes ?? 30
+    ),
   };
 }
 
@@ -261,6 +270,10 @@ function OfficialForm({
         published: f.published,
         is_featured: f.is_featured,
         is_pinned: f.is_pinned,
+        booking_type: f.booking_type,
+        organiser_user_id: f.organiser_user_id.trim() || null,
+        selection_payment_deadline_minutes:
+          Number(f.selection_payment_deadline_minutes) || 30,
       });
     } finally { setBusy(false); }
   }
@@ -275,6 +288,42 @@ function OfficialForm({
             {OFFICIAL_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </Field>
+        <Field label="Booking Type">
+  <select
+    value={f.booking_type}
+    onChange={(e) =>
+      set(
+        "booking_type",
+        e.target.value as "instant" | "selection"
+      )
+    }
+    className={inputCls}
+  >
+    <option value="instant">Instant Booking</option>
+    <option value="selection">Selection Required</option>
+  </select>
+</Field>
+
+{f.booking_type === "selection" && (
+  <Field label="Payment deadline after selection">
+    <select
+      value={f.selection_payment_deadline_minutes}
+      onChange={(e) =>
+        set(
+          "selection_payment_deadline_minutes",
+          e.target.value
+        )
+      }
+      className={inputCls}
+    >
+      <option value="15">15 minutes</option>
+      <option value="30">30 minutes</option>
+      <option value="60">1 hour</option>
+      <option value="120">2 hours</option>
+      <option value="1440">24 hours</option>
+    </select>
+  </Field>
+)} 
         <Field label="Price / pass price"><input value={f.price_text} onChange={(e) => set("price_text", e.target.value)} placeholder="₹499 onwards" className={inputCls} /></Field>
         <Field label="Date"><input required type="date" value={f.date} onChange={(e) => set("date", e.target.value)} className={inputCls} /></Field>
         <Field label="Start time"><input type="time" value={f.time} onChange={(e) => set("time", e.target.value)} className={inputCls} /></Field>
