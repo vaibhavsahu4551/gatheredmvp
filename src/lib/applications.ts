@@ -73,3 +73,68 @@ export function validateQuestions(questions: ApplicationQuestion[]): string | nu
   }
   return null;
 }
+export type ApplicationStatus = "pending" | "accepted" | "rejected" | "payment_pending" | "confirmed";
+
+export type ApplicationAnswer = { question_id: string; question_text: string; answer: string };
+
+export type ApplicationRow = {
+  id: string;
+  event_id: string;
+  user_id: string;
+  answers: ApplicationAnswer[];
+  status: ApplicationStatus;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Applicant: submit answers for a Selection Based event. Creates a "pending" application. */
+export async function submitApplication(eventId: string, answers: ApplicationAnswer[]) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Sign in required");
+  const { error } = await supabase.from("event_applications").insert({
+    event_id: eventId,
+    user_id: user.id,
+    answers,
+  });
+  if (error) throw error;
+}
+
+/** Applicant: withdraw a still-pending application. */
+export async function cancelApplication(applicationId: string) {
+  const { error } = await supabase.from("event_applications").delete().eq("id", applicationId);
+  if (error) throw error;
+}
+
+/** Applicant: fetch the current user's application for this event, if any. */
+export async function getMyApplication(eventId: string): Promise<ApplicationRow | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data, error } = await supabase
+    .from("event_applications")
+    .select("*")
+    .eq("event_id", eventId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as unknown as ApplicationRow) ?? null;
+}
+
+/** Host: fetch every application submitted for this event, oldest first. */
+export async function listApplicationsForEvent(eventId: string): Promise<ApplicationRow[]> {
+  const { data, error } = await supabase
+    .from("event_applications")
+    .select("*")
+    .eq("event_id", eventId)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as unknown as ApplicationRow[];
+}
+
+/** Host: accept or reject a pending application (RLS + trigger handle the rest). */
+export async function respondToApplication(applicationId: string, decision: "accepted" | "rejected") {
+  const { error } = await supabase.rpc("respond_event_application", {
+    _application_id: applicationId,
+    _decision: decision,
+  });
+  if (error) throw error;
+}
