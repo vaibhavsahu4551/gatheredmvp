@@ -479,15 +479,40 @@ const withdrawApplication = async () => {
               </div>
             )}
             {my?.status === "rejected" && <div className="w-full rounded-full bg-red-100 text-red-700 py-3 text-sm text-center font-medium">Request declined</div>}
-            {!my && closed && (
-              <div className="w-full rounded-full bg-muted text-muted-foreground py-3 text-sm text-center font-medium">Closed — joining is off</div>
+          {!my && closed && (
+              <div className="w-full rounded-full bg-muted text-muted-foreground py-3 text-sm text-center font-medium">
+                {bookingType === "selection" ? "Closed — applications are off" : "Closed — joining is off"}
+              </div>
             )}
-            {!my && !closed && event.status !== "cancelled" && (
+            {!my && !closed && event.status !== "cancelled" && bookingType === "instant" && (
               <button onClick={doJoin} className="w-full rounded-full bg-primary text-primary-foreground py-3.5 text-sm font-medium">Request to Join</button>
+            )}
+            {!my && !closed && event.status !== "cancelled" && bookingType === "selection" && (
+              <>
+                {!myApplication && (
+                  <button onClick={() => setApplyOpen(true)} className="w-full rounded-full bg-primary text-primary-foreground py-3.5 text-sm font-medium">Apply</button>
+                )}
+                {myApplication?.status === "pending" && (
+                  <div className="space-y-2">
+                    <div className="w-full rounded-full bg-muted text-foreground py-3 text-sm text-center font-medium">Application pending review</div>
+                    <button onClick={withdrawApplication} className="w-full rounded-full border border-border text-foreground py-3 text-sm font-medium">Withdraw application</button>
+                  </div>
+                )}
+                {myApplication?.status === "rejected" && (
+                  <div className="w-full rounded-full bg-red-100 text-red-700 py-3 text-sm text-center font-medium">Application declined</div>
+                )}
+              </>
             )}
           </div>
         )}
-
+        {applyOpen && (
+          <ApplicationForm
+            eventId={event.id}
+            questions={questions}
+            onClose={() => setApplyOpen(false)}
+            onSubmitted={async () => { setApplyOpen(false); await load(); }}
+          />
+        )}     
         <div className="mt-6">
           <h3 className="text-sm font-semibold">Going ({approved.length})</h3>
           {(() => {
@@ -570,7 +595,61 @@ const withdrawApplication = async () => {
             </div>
           </div>
         )}
-
+{isHost && bookingType === "selection" && (() => {
+          const acceptedCount = applications.filter((a) => a.status === "accepted" || a.status === "confirmed").length;
+          const paymentPendingCount = applications.filter((a) => a.status === "payment_pending").length;
+          const confirmedCount = applications.filter((a) => a.status === "confirmed").length;
+          return (
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold">Applicants ({applications.length})</h3>
+              <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                <span>Applied: {applications.length}</span>
+                <span>Accepted: {acceptedCount}</span>
+                <span>Payment pending: {paymentPendingCount}</span>
+                <span>Confirmed: {confirmedCount}</span>
+              </div>
+              <div className="mt-3 space-y-2">
+                {applications.map((a) => {
+                  const prof = profiles[a.user_id];
+                  const statusStyle =
+                    a.status === "pending" ? "bg-amber-100 text-amber-700"
+                    : a.status === "accepted" || a.status === "confirmed" ? "bg-emerald-100 text-emerald-700"
+                    : a.status === "payment_pending" ? "bg-sky-100 text-sky-700"
+                    : "bg-red-100 text-red-700";
+                  return (
+                    <div key={a.id} className="rounded-2xl border border-border p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <Link to="/u/$userId" params={{ userId: a.user_id }} className="font-medium text-sm truncate hover:underline">
+                          {prof?.full_name ?? "Someone"}
+                        </Link>
+                        <span className={shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold capitalize ${statusStyle}}>
+                          {a.status.replace("_", " ")}
+                        </span>
+                      </div>
+                      {a.answers.length > 0 && (
+                        <div className="mt-2 space-y-1.5">
+                          {a.answers.map((ans, i) => (
+                            <div key={i} className="text-xs">
+                              <div className="text-muted-foreground">{ans.question_text}</div>
+                              <div className="font-medium text-foreground/90">{ans.answer || "—"}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {a.status === "pending" && (
+                        <div className="mt-3 flex gap-2">
+                          <button onClick={() => respondApp(a.id, "rejected")} className="flex-1 rounded-full border border-border py-1.5 text-xs font-medium">Reject</button>
+                          <button onClick={() => respondApp(a.id, "accepted")} className="flex-1 rounded-full bg-primary text-primary-foreground py-1.5 text-xs font-medium">Accept</button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                {applications.length === 0 && <div className="text-sm text-muted-foreground">No applications yet.</div>}
+              </div>
+            </div>
+          );
+        })()} 
         <div className="mt-8">
           <h3 className="text-sm font-semibold flex items-center gap-1.5">
             <MessageCircle className="h-4 w-4" /> Discussion
