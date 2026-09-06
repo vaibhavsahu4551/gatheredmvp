@@ -137,6 +137,10 @@ function Create() {
       if (prideSuspended) return toast.error("Your Pride access is suspended.");
       if (!hasPrideIdentity) return toast.error("Set up your Pride identity first");
     }
+    if (bookingType === "selection") {
+      const qErr = validateQuestions(questions);
+      if (qErr) return toast.error(qErr);
+    }
 
     setSaving(true);
 
@@ -182,10 +186,19 @@ function Create() {
       venue_type: venueType,
       beginner_friendly: beginnerFriendly,
       circle_id: !(prideOptIn && isPride) && circleId ? circleId : null,
+      booking_type: bookingType,
     } as any).select("id").maybeSingle();
 
+    if (error) { setSaving(false); return toast.error(error.message); }
+    if (data && bookingType === "selection") {
+      try {
+        await saveEventQuestions(data.id, questions);
+      } catch (e: any) {
+        setSaving(false);
+        return toast.error(e?.message ?? "Could not save your questions");
+      }
+    }
     setSaving(false);
-    if (error) return toast.error(error.message);
     toast.success("Event created");
     if (circleId && !(prideOptIn && isPride)) {
       postToCircleChat(circleId, `New Gathr: ${title.trim()}`).catch(() => {});
