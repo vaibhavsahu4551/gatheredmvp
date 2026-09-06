@@ -622,7 +622,7 @@ const withdrawApplication = async () => {
                         <Link to="/u/$userId" params={{ userId: a.user_id }} className="font-medium text-sm truncate hover:underline">
                           {prof?.full_name ?? "Someone"}
                         </Link>
-                        <span className={shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold capitalize ${statusStyle}}>
+                        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold capitalize ${statusStyle}`}>
                           {a.status.replace("_", " ")}
                         </span>
                       </div>
