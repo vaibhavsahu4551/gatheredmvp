@@ -1,3 +1,13 @@
+import { ApplicationForm } from "@/components/ApplicationForm";
+import {
+  cancelApplication,
+  getMyApplication,
+  listApplicationsForEvent,
+  listEventQuestions,
+  respondToApplication,
+  type ApplicationQuestion,
+  type ApplicationRow,
+} from "@/lib/applications";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { eventTypeStyle } from "@/lib/event-style";
 
@@ -49,7 +59,13 @@ function EventDetail() {
   const [upgradeMsg, setUpgradeMsg] = useState("");
   const [closeOpen, setCloseOpen] = useState(false);
 
+  const [questions, setQuestions] = useState<ApplicationQuestion[]>([]);
+  const [myApplication, setMyApplication] = useState<ApplicationRow | null>(null);
+  const [applications, setApplications] = useState<ApplicationRow[]>([]);
+  const [applyOpen, setApplyOpen] = useState(false);
+
   const isPride = !!(event as any)?.is_pride;
+  const bookingType = ((event as any)?.booking_type === "selection" ? "selection" : "instant") as "instant" | "selection";
 
   useEffect(() => {
     getMyEntitlements().then((e) => setHasPremium(e.hasAccess));
@@ -63,6 +79,24 @@ function EventDetail() {
     setEvent(ev);
     const ps = await getParticipants(eventId);
     setParts(ps);
+    const isSelection = (ev as any)?.booking_type === "selection";
+    const isHostNow = ev?.host_id === user.id;
+    let apps: ApplicationRow[] = [];
+    if (isSelection) {
+      setQuestions(await listEventQuestions(eventId));
+      if (isHostNow) {
+        apps = await listApplicationsForEvent(eventId);
+        setApplications(apps);
+        setMyApplication(null);
+      } else {
+        setApplications([]);
+        setMyApplication(await getMyApplication(eventId));
+      }
+    } else {
+      setQuestions([]);
+      setApplications([]);
+      setMyApplication(null);
+    }
     if ((ev as any)?.is_pride) {
       // In Pride, DO NOT hydrate real profiles for host/attendees.
       const prideIds = [
@@ -76,7 +110,7 @@ function EventDetail() {
       const entries = await Promise.all(paths.map(async (p) => [p, await signedPridePhotoUrl(p)] as const));
       setPridePhotoUrls((s) => ({ ...s, ...Object.fromEntries(entries) }));
     } else {
-      const ids = Array.from(new Set([...(ev ? [ev.host_id] : []), ...ps.map((p) => p.user_id)]));
+     const ids = Array.from(new Set([...(ev ? [ev.host_id] : []), ...ps.map((p) => p.user_id), ...apps.map((a) => a.user_id)]));
       setProfiles(await getProfilesLite(ids));
       setTiers(await getUserTiers(ids));
       setVerifiedIds(await getVerifiedIds(ids));
@@ -90,6 +124,7 @@ function EventDetail() {
     const ch = supabase.channel(`event-parts-${eventId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "event_participants", filter: `event_id=eq.${eventId}` }, () => { load(); })
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "events", filter: `id=eq.${eventId}` }, () => { load(); })
+     .on("postgres_changes", { event: "*", schema: "public", table: "event_applications", filter: `event_id=eq.${eventId}` }, () => { load(); })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [eventId]);
@@ -194,7 +229,27 @@ function EventDetail() {
   const decide = async (id: string, s: "approved" | "rejected") => {
     await setParticipantStatus(id, s); await load();
   };
+const withdrawApplication = async () => {
+    if (!myApplication) return;
+    if (!confirm("Withdraw your application?")) return;
+    try {
+      await cancelApplication(myApplication.id);
+      toast.success("Application withdrawn");
+      await load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Couldn't withdraw application");
+    }
+  };
 
+  const respondApp = async (id: string, decision: "accepted" | "rejected") => {
+    try {
+      await respondToApplication(id, decision);
+      toast.success(decision === "accepted" ? "Applicant accepted" : "Applicant rejected");
+      await load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Couldn't update application");
+    }
+  };
   const attendeeDisplay = (p: ParticipantRow) => {
     if (isPride) {
       const pid = (p as any).pride_actor_id as string | undefined;
