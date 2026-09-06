@@ -21,7 +21,7 @@ export function ApplicationForm({
   const submit = async () => {
     for (const q of questions) {
       if (q.is_required && !values[q.id!]?.trim()) {
-        toast.error(Please answer: ${q.question_text});
+        toast.error(`Please answer: ${q.question_text}`);
         return;
       }
     }
