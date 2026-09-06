@@ -14,6 +14,14 @@ import { toast } from "sonner";
 import { AlertTriangle, ImagePlus, ShieldAlert, Sparkles } from "lucide-react";
 import { pickPlaceholderCover, uploadEventCover } from "@/lib/event-cover";
 import { LocationMap } from "@/components/LocationMap";
+import { QuestionBuilder } from "@/components/QuestionBuilder";
+import {
+  emptyQuestion,
+  saveEventQuestions,
+  validateQuestions,
+  type ApplicationQuestion,
+  type BookingType,
+} from "@/lib/applications";
 
 export const Route = createFileRoute("/_authenticated/_app/create")({
   validateSearch: (s: Record<string, unknown>): { circle?: string } =>
@@ -79,6 +87,8 @@ function Create() {
   const [beginnerFriendly, setBeginnerFriendly] = useState(false);
   const [circles, setCircles] = useState<CircleWithMeta[]>([]);
   const [circleId, setCircleId] = useState<string>(search.circle ?? "");
+  const [bookingType, setBookingType] = useState<BookingType>("instant");
+  const [questions, setQuestions] = useState<ApplicationQuestion[]>([emptyQuestion(0)]);
 
   useEffect(() => {
     listMyCircles().then(setCircles).catch(() => {});
