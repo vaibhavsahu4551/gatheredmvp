@@ -422,25 +422,52 @@ function Choices({ options, value, onChange }: { options: string[]; value: strin
 }
 
 function HeightPicker({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
-  const [unit, setUnit] = useState<"cm" | "ft">("cm");
   const cm = value ?? 170;
   const totalIn = Math.round(cm / 2.54);
   const ft = Math.floor(totalIn / 12);
   const inch = totalIn % 12;
+
+  const setFeetInches = (newFt: number, newIn: number) => {
+    const totalInches = newFt * 12 + newIn;
+    const newCm = Math.round(totalInches * 2.54);
+    onChange(newCm);
+  };
+
   return (
     <div>
-      <div className="grid grid-cols-2 rounded-full bg-muted p-1 mb-5">
-        {(["cm", "ft"] as const).map((u) => (
-          <button key={u} onClick={() => setUnit(u)} className={`h-9 rounded-full text-[13px] font-semibold ${unit === u ? "bg-background shadow-sm" : "text-muted-foreground"}`}>
-            {u === "cm" ? "Centimetres" : "Feet / inches"}
-          </button>
-        ))}
-      </div>
       <div className="text-center text-3xl font-semibold tabular-nums">
-        {unit === "cm" ? `${cm} cm` : `${ft}′ ${inch}″`}
+        {ft}′ {inch}″
       </div>
-      <input type="range" min={120} max={220} value={cm} onChange={(e) => onChange(Number(e.target.value))} className="mt-4 w-full accent-[color:var(--brand-2)]" />
-      <div className="mt-1 flex justify-between text-xs text-muted-foreground"><span>120 cm</span><span>220 cm</span></div>
+
+      <div className="mt-6">
+        <div className="flex justify-between text-xs text-muted-foreground mb-1">
+          <span>Feet</span>
+          <span>{ft} ft</span>
+        </div>
+        <input
+          type="range"
+          min={4}
+          max={7}
+          value={ft}
+          onChange={(e) => setFeetInches(Number(e.target.value), inch)}
+          className="w-full accent-[color:var(--brand-2)]"
+        />
+      </div>
+
+      <div className="mt-6">
+        <div className="flex justify-between text-xs text-muted-foreground mb-1">
+          <span>Inches</span>
+          <span>{inch} in</span>
+        </div>
+        <input
+          type="range"
+          min={0}
+          max={11}
+          value={inch}
+          onChange={(e) => setFeetInches(ft, Number(e.target.value))}
+          className="w-full accent-[color:var(--brand-2)]"
+        />
+      </div>
     </div>
   );
 }
