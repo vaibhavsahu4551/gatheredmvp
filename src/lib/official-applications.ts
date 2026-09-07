@@ -55,6 +55,24 @@ export type ApplicationDecision = {
   rejectionReason?: string;
 };
 
+export type CreateOfficialApplicationQuestionInput = {
+  eventId: string;
+  questionText: string;
+  questionType: OfficialApplicationQuestionType;
+  choices?: string[] | null;
+  isRequired?: boolean;
+  sortOrder?: number;
+};
+
+export type UpdateOfficialApplicationQuestionInput = {
+  questionId: string;
+  questionText: string;
+  questionType: OfficialApplicationQuestionType;
+  choices?: string[] | null;
+  isRequired?: boolean;
+  sortOrder?: number;
+};
+
 async function getCurrentUserId() {
   const {
     data: { user },
@@ -73,23 +91,16 @@ async function getCurrentUserId() {
 export async function getApplicationQuestions(
   eventId: string
 ): Promise<OfficialApplicationQuestion[]> {
-  export type CreateOfficialApplicationQuestionInput = {
-  eventId: string;
-  questionText: string;
-  questionType: OfficialApplicationQuestionType;
-  choices?: string[] | null;
-  isRequired?: boolean;
-  sortOrder?: number;
-};
+  const { data, error } = await supabase
+    .from("official_event_application_questions")
+    .select("*")
+    .eq("event_id", eventId)
+    .order("sort_order", { ascending: true });
 
-export type UpdateOfficialApplicationQuestionInput = {
-  questionId: string;
-  questionText: string;
-  questionType: OfficialApplicationQuestionType;
-  choices?: string[] | null;
-  isRequired?: boolean;
-  sortOrder?: number;
-};
+  if (error) throw error;
+
+  return (data ?? []) as OfficialApplicationQuestion[];
+}
 
 export async function createApplicationQuestion(
   input: CreateOfficialApplicationQuestionInput
@@ -108,7 +119,7 @@ export async function createApplicationQuestion(
 
   if (error) throw error;
 
-  return data as OfficialApplicationQuestion;
+  return data as unknown as OfficialApplicationQuestion;
 }
 
 export async function updateApplicationQuestion(
@@ -128,7 +139,7 @@ export async function updateApplicationQuestion(
 
   if (error) throw error;
 
-  return data as OfficialApplicationQuestion;
+  return data as unknown as OfficialApplicationQuestion;
 }
 
 export async function deleteApplicationQuestion(
@@ -144,16 +155,6 @@ export async function deleteApplicationQuestion(
   if (error) throw error;
 
   return Boolean(data);
-}
-  const { data, error } = await supabase
-    .from("official_event_application_questions")
-    .select("*")
-    .eq("event_id", eventId)
-    .order("sort_order", { ascending: true });
-
-  if (error) throw error;
-
-  return (data ?? []) as OfficialApplicationQuestion[];
 }
 
 /**

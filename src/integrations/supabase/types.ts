@@ -2128,10 +2128,40 @@ export type Database = {
           week_start: string
         }[]
       }
+      admin_create_official_event_application_question: {
+        Args: {
+          p_choices?: Json
+          p_event_id: string
+          p_is_required?: boolean
+          p_question_text: string
+          p_question_type: string
+          p_sort_order?: number
+        }
+        Returns: {
+          choices: Json | null
+          created_at: string
+          event_id: string
+          id: string
+          is_required: boolean
+          question_text: string
+          question_type: string
+          sort_order: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "official_event_application_questions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_delete_challenge: { Args: { _id: string }; Returns: undefined }
       admin_delete_icebreaker_prompt: {
         Args: { _id: string }
         Returns: undefined
+      }
+      admin_delete_official_event_application_question: {
+        Args: { p_question_id: string }
+        Returns: boolean
       }
       admin_delete_post: { Args: { _id: string }; Returns: undefined }
       admin_delete_story: { Args: { _story: string }; Returns: undefined }
@@ -2380,6 +2410,32 @@ export type Database = {
           referrals: number
           user_id: string
         }[]
+      }
+      admin_update_official_event_application_question: {
+        Args: {
+          p_choices?: Json
+          p_is_required?: boolean
+          p_question_id: string
+          p_question_text: string
+          p_question_type: string
+          p_sort_order?: number
+        }
+        Returns: {
+          choices: Json | null
+          created_at: string
+          event_id: string
+          id: string
+          is_required: boolean
+          question_text: string
+          question_type: string
+          sort_order: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "official_event_application_questions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       admin_upsert_badge_catalog: {
         Args: {
