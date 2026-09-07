@@ -77,7 +77,7 @@ function TicketDetail() {
         bgImg.src = ticketBg;
         await new Promise((res, rej) => { bgImg.onload = res; bgImg.onerror = rej; });
         ctx.drawImage(bgImg, 0, 0, c.width, c.height);
-        ctx.fillStyle = "rgba(255,255,255,0.88)";
+        ctx.fillStyle = "rgba(255,255,255,0.80)";
         ctx.fillRect(0, 0, c.width, c.height);
       } catch {
         /* background failed to load — fall back to plain white */
@@ -139,24 +139,33 @@ function TicketDetail() {
           {ticketBg && (
             <>
               <img src={ticketBg} alt="" className="absolute inset-0 h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-background/88" />
+              <div className="absolute inset-0 bg-background/80" />
             </>
           )}
-          <div className="relative flex items-center justify-between px-5 pt-4">
+                    <div className="relative flex items-center justify-between px-5 pt-4">
             <span className="text-lg font-black tracking-tight">Gathr</span>
             <span className="rounded-full bg-muted px-2.5 py-1 font-mono text-[11px]">{order.order_code}</span>
           </div>
 
-          {event?.cover_url && (
-            <img src={event.cover_url} alt={`${event.title} cover`} loading="lazy" className="mt-3 h-40 w-full object-cover" />
-          )}
+          <div className="relative flex gap-3 px-5 pt-3">
+            {event?.cover_url && (
+              <img
+                src={event.cover_url}
+                alt={`${event.title} cover`}
+                loading="lazy"
+                className="h-20 w-20 shrink-0 rounded-xl object-cover shadow-sm"
+              />
+            )}
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base font-extrabold leading-snug">{event?.title ?? "Official event"}</h2>
+              <div className="mt-1 flex items-center gap-2 text-[12px] text-muted-foreground">
+                <Ticket className="h-3.5 w-3.5 shrink-0" />
+                {order.pass_name} × {order.quantity} · ₹{Number(order.amount).toLocaleString("en-IN")}
+              </div>
+            </div>
+          </div>
 
           <div className="relative space-y-2 px-5 py-4">
-            <h2 className="text-base font-extrabold leading-snug">{event?.title ?? "Official event"}</h2>
-            <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
-              <Ticket className="h-4 w-4" />
-              {order.pass_name} × {order.quantity} · ₹{Number(order.amount).toLocaleString("en-IN")}
-            </div>
             {event?.starts_at && (
               <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
                 <CalendarDays className="h-4 w-4" />{fmtDate(event.starts_at)}
