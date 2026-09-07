@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Download, MapPin, CalendarDays, Ticket } from "lucide-react";
 import QRCode from "qrcode";
 import { myOrder, type OfficialOrder } from "@/lib/official-passes";
-import { getOfficialEvent, type OfficialEvent } from "@/lib/official-events";
+import { getOfficialEvent, resolveOfficialMedia, type OfficialEvent } from "@/lib/official-events";
+
 
 export const Route = createFileRoute("/_authenticated/_app/passes/$orderId")({
   head: () => ({
@@ -32,6 +33,7 @@ function TicketDetail() {
   const [order, setOrder] = useState<OfficialOrder | null>(null);
   const [event, setEvent] = useState<OfficialEvent | null>(null);
   const [qr, setQr] = useState("");
+  const [ticketBg, setTicketBg] = useState("");
   const [loading, setLoading] = useState(true);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -43,7 +45,13 @@ function TicketDetail() {
         setOrder(o);
         setLoading(false);
         if (!o) return;
-        getOfficialEvent(o.event_id).then((e) => alive && setEvent(e)).catch(() => {});
+                getOfficialEvent(o.event_id).then((e) => {
+          if (!alive) return;
+          setEvent(e);
+          if (e?.ticket_bg_url) {
+            resolveOfficialMedia(e.ticket_bg_url).then((u) => alive && setTicketBg(u)).catch(() => {});
+          }
+        }).catch(() => {});
         if (o.ticket_status === "ACTIVE" && o.payment_status === "APPROVED") {
           const url = await QRCode.toDataURL(
             JSON.stringify({ t: o.order_code, o: o.id, e: o.event_id, q: o.quantity }),
@@ -61,7 +69,20 @@ function TicketDetail() {
     const c = document.createElement("canvas");
     c.width = 900; c.height = 1350;
     const ctx = c.getContext("2d")!;
-    ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, c.width, c.height);
+    if (ticketBg) {
+      try {
+        const bgImg = new Image();
+        bgImg.crossOrigin = "anonymous";
+        bgImg.src = ticketBg;
+        await new Promise((res, rej) => { bgImg.onload = res; bgImg.onerror = rej; });
+        ctx.drawImage(bgImg, 0, 0, c.width, c.height);
+        ctx.fillStyle = "rgba(255,255,255,0.88)";
+        ctx.fillRect(0, 0, c.width, c.height);
+      } catch {
+        /* background failed to load — fall back to plain white */
+      }
+    }
     ctx.fillStyle = "#111111";
     ctx.font = "bold 64px sans-serif";
     ctx.fillText("Gathr", 60, 110);
@@ -114,8 +135,14 @@ function TicketDetail() {
       </div>
 
       <div className="px-5 pt-2">
-        <div ref={cardRef} className="overflow-hidden rounded-3xl border border-border bg-card shadow-elevated">
-          <div className="flex items-center justify-between px-5 pt-4">
+            <div ref={cardRef} className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-elevated">
+          {ticketBg && (
+            <>
+              <img src={ticketBg} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-background/88" />
+            </>
+          )}
+          <div className="relative flex items-center justify-between px-5 pt-4">
             <span className="text-lg font-black tracking-tight">Gathr</span>
             <span className="rounded-full bg-muted px-2.5 py-1 font-mono text-[11px]">{order.order_code}</span>
           </div>
@@ -124,7 +151,7 @@ function TicketDetail() {
             <img src={event.cover_url} alt={`${event.title} cover`} loading="lazy" className="mt-3 h-40 w-full object-cover" />
           )}
 
-          <div className="space-y-2 px-5 py-4">
+          <div className="relative space-y-2 px-5 py-4">
             <h2 className="text-base font-extrabold leading-snug">{event?.title ?? "Official event"}</h2>
             <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
               <Ticket className="h-4 w-4" />
@@ -143,7 +170,7 @@ function TicketDetail() {
             <div className="text-[13px] text-muted-foreground">Organizer: {event?.organizer_name || "Gathr"}</div>
           </div>
 
-          <div className="border-t border-dashed border-border px-5 py-6 text-center">
+          <div className="relative border-t border-dashed border-border px-5 py-6 text-center">
             {confirmed ? (
               qr ? (
                 <>
