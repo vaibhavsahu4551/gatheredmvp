@@ -4,7 +4,14 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PhotoCropModal } from "@/components/PhotoCropModal";
 import { PassManager } from "@/components/PassManager";
-
+import {
+  createApplicationQuestion,
+  deleteApplicationQuestion,
+  getApplicationQuestions,
+  updateApplicationQuestion,
+  type OfficialApplicationQuestion,
+  type OfficialApplicationQuestionType,
+} from "@/lib/official-applications";
 import {
   OFFICIAL_CATEGORIES,
   adminCreateOfficialEvent,
@@ -90,6 +97,7 @@ function toForm(e: OfficialEvent): Form {
 
 function AdminOfficialEvents() {
   const [rows, setRows] = useState<OfficialEvent[]>([]);
+  const [questionsFor, setQuestionsFor] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<OfficialEvent | null>(null);
@@ -190,12 +198,23 @@ function AdminOfficialEvents() {
                 <button onClick={() => toggle(r, { published: !r.published })} className="underline">{r.published ? "Unpublish" : "Publish"}</button>
                 <button onClick={() => toggle(r, { is_pinned: !r.is_pinned })} className="underline">{r.is_pinned ? "Unpin" : "Pin"}</button>
                 <button onClick={() => toggle(r, { is_featured: !r.is_featured })} className="underline">{r.is_featured ? "Unfeature" : "Feature"}</button>
+                <button
+  onClick={() =>
+    setQuestionsFor((v) => (v === r.id ? null : r.id))
+  }
+  className="underline"
+>
+  {questionsFor === r.id ? "Hide questions" : "Questions"}
+</button>
                 <button onClick={() => setPassesFor((v) => (v === r.id ? null : r.id))} className="underline">{passesFor === r.id ? "Hide passes" : "Passes"}</button>
                 <button onClick={() => { setEditing(r); setShowForm(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="underline">Edit</button>
                 <button onClick={() => remove(r)} className="text-destructive underline">Delete</button>
               </div>
             </div>
             {passesFor === r.id && <PassManager eventId={r.id} />}
+            {questionsFor === r.id && (
+  <OfficialQuestionManager eventId={r.id} />
+)}
           </div>
         ))}
 
@@ -203,7 +222,395 @@ function AdminOfficialEvents() {
     </div>
   );
 }
+function OfficialQuestionManager({
+  eventId,
+}: {
+  eventId: string;
+}) {
+  const [questions, setQuestions] = useState<OfficialApplicationQuestion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const [questionText, setQuestionText] = useState("");
+  const [questionType, setQuestionType] =
+    useState<OfficialApplicationQuestionType>("text");
+  const [isRequired, setIsRequired] = useState(true);
+  const [choices, setChoices] = useState<string[]>([""]);
+
+  async function loadQuestions() {
+    setLoading(true);
+
+    try {
+      const data = await getApplicationQuestions(eventId);
+      setQuestions(data);
+    } catch (error: any) {
+      toast.error(error?.message || "Couldn't load questions");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadQuestions();
+  }, [eventId]);
+
+  function resetForm() {
+    setEditingId(null);
+    setQuestionText("");
+    setQuestionType("text");
+    setIsRequired(true);
+    setChoices([""]);
+  }
+
+  function startEdit(question: OfficialApplicationQuestion) {
+    setEditingId(question.id);
+    setQuestionText(question.question_text);
+    setQuestionType(question.question_type);
+    setIsRequired(question.is_required);
+
+    setChoices(
+      question.choices && question.choices.length > 0
+        ? question.choices
+        : [""]
+    );
+  }
+
+  function handleTypeChange(
+    type: OfficialApplicationQuestionType
+  ) {
+    setQuestionType(type);
+
+    if (
+      type === "single_choice" ||
+      type === "multiple_choice"
+    ) {
+      if (choices.length === 0) {
+        setChoices([""]);
+      }
+    } else {
+      setChoices([]);
+    }
+  }
+
+  async function saveQuestion() {
+    if (!questionText.trim()) {
+      toast.error("Please enter a question.");
+      return;
+    }
+
+    const needsChoices =
+      questionType === "single_choice" ||
+      questionType === "multiple_choice";
+
+    const cleanChoices = choices
+      .map((choice) => choice.trim())
+      .filter(Boolean);
+
+    if (needsChoices && cleanChoices.length === 0) {
+      toast.error("Please add at least one choice.");
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      if (editingId) {
+        await updateApplicationQuestion({
+          questionId: editingId,
+          questionText: questionText.trim(),
+          questionType,
+          choices: needsChoices ? cleanChoices : null,
+          isRequired,
+          sortOrder:
+            questions.find((q) => q.id === editingId)?.sort_order ?? 0,
+        });
+
+        toast.success("Question updated");
+      } else {
+        await createApplicationQuestion({
+          eventId,
+          questionText: questionText.trim(),
+          questionType,
+          choices: needsChoices ? cleanChoices : null,
+          isRequired,
+          sortOrder: questions.length,
+        });
+
+        toast.success("Question added");
+      }
+
+      resetForm();
+      await loadQuestions();
+    } catch (error: any) {
+      toast.error(error?.message || "Couldn't save question");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function removeQuestion(question: OfficialApplicationQuestion) {
+    if (!confirm(Delete "${question.question_text}"?)) {
+      return;
+    }
+
+    try {
+      await deleteApplicationQuestion(question.id);
+
+      toast.success("Question deleted");
+
+      if (editingId === question.id) {
+        resetForm();
+      }
+
+      await loadQuestions();
+    } catch (error: any) {
+      toast.error(error?.message || "Couldn't delete question");
+    }
+  }
+
+  function addChoice() {
+    setChoices((prev) => [...prev, ""]);
+  }
+
+  function updateChoice(index: number, value: string) {
+    setChoices((prev) =>
+      prev.map((choice, i) =>
+        i === index ? value : choice
+      )
+    );
+  }
+
+  function removeChoice(index: number) {
+    setChoices((prev) =>
+      prev.filter((_, i) => i !== index)
+    );
+  }
+
+  return (
+    <div className="mt-3 rounded-xl border border-border bg-muted/20 p-4">
+      <div className="mb-4">
+        <h3 className="font-semibold">Application Questions</h3>
+        <p className="text-xs text-muted-foreground">
+          These questions will be shown to users when they apply
+          for this event.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="py-4 text-center text-sm text-muted-foreground">
+          Loading questions…
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {questions.length === 0 && (
+            <div className="rounded-lg border border-dashed border-border p-4 text-center text-sm text-muted-foreground">
+              No questions added yet.
+            </div>
+          )}
+
+          {questions.map((question, index) => (
+            <div
+              key={question.id}
+              className="rounded-lg border border-border bg-background p-3"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium">
+                    {index + 1}. {question.question_text}
+                  </div>
+
+                  <div className="mt-1 text-[11px] text-muted-foreground">
+                    {question.question_type.replace("_", " ")}
+                    {" · "}
+                    {question.is_required
+                      ? "Required"
+                      : "Optional"}
+                  </div>
+
+                  {question.choices &&
+                    question.choices.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {question.choices.map((choice) => (
+                          <div
+                            key={choice}
+                            className="text-xs text-muted-foreground"
+                          >
+                            • {choice}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                </div>
+
+                <div className="flex shrink-0 gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => startEdit(question)}
+                    className="underline"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => removeQuestion(question)}
+                    className="text-destructive underline"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-4 rounded-xl border border-border bg-background p-4">
+        <div className="mb-3">
+          <h4 className="text-sm font-semibold">
+            {editingId ? "Edit Question" : "Add Question"}
+          </h4>
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs font-medium">
+              Question
+            </label>
+
+            <input
+              value={questionText}
+              onChange={(e) =>
+                setQuestionText(e.target.value)
+              }
+              placeholder="e.g. Why do you want to join this event?"
+              className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-medium">
+              Answer Type
+            </label>
+
+            <select
+              value={questionType}
+              onChange={(e) =>
+                handleTypeChange(
+                  e.target.value as OfficialApplicationQuestionType
+                )
+              }
+              className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none"
+            >
+              <option value="text">
+                Short text
+              </option>
+
+              <option value="textarea">
+                Long text
+              </option>
+
+              <option value="single_choice">
+                Single choice
+              </option>
+
+              <option value="multiple_choice">
+                Multiple choice
+              </option>
+            </select>
+          </div>
+
+          {(questionType === "single_choice" ||
+            questionType === "multiple_choice") && (
+            <div>
+              <label className="text-xs font-medium">
+                Choices
+              </label>
+
+              <div className="mt-1.5 space-y-2">
+                {choices.map((choice, index) => (
+                  <div
+                    key={index}
+                    className="flex gap-2"
+                  >
+                    <input
+                      value={choice}
+                      onChange={(e) =>
+                        updateChoice(
+                          index,
+                          e.target.value
+                        )
+                      }
+                      placeholder={Choice ${index + 1}}
+                      className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        removeChoice(index)
+                      }
+                      disabled={choices.length === 1}
+                      className="rounded-lg border border-border px-3 text-xs disabled:opacity-40"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={addChoice}
+                  className="text-xs font-semibold underline"
+                >
+                  + Add choice
+                </button>
+              </div>
+            </div>
+          )}
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={isRequired}
+              onChange={(e) =>
+                setIsRequired(e.target.checked)
+              }
+            />
+            Required question
+          </label>
+
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={saveQuestion}
+              disabled={saving}
+              className="rounded-lg bg-foreground px-4 py-2 text-sm font-semibold text-background disabled:opacity-60"
+            >
+              {saving
+                ? "Saving…"
+                : editingId
+                  ? "Update Question"
+                  : "Add Question"}
+            </button>
+
+            {editingId && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="rounded-lg border border-border px-4 py-2 text-sm"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 function Thumb({ path }: { path: string | null }) {
   const [url, setUrl] = useState("");
   useEffect(() => { let a = true; resolveOfficialMedia(path).then((u) => a && setUrl(u)).catch(() => {}); return () => { a = false; }; }, [path]);
