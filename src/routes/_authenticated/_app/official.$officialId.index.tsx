@@ -1,6 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, BadgeCheck, CalendarDays, ExternalLink, MapPin, MessageCircle, Ticket } from "lucide-react";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  ExternalLink,
+  MapPin,
+  MessageCircle,
+  Ticket,
+} from "lucide-react";
 import {
   defaultBookingWhatsapp,
   getOfficialEvent,
@@ -10,7 +20,13 @@ import {
   type OfficialEvent,
 } from "@/lib/official-events";
 import { listPasses, passRemaining, passSoldOut, type OfficialPass } from "@/lib/official-passes";
-
+import {
+  getApplicationQuestions,
+  getMyApplication,
+  submitOfficialApplication,
+  type OfficialApplication,
+  type OfficialApplicationQuestion,
+} from "@/lib/official-applications";
 export const Route = createFileRoute("/_authenticated/_app/official/$officialId/")({
   component: OfficialEventDetail,
 });
@@ -24,7 +40,26 @@ function OfficialEventDetail() {
   const [logo, setLogo] = useState("");
   const [fallbackNum, setFallbackNum] = useState("");
   const [passes, setPasses] = useState<OfficialPass[]>([]);
+  const [application, setApplication] =
+  useState<OfficialApplication | null>(null);
 
+const [questions, setQuestions] =
+  useState<OfficialApplicationQuestion[]>([]);
+
+const [answers, setAnswers] =
+  useState<Record<string, string | string[]>>({});
+
+const [showApplicationForm, setShowApplicationForm] =
+  useState(false);
+
+const [applicationLoading, setApplicationLoading] =
+  useState(false);
+
+const [applicationSubmitting, setApplicationSubmitting] =
+  useState(false);
+
+const [applicationError, setApplicationError] =
+  useState("");
   useEffect(() => {
     let alive = true;
     getOfficialEvent(officialId)
@@ -39,11 +74,57 @@ function OfficialEventDetail() {
       })
       .catch(() => alive && setLoading(false));
     listPasses(officialId, { activeOnly: true }).then((p) => alive && setPasses(p)).catch(() => {});
+    getApplicationQuestions(officialId)
+  .then((q) => alive && setQuestions(q))
+  .catch(() => {});
+
+getMyApplication(officialId)
+  .then((a) => alive && setApplication(a))
+  .catch(() => {});
     defaultBookingWhatsapp().then((n) => alive && setFallbackNum(n));
     return () => { alive = false; };
   }, [officialId]);
 
+async function handleSubmitApplication() {
+  if (!e) return;
 
+  setApplicationError("");
+
+  for (const q of questions) {
+    if (!q.is_required) continue;
+
+    const answer = answers[q.id];
+
+    if (
+      answer === undefined ||
+      answer === "" ||
+      (Array.isArray(answer) && answer.length === 0)
+    ) {
+      setApplicationError(
+        Please answer: ${q.question_text}
+      );
+      return;
+    }
+  }
+
+  try {
+    setApplicationSubmitting(true);
+
+    const submitted = await submitOfficialApplication({
+      eventId: e.id,
+      answers,
+    });
+
+    setApplication(submitted);
+    setShowApplicationForm(false);
+  } catch (error: any) {
+    setApplicationError(
+      error?.message || "Unable to submit application."
+    );
+  } finally {
+    setApplicationSubmitting(false);
+  }
+}
   if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
   if (!e) return <div className="p-6 text-sm text-muted-foreground">This event is no longer available.</div>;
 
@@ -82,7 +163,240 @@ function OfficialEventDetail() {
           {e.ends_at && <Row icon={CalendarDays} label={`Ends ${new Date(e.ends_at).toLocaleString([], { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}`} />}
           {e.contact_phone && <Row icon={MessageCircle} label={e.contact_phone} />}
         </div>
+      {e.booking_type === "selection" && (
+  <section className="rounded-2xl border border-border bg-card p-4">
+    <h2 className="text-sm font-semibold">
+      Entry by Selection
+    </h2>
 
+    {!application && !showApplicationForm && (
+      <>
+        <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
+          Apply for this event by answering a few questions.
+          Your application will be reviewed by the organiser.
+        </p>
+
+        <button
+          type="button"
+          onClick={async () => {
+            setApplicationLoading(true);
+            setApplicationError("");
+
+            try {
+              const q = await getApplicationQuestions(officialId);
+              setQuestions(q);
+              setShowApplicationForm(true);
+            } catch (error: any) {
+              setApplicationError(
+                error?.message || "Unable to load application."
+              );
+            } finally {
+              setApplicationLoading(false);
+            }
+          }}
+          disabled={applicationLoading}
+          className="mt-3 w-full rounded-full bg-gradient-brand py-3.5 text-[15px] font-bold text-white disabled:opacity-60"
+        >
+          {applicationLoading ? "Loading…" : "Apply Now"}
+        </button>
+      </>
+    )}
+
+    {application?.status === "pending" && (
+      <div className="mt-3 rounded-xl bg-muted/60 p-3">
+        <div className="flex items-center gap-2 text-sm font-semibold">
+          <Clock3 className="h-4 w-4" />
+          Application under review
+        </div>
+
+        <p className="mt-1 text-[12px] text-muted-foreground">
+          Your application has been submitted. You’ll be able to
+          continue once the organiser reviews it.
+        </p>
+      </div>
+    )}
+
+    {application?.status === "rejected" && (
+      <div className="mt-3 rounded-xl bg-muted/60 p-3">
+        <div className="text-sm font-semibold">
+          Application Rejected
+        </div>
+
+        {application.rejection_reason && (
+          <p className="mt-1 text-[12px] text-muted-foreground">
+            Reason: {application.rejection_reason}
+          </p>
+        )}
+      </div>
+    )}
+
+    {(application?.status === "accepted" ||
+      application?.status === "payment_pending") && (
+      <div className="mt-3 rounded-xl border border-border p-3">
+        <div className="flex items-center gap-2 text-sm font-semibold">
+          <CheckCircle2 className="h-4 w-4" />
+          Application Accepted
+        </div>
+
+        <p className="mt-1 text-[12px] text-muted-foreground">
+          Your application has been accepted. Complete your payment
+          before the deadline to confirm your spot.
+        </p>
+      </div>
+    )}
+
+    {application?.status === "confirmed" && (
+      <div className="mt-3 rounded-xl border border-border p-3">
+        <div className="flex items-center gap-2 text-sm font-semibold">
+          <CheckCircle2 className="h-4 w-4" />
+          You're confirmed
+        </div>
+
+        <p className="mt-1 text-[12px] text-muted-foreground">
+          Your spot for this event is confirmed.
+        </p>
+      </div>
+    )}
+
+    {showApplicationForm && !application && (
+      <div className="mt-4 space-y-4">
+        {questions.map((q) => (
+          <div key={q.id}>
+            <label className="text-sm font-medium">
+              {q.question_text}
+              {q.is_required && (
+                <span className="text-destructive"> *</span>
+              )}
+            </label>
+
+            {q.question_type === "text" && (
+              <input
+                value={
+                  typeof answers[q.id] === "string"
+                    ? answers[q.id] as string
+                    : ""
+                }
+                onChange={(ev) =>
+                  setAnswers((prev) => ({
+                    ...prev,
+                    [q.id]: ev.target.value,
+                  }))
+                }
+                className="mt-1.5 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none"
+              />
+            )}
+
+            {q.question_type === "textarea" && (
+              <textarea
+                value={
+                  typeof answers[q.id] === "string"
+                    ? answers[q.id] as string
+                    : ""
+                }
+                onChange={(ev) =>
+                  setAnswers((prev) => ({
+                    ...prev,
+                    [q.id]: ev.target.value,
+                  }))
+                }
+                rows={4}
+                className="mt-1.5 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none"
+              />
+            )}
+
+            {q.question_type === "single_choice" && (
+              <div className="mt-2 space-y-2">
+                {(q.choices ?? []).map((choice) => (
+                  <label
+                    key={choice}
+                    className="flex items-center gap-2 rounded-xl border border-border p-3 text-sm"
+                  >
+                    <input
+                      type="radio"
+                      name={q.id}
+                      checked={answers[q.id] === choice}
+                      onChange={() =>
+                        setAnswers((prev) => ({
+                          ...prev,
+                          [q.id]: choice,
+                        }))
+                      }
+                    />
+                    {choice}
+                  </label>
+                ))}
+              </div>
+            )}
+
+            {q.question_type === "multiple_choice" && (
+              <div className="mt-2 space-y-2">
+                {(q.choices ?? []).map((choice) => {
+                  const selected = Array.isArray(answers[q.id])
+                    ? answers[q.id].includes(choice)
+                    : false;
+
+                  return (
+                    <label
+                      key={choice}
+                      className="flex items-center gap-2 rounded-xl border border-border p-3 text-sm"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={(ev) => {
+                          const current = Array.isArray(
+                            answers[q.id]
+                          )
+                            ? answers[q.id]
+                            : [];
+
+                          setAnswers((prev) => ({
+                            ...prev,
+                            [q.id]: ev.target.checked
+                              ? [...current, choice]
+                              : current.filter(
+                                  (item) => item !== choice
+                                ),
+                          }));
+                        }}
+                      />
+                      {choice}
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {applicationError && (
+          <div className="rounded-xl bg-destructive/10 p-3 text-[12px] text-destructive">
+            {applicationError}
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={handleSubmitApplication}
+          disabled={applicationSubmitting}
+          className="w-full rounded-full bg-gradient-brand py-3.5 text-[15px] font-bold text-white disabled:opacity-60"
+        >
+          {applicationSubmitting
+            ? "Submitting…"
+            : "Submit Application"}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShowApplicationForm(false)}
+          className="w-full py-2 text-sm font-semibold text-muted-foreground"
+        >
+          Cancel
+        </button>
+      </div>
+    )}
+  </section>
+)}
         {passes.length > 0 && (
           <section id="passes" className="rounded-2xl border border-border bg-card p-4">
             <h2 className="text-sm font-semibold">Available passes</h2>
