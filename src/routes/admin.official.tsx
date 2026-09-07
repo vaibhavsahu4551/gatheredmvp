@@ -781,6 +781,7 @@ const [coverPreview, setCoverPreview] = useState("");
         organiser_user_id: f.organiser_user_id.trim() || null,
         selection_payment_deadline_minutes:
           Number(f.selection_payment_deadline_minutes) || 30,
+        razorpay_enabled: f.razorpay_enabled
       });
     } finally { setBusy(false); }
   }
