@@ -1027,6 +1027,9 @@ export type Database = {
           event_id: string
           expires_at: string | null
           id: string
+          label: string | null
+          pin: string | null
+          purpose: string
           revoked_at: string | null
           token_hash: string
         }
@@ -1036,6 +1039,9 @@ export type Database = {
           event_id: string
           expires_at?: string | null
           id?: string
+          label?: string | null
+          pin?: string | null
+          purpose?: string
           revoked_at?: string | null
           token_hash: string
         }
@@ -1045,6 +1051,9 @@ export type Database = {
           event_id?: string
           expires_at?: string | null
           id?: string
+          label?: string | null
+          pin?: string | null
+          purpose?: string
           revoked_at?: string | null
           token_hash?: string
         }
@@ -1137,6 +1146,7 @@ export type Database = {
           selection_payment_deadline_minutes: number
           starts_at: string
           terms: string | null
+          ticket_bg_url: string | null
           ticket_url: string | null
           title: string
           updated_at: string
@@ -1170,6 +1180,7 @@ export type Database = {
           selection_payment_deadline_minutes?: number
           starts_at: string
           terms?: string | null
+          ticket_bg_url?: string | null
           ticket_url?: string | null
           title: string
           updated_at?: string
@@ -1203,6 +1214,7 @@ export type Database = {
           selection_payment_deadline_minutes?: number
           starts_at?: string
           terms?: string | null
+          ticket_bg_url?: string | null
           ticket_url?: string | null
           title?: string
           updated_at?: string
@@ -2478,6 +2490,18 @@ export type Database = {
         }
         Returns: string
       }
+      checkin_context: {
+        Args: { p_pin?: string; p_token: string }
+        Returns: Json
+      }
+      checkin_lookup_ticket: {
+        Args: { p_order_code: string; p_pin?: string; p_token: string }
+        Returns: Json
+      }
+      checkin_mark_used: {
+        Args: { p_order_code: string; p_pin?: string; p_token: string }
+        Returns: Json
+      }
       claim_referral: { Args: { _code: string }; Returns: boolean }
       claim_weekly_challenge: { Args: never; Returns: string }
       cleanup_expired_stories: { Args: never; Returns: undefined }
@@ -2495,6 +2519,10 @@ export type Database = {
         Returns: string
       }
       event_is_closed: { Args: { _event: string }; Returns: boolean }
+      generate_official_event_checkin_link: {
+        Args: { p_days?: number; p_event_id: string; p_pin?: string }
+        Returns: Json
+      }
       generate_official_event_organiser_link: {
         Args: { p_event_id: string }
         Returns: Json
@@ -2676,6 +2704,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      revoke_official_event_checkin_links: {
+        Args: { p_event_id: string }
+        Returns: undefined
       }
       roll_daily_icebreaker: { Args: never; Returns: string }
       roll_weekly_challenge: { Args: never; Returns: string }
