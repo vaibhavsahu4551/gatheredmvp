@@ -102,7 +102,6 @@ function toForm(e: OfficialEvent): Form {
       e.selection_payment_deadline_minutes ?? 30
       ),
       razorpay_enabled: e.razorpay_enabled ?? false,
-    ),
   };
 }
 
