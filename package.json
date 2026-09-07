@@ -58,6 +58,7 @@
     "firebase": "^12.16.0",
     "input-otp": "^1.4.2",
     "jose": "^6.2.5",
+    "jsqr": "^1.4.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.575.0",
     "qrcode": "^1.5.4",
