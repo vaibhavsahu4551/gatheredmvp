@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -27,12 +27,14 @@ import {
   type OfficialApplication,
   type OfficialApplicationQuestion,
 } from "@/lib/official-applications";
+import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/official/$officialId/")({
   component: OfficialEventDetail,
 });
 
 
 function OfficialEventDetail() {
+  const navigate = useNavigate();
   const { officialId } = Route.useParams();
   const [e, setE] = useState<OfficialEvent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -178,22 +180,28 @@ async function handleSubmitApplication() {
 
         <button
           type="button"
-          onClick={async () => {
-            setApplicationLoading(true);
-            setApplicationError("");
+        onClick={async () => {
+  setApplicationLoading(true);
+  setApplicationError("");
 
-            try {
-              const q = await getApplicationQuestions(officialId);
-              setQuestions(q);
-              setShowApplicationForm(true);
-            } catch (error: any) {
-              setApplicationError(
-                error?.message || "Unable to load application."
-              );
-            } finally {
-              setApplicationLoading(false);
-            }
-          }}
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      navigate({ to: "/auth" });
+      return;
+    }
+
+    const q = await getApplicationQuestions(officialId);
+    setQuestions(q);
+    setShowApplicationForm(true);
+  } catch (error: any) {
+    setApplicationError(
+      error?.message || "Unable to load application."
+    );
+  } finally {
+    setApplicationLoading(false);
+  }
+}}
           disabled={applicationLoading}
           className="mt-3 w-full rounded-full bg-gradient-brand py-3.5 text-[15px] font-bold text-white disabled:opacity-60"
         >
