@@ -16,6 +16,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as CheckinTokenRouteImport } from './routes/checkin.$token'
 import { Route as AdminVerificationRouteImport } from './routes/admin.verification'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminStoriesRouteImport } from './routes/admin.stories'
@@ -112,6 +113,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const CheckinTokenRoute = CheckinTokenRouteImport.update({
+  id: '/checkin/$token',
+  path: '/checkin/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminVerificationRoute = AdminVerificationRouteImport.update({
   id: '/verification',
@@ -484,6 +490,7 @@ export interface FileRoutesByFullPath {
   '/admin/stories': typeof AdminStoriesRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
+  '/checkin/$token': typeof CheckinTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/create': typeof AuthenticatedAppCreateRoute
   '/discover': typeof AuthenticatedAppDiscoverRoute
@@ -552,6 +559,7 @@ export interface FileRoutesByTo {
   '/admin/stories': typeof AdminStoriesRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
+  '/checkin/$token': typeof CheckinTokenRoute
   '/admin': typeof AdminIndexRoute
   '/create': typeof AuthenticatedAppCreateRoute
   '/discover': typeof AuthenticatedAppDiscoverRoute
@@ -623,6 +631,7 @@ export interface FileRoutesById {
   '/admin/stories': typeof AdminStoriesRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
+  '/checkin/$token': typeof CheckinTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/_authenticated/_app/create': typeof AuthenticatedAppCreateRoute
   '/_authenticated/_app/discover': typeof AuthenticatedAppDiscoverRoute
@@ -694,6 +703,7 @@ export interface FileRouteTypes {
     | '/admin/stories'
     | '/admin/users'
     | '/admin/verification'
+    | '/checkin/$token'
     | '/admin/'
     | '/create'
     | '/discover'
@@ -762,6 +772,7 @@ export interface FileRouteTypes {
     | '/admin/stories'
     | '/admin/users'
     | '/admin/verification'
+    | '/checkin/$token'
     | '/admin'
     | '/create'
     | '/discover'
@@ -832,6 +843,7 @@ export interface FileRouteTypes {
     | '/admin/stories'
     | '/admin/users'
     | '/admin/verification'
+    | '/checkin/$token'
     | '/admin/'
     | '/_authenticated/_app/create'
     | '/_authenticated/_app/discover'
@@ -886,6 +898,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AuthRoute: typeof AuthRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  CheckinTokenRoute: typeof CheckinTokenRoute
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
   ApiPublicSendPushRoute: typeof ApiPublicSendPushRoute
 }
@@ -940,6 +953,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/checkin/$token': {
+      id: '/checkin/$token'
+      path: '/checkin/$token'
+      fullPath: '/checkin/$token'
+      preLoaderRoute: typeof CheckinTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/verification': {
       id: '/admin/verification'
@@ -1551,6 +1571,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AuthRoute: AuthRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  CheckinTokenRoute: CheckinTokenRoute,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
   ApiPublicSendPushRoute: ApiPublicSendPushRoute,
 }

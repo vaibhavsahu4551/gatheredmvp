@@ -24,6 +24,7 @@ export type OfficialEvent = {
   category: string;
   description: string | null;
   cover_url: string | null;
+  ticket_bg_url: string | null;
   starts_at: string;
   ends_at: string | null;
   venue: string;

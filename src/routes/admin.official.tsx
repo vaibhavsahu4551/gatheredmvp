@@ -34,6 +34,7 @@ const emptyForm = {
   category: OFFICIAL_CATEGORIES[0] as string,
   description: "",
   cover_url: "",
+  ticket_bg_url: "",
   date: "",
   time: "19:00",
   end_time: "",
@@ -68,6 +69,7 @@ function toForm(e: OfficialEvent): Form {
     category: e.category,
     description: e.description ?? "",
     cover_url: e.cover_url ?? "",
+    ticket_bg_url: e.ticket_bg_url ?? "",
     date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
     time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
     end_time: e.ends_at ? `${pad(new Date(e.ends_at).getHours())}:${pad(new Date(e.ends_at).getMinutes())}` : "",
@@ -629,7 +631,9 @@ function OfficialForm({
   const [f, setF] = useState<Form>(initial);
   const [busy, setBusy] = useState(false);
   const [cropFile, setCropFile] = useState<File | null>(null);
+  const [ticketCropFile, setTicketCropFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState("");
+  const [ticketPreview, setTicketPreview] = useState("");
   const set = (k: keyof Form, v: any) => setF((p) => ({ ...p, [k]: v }));
 
   useEffect(() => {
@@ -638,7 +642,13 @@ function OfficialForm({
     return () => { alive = false; };
   }, [f.cover_url]);
 
-  async function pick(key: "cover_url" | "organizer_logo", file?: File | null) {
+  useEffect(() => {
+    let alive = true;
+    resolveOfficialMedia(f.ticket_bg_url).then((u) => alive && setTicketPreview(u)).catch(() => {});
+    return () => { alive = false; };
+  }, [f.ticket_bg_url]);
+
+  async function pick(key: "cover_url" | "organizer_logo" | "ticket_bg_url", file?: File | null) {
     if (!file) return;
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -659,6 +669,7 @@ function OfficialForm({
         category: f.category,
         description: f.description.trim() || null,
         cover_url: f.cover_url.trim() || null,
+        ticket_bg_url: f.ticket_bg_url.trim() || null,
         starts_at: new Date(`${f.date}T${f.time || "19:00"}`).toISOString(),
         venue: f.venue.trim(),
         city: f.city.trim(),
