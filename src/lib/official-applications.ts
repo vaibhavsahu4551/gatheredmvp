@@ -177,7 +177,7 @@ export async function rejectApplication(
     "reject_official_event_application",
     {
       p_application_id: input.applicationId,
-      p_rejection_reason: input.rejectionReason ?? null,
+      p_rejection_reason: input.rejectionReason ?? undefined,
     }
   );
 
