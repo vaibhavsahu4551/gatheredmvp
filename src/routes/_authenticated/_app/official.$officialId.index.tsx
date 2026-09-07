@@ -344,10 +344,9 @@ async function handleSubmitApplication() {
                         type="checkbox"
                         checked={selected}
                         onChange={(ev) => {
-                          const current = Array.isArray(
-                            answers[q.id]
-                          )
-                            ? answers[q.id]
+                          const raw = answers[q.id];
+                          const current: string[] = Array.isArray(raw)
+                            ? raw
                             : [];
 
                           setAnswers((prev) => ({
@@ -355,7 +354,7 @@ async function handleSubmitApplication() {
                             [q.id]: ev.target.checked
                               ? [...current, choice]
                               : current.filter(
-                                  (item) => item !== choice
+                                  (item: string) => item !== choice
                                 ),
                           }));
                         }}
