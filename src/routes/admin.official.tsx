@@ -9,8 +9,13 @@ import {
   deleteApplicationQuestion,
   getApplicationQuestions,
   updateApplicationQuestion,
+  listOfficialApplications,
+  acceptApplication,
+  rejectApplication,
+  generateOrganiserLink,
   type OfficialApplicationQuestion,
   type OfficialApplicationQuestionType,
+  type OfficialApplication,
 } from "@/lib/official-applications";
 import {
   OFFICIAL_CATEGORIES,
@@ -100,6 +105,7 @@ function toForm(e: OfficialEvent): Form {
 function AdminOfficialEvents() {
   const [rows, setRows] = useState<OfficialEvent[]>([]);
   const [questionsFor, setQuestionsFor] = useState<string | null>(null);
+  const [applicationsFor, setApplicationsFor] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<OfficialEvent | null>(null);
@@ -208,6 +214,14 @@ function AdminOfficialEvents() {
 >
   {questionsFor === r.id ? "Hide questions" : "Questions"}
 </button>
+                <button
+  onClick={() =>
+    setApplicationsFor((v) => (v === r.id ? null : r.id))
+  }
+  className="underline"
+>
+  {applicationsFor === r.id ? "Hide applications" : "Applications"}
+</button>
                 <button onClick={() => setPassesFor((v) => (v === r.id ? null : r.id))} className="underline">{passesFor === r.id ? "Hide passes" : "Passes"}</button>
                 <button onClick={() => { setEditing(r); setShowForm(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="underline">Edit</button>
                 <button onClick={() => remove(r)} className="text-destructive underline">Delete</button>
@@ -216,6 +230,9 @@ function AdminOfficialEvents() {
             {passesFor === r.id && <PassManager eventId={r.id} />}
             {questionsFor === r.id && (
   <OfficialQuestionManager eventId={r.id} />
+)}
+            {applicationsFor === r.id && (
+  <OfficialApplicationsManager eventId={r.id} />
 )}
           </div>
         ))}
@@ -825,3 +842,204 @@ function Check({ label, checked, onChange }: { label: string; checked: boolean; 
     </label>
   );
 }
+function OfficialApplicationsManager({ eventId }: { eventId: string }) {
+  const [applications, setApplications] = useState<OfficialApplication[]>([]);
+  const [questions, setQuestions] = useState<OfficialApplicationQuestion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [orgLink, setOrgLink] = useState<string | null>(null);
+  const [orgLoading, setOrgLoading] = useState(false);
+
+  async function loadData() {
+    setLoading(true);
+    try {
+      const [apps, qs] = await Promise.all([
+        listOfficialApplications(eventId),
+        getApplicationQuestions(eventId),
+      ]);
+      setApplications(apps);
+      setQuestions(qs);
+    } catch (error: any) {
+      toast.error(error?.message || "Couldn't load applications");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadData();
+  }, [eventId]);
+
+  async function handleAccept(app: OfficialApplication) {
+    setBusyId(app.id);
+    try {
+      await acceptApplication(app.id);
+      toast.success("Application accepted");
+      await loadData();
+    } catch (error: any) {
+      toast.error(error?.message || "Couldn't accept");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function handleReject(app: OfficialApplication) {
+    setBusyId(app.id);
+    try {
+      await rejectApplication({
+        applicationId: app.id,
+        rejectionReason: rejectReason.trim() || undefined,
+      });
+      toast.success("Application rejected");
+      setRejectingId(null);
+      setRejectReason("");
+      await loadData();
+    } catch (error: any) {
+      toast.error(error?.message || "Couldn't reject");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function handleGenerateOrgLink() {
+    setOrgLoading(true);
+    try {
+      const result = await generateOrganiserLink(eventId);
+      setOrgLink(result.url);
+      await navigator.clipboard.writeText(result.url);
+      toast.success("Organiser link copied to clipboard");
+    } catch (error: any) {
+      toast.error(error?.message || "Couldn't generate link");
+    } finally {
+      setOrgLoading(false);
+    }
+  }
+
+  function answerFor(app: OfficialApplication, questionId: string) {
+    const val = app.answers?.[questionId];
+    if (!val) return "—";
+    return Array.isArray(val) ? val.join(", ") : val;
+  }
+
+  return (
+    <div className="mt-3 rounded-xl border border-border bg-muted/20 p-4">
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <h3 className="font-semibold">Applications</h3>
+          <p className="text-xs text-muted-foreground">
+            Review applicant answers, accept or reject.
+          </p>
+        </div>
+        <button
+          onClick={handleGenerateOrgLink}
+          disabled={orgLoading}
+          className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
+        >
+          {orgLoading ? "…" : orgLink ? "Copy organiser link" : "Generate organiser link"}
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="py-4 text-center text-sm text-muted-foreground">
+          Loading applications…
+        </div>
+      ) : applications.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-border p-4 text-center text-sm text-muted-foreground">
+          No applications yet.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {applications.map((app) => (
+            <div
+              key={app.id}
+              className="rounded-lg border border-border bg-background p-3"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-sm font-medium">
+                  Applicant: {app.user_id.slice(0, 8)}…
+                </div>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                    app.status === "accepted" ||
+                    app.status === "confirmed" ||
+                    app.status === "payment_pending"
+                      ? "bg-green-500/15 text-green-600"
+                      : app.status === "rejected" || app.status === "expired"
+                        ? "bg-red-500/15 text-red-600"
+                        : "bg-yellow-500/15 text-yellow-600"
+                  }`}
+                >
+                  {app.status}
+                </span>
+              </div>
+
+              <div className="mt-3 space-y-2">
+                {questions.map((q) => (
+                  <div key={q.id} className="text-xs">
+                    <div className="font-medium text-muted-foreground">
+                      {q.question_text}
+                    </div>
+                    <div className="mt-0.5">{answerFor(app, q.id)}</div>
+                  </div>
+                ))}
+              </div>
+
+              {app.status === "pending" && (
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={() => handleAccept(app)}
+                    disabled={busyId === app.id}
+                    className="rounded-lg bg-foreground px-3 py-1.5 text-xs font-semibold text-background disabled:opacity-60"
+                  >
+                    Accept
+                  </button>
+                  {rejectingId === app.id ? (
+                    <>
+                      <input
+                        value={rejectReason}
+                        onChange={(e) => setRejectReason(e.target.value)}
+                        placeholder="Reason (optional)"
+                        className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs outline-none"
+                      />
+                      <button
+                        onClick={() => handleReject(app)}
+                        disabled={busyId === app.id}
+                        className="rounded-lg border border-destructive px-3 py-1.5 text-xs font-semibold text-destructive disabled:opacity-60"
+                      >
+                        Confirm reject
+                      </button>
+                      <button
+                        onClick={() => {
+                          setRejectingId(null);
+                          setRejectReason("");
+                        }}
+                        className="text-xs underline"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => setRejectingId(app.id)}
+                      className="rounded-lg border border-border px-3 py-1.5 text-xs"
+                    >
+                      Reject
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {app.rejection_reason && (
+                <div className="mt-2 text-xs text-red-600">
+                  Reason: {app.rejection_reason}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+} 
