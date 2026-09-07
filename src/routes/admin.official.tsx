@@ -225,7 +225,7 @@ function AdminOfficialEvents() {
                 <button onClick={() => setPassesFor((v) => (v === r.id ? null : r.id))} className="underline">{passesFor === r.id ? "Hide passes" : "Passes"}</button>
                 <button
   onClick={() => {
-    const link = https://gathrmeet.in/official/${r.id};
+    const link = `https://gathrmeet.in/official/${r.id}`;
     navigator.clipboard.writeText(link);
     toast.success("Event link copied!");
   }}
