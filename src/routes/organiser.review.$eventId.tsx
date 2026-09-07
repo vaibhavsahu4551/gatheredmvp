@@ -54,9 +54,23 @@ type Application = {
   payment_deadline_at: string | null;
   created_at: string;
   updated_at: string;
+
   applicant_name?: string;
   applicant_phone?: string | null;
   payment_status?: string | null;
+};
+
+type ReviewData = {
+  event: {
+    id: string;
+    title: string;
+    ticket_url: string | null;
+    pass_price: number | null;
+    price_text: string | null;
+  } | null;
+
+  questions: Question[];
+  applications: Application[];
 };
 
 function OrganiserReviewPage() {
@@ -68,15 +82,13 @@ function OrganiserReviewPage() {
 
   const [applications, setApplications] = useState<Application[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
+
   const [eventTitle, setEventTitle] = useState("");
   const [eventTicketUrl, setEventTicketUrl] = useState("");
   const [eventPrice, setEventPrice] = useState("");
 
   const [openId, setOpenId] = useState<string | null>(null);
-
-  const [actionLoading, setActionLoading] = useState<string | null>(
-    null
-  );
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     loadPage();
@@ -97,202 +109,43 @@ function OrganiserReviewPage() {
     }
 
     try {
-      // -----------------------------------------
-      // 1. Validate organiser token
-      // -----------------------------------------
+      const { data, error: rpcError } = await supabase.rpc(
+        "get_official_event_organiser_review_data",
+        {
+          p_event_id: eventId,
+          p_token: token,
+        }
+      );
 
-      const { data: validation, error: validationError } =
-        await supabase.rpc(
-          "validate_official_event_organiser_token",
-          {
-            p_event_id: eventId,
-            p_token: token,
-          }
-        );
-
-      if (validationError) {
-        throw validationError;
+      if (rpcError) {
+        throw rpcError;
       }
 
-      if (!(validation as any)?.valid) {
-        throw new Error("Invalid organiser link");
+      const result = data as ReviewData;
+
+      if (!result?.event) {
+        throw new Error("Event not found");
       }
 
       setValid(true);
 
-      // -----------------------------------------
-      // 2. Load event
-      // -----------------------------------------
+      setEventTitle(result.event.title || "Official Event");
 
-      const { data: event, error: eventError } = await supabase
-        .from("official_events")
-        .select("title, ticket_url, pass_price, price_text")
-        .eq("id", eventId)
-        .maybeSingle();
+      setEventTicketUrl(result.event.ticket_url || "");
 
-      if (eventError) {
-        throw eventError;
-      }
-
-      setEventTitle(event?.title ?? "Official Event");
-      setEventTicketUrl(event?.ticket_url ?? "");
       setEventPrice(
-        event?.pass_price != null
-          ? String(event.pass_price)
-          : event?.price_text ?? ""
+        result.event.pass_price != null
+          ? String(result.event.pass_price)
+          : result.event.price_text || ""
       );
 
-      // -----------------------------------------
-      // 3. Load questions
-      // -----------------------------------------
-
-      const { data: questionData, error: questionError } =
-        await supabase
-          .from("official_event_application_questions")
-          .select(
-            `
-              id,
-              event_id,
-              question_text,
-              question_type,
-              choices,
-              is_required,
-              sort_order
-            `
-          )
-          .eq("event_id", eventId)
-          .order("sort_order", { ascending: true });
-
-      if (questionError) {
-        throw questionError;
-      }
-
-      setQuestions((questionData ?? []) as Question[]);
-
-      // -----------------------------------------
-      // 4. Load applications
-      // -----------------------------------------
-
-      const { data: applicationData, error: applicationsError } =
-        await supabase.rpc(
-          "get_official_event_applications_by_organiser_token",
-          {
-            p_event_id: eventId,
-            p_token: token,
-          }
-        );
-
-      if (applicationsError) {
-        throw applicationsError;
-      }
-
-      const rawApplications =
-        (applicationData ?? []) as Application[];
-
-      // -----------------------------------------
-      // 5. Load applicant profiles
-      // -----------------------------------------
-
-      const userIds = [
-        ...new Set(
-          rawApplications
-            .map((application) => application.user_id)
-            .filter(Boolean)
-        ),
-      ];
-
-      let profiles: Record<
-        string,
-        {
-          name: string;
-          phone: string | null;
-        }
-      > = {};
-
-      if (userIds.length > 0) {
-        const { data: profileData, error: profileError } =
-          await supabase
-            .from("profiles")
-            .select("id, full_name, phone")
-            .in("id", userIds);
-
-        if (profileError) {
-          throw profileError;
-        }
-
-        profiles = Object.fromEntries(
-          (profileData ?? []).map((profile) => [
-            profile.id,
-            {
-              name: profile.full_name || "Gathr User",
-              phone: profile.phone || null,
-            },
-          ])
-        );
-      }
-
-      // -----------------------------------------
-      // 6. Load payment status
-      // -----------------------------------------
-
-      let orderData: {
-        user_id: string;
-        event_id: string;
-        payment_status: string | null;
-      }[] = [];
-
-      if (userIds.length > 0) {
-        const { data, error: orderError } = await supabase
-          .from("official_orders")
-          .select("user_id, event_id, payment_status")
-          .eq("event_id", eventId)
-          .in("user_id", userIds);
-
-        if (orderError) {
-          throw orderError;
-        }
-
-        orderData = data ?? [];
-      }
-
-      const paymentMap = new Map<string, string>();
-
-      orderData.forEach((order) => {
-        paymentMap.set(
-          `${order.user_id}_${order.event_id}`,
-          order.payment_status ?? ""
-        );
-      });
-
-      // -----------------------------------------
-      // 7. Merge everything
-      // -----------------------------------------
-
-      const finalApplications = rawApplications.map(
-        (application) => ({
-          ...application,
-          applicant_name:
-            profiles[application.user_id]?.name ||
-            "Gathr User",
-
-          applicant_phone:
-            profiles[application.user_id]?.phone || null,
-
-          payment_status:
-            paymentMap.get(
-              `${application.user_id}_${application.event_id}`
-            ) ?? null,
-        })
-      );
-
-      setApplications(finalApplications);
+      setQuestions(result.questions || []);
+      setApplications(result.applications || []);
     } catch (err) {
-      console.error(
-        "Organiser review loading failed:",
-        err
-      );
+      console.error("Organiser review loading failed:", err);
 
       setValid(false);
+
       setError(
         "This organiser link is invalid or expired."
       );
@@ -316,12 +169,12 @@ function OrganiserReviewPage() {
     }
 
     const confirmed = window.confirm(
-      `Accept ${application.applicant_name || "this applicant"}?`
+      `Accept ${
+        application.applicant_name || "this applicant"
+      }?`
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     setActionLoading(application.id);
 
@@ -335,13 +188,11 @@ function OrganiserReviewPage() {
         }
       );
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       const result = data as any;
 
-      const updatedApplication =
+      const updated =
         result?.application as Application;
 
       setApplications((current) =>
@@ -349,11 +200,13 @@ function OrganiserReviewPage() {
           item.id === application.id
             ? {
                 ...item,
-                ...updatedApplication,
+                ...updated,
                 applicant_name:
                   item.applicant_name,
                 applicant_phone:
                   item.applicant_phone,
+                payment_status:
+                  item.payment_status,
               }
             : item
         )
@@ -362,7 +215,7 @@ function OrganiserReviewPage() {
       setOpenId(application.id);
 
       alert(
-        "Application accepted. Applicant can now make the payment."
+        "Application accepted. Payment deadline has been set."
       );
     } catch (err: any) {
       console.error("Accept failed:", err);
@@ -394,9 +247,7 @@ function OrganiserReviewPage() {
       "Enter rejection reason:"
     );
 
-    if (reason === null) {
-      return;
-    }
+    if (reason === null) return;
 
     if (!reason.trim()) {
       alert("Please enter a rejection reason.");
@@ -404,12 +255,12 @@ function OrganiserReviewPage() {
     }
 
     const confirmed = window.confirm(
-      `Reject ${application.applicant_name || "this applicant"}?`
+      `Reject ${
+        application.applicant_name || "this applicant"
+      }?`
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     setActionLoading(application.id);
 
@@ -424,13 +275,11 @@ function OrganiserReviewPage() {
         }
       );
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       const result = data as any;
 
-      const updatedApplication =
+      const updated =
         result?.application as Application;
 
       setApplications((current) =>
@@ -438,11 +287,13 @@ function OrganiserReviewPage() {
           item.id === application.id
             ? {
                 ...item,
-                ...updatedApplication,
+                ...updated,
                 applicant_name:
                   item.applicant_name,
                 applicant_phone:
                   item.applicant_phone,
+                payment_status:
+                  item.payment_status,
               }
             : item
         )
@@ -475,15 +326,15 @@ function OrganiserReviewPage() {
       return;
     }
 
+    const phone = cleanPhoneNumber(
+      application.applicant_phone
+    );
+
     const message = createWhatsAppMessage(
       application,
       eventTitle,
       eventPrice,
       eventTicketUrl
-    );
-
-    const phone = cleanPhoneNumber(
-      application.applicant_phone
     );
 
     const whatsappUrl =
@@ -497,6 +348,10 @@ function OrganiserReviewPage() {
     );
   }
 
+  // -----------------------------------------
+  // LOADING
+  // -----------------------------------------
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -507,6 +362,10 @@ function OrganiserReviewPage() {
       </div>
     );
   }
+
+  // -----------------------------------------
+  // INVALID
+  // -----------------------------------------
 
   if (!valid) {
     return (
@@ -521,16 +380,18 @@ function OrganiserReviewPage() {
 
         <p className="mt-2 text-sm text-muted-foreground">
           {error ||
-            "This organiser link is invalid or has expired. Please ask the Gathr team for a new link."}
+            "This organiser link is invalid or has expired."}
         </p>
       </div>
     );
   }
 
+  // -----------------------------------------
+  // PAGE
+  // -----------------------------------------
+
   return (
     <div className="mx-auto min-h-screen max-w-2xl px-4 pb-16 pt-8">
-      {/* HEADER */}
-
       <header className="mb-6">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
           Gathr
@@ -549,27 +410,19 @@ function OrganiserReviewPage() {
         </p>
       </header>
 
-      {/* APPLICATION COUNT */}
+      {/* COUNT */}
 
       <div className="mb-5 rounded-2xl border border-border bg-card p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-muted-foreground">
-              Applications
-            </p>
+        <p className="text-xs text-muted-foreground">
+          Applications
+        </p>
 
-            <p className="mt-1 text-2xl font-extrabold">
-              {applications.length}
-            </p>
-          </div>
-
-          <div className="rounded-full bg-primary/10 p-3">
-            <CheckCircle2 className="h-5 w-5 text-primary" />
-          </div>
-        </div>
+        <p className="mt-1 text-2xl font-extrabold">
+          {applications.length}
+        </p>
       </div>
 
-      {/* APPLICATION LIST */}
+      {/* LIST */}
 
       {applications.length === 0 ? (
         <div className="rounded-2xl border border-border p-6 text-center">
@@ -586,7 +439,8 @@ function OrganiserReviewPage() {
       ) : (
         <div className="space-y-3">
           {applications.map((application) => {
-            const open = openId === application.id;
+            const open =
+              openId === application.id;
 
             const isPending =
               application.status === "pending";
@@ -606,7 +460,7 @@ function OrganiserReviewPage() {
                 key={application.id}
                 className="overflow-hidden rounded-2xl border border-border bg-card"
               >
-                {/* APPLICANT HEADER */}
+                {/* HEADER */}
 
                 <button
                   type="button"
@@ -679,7 +533,7 @@ function OrganiserReviewPage() {
                         application.status ===
                           "payment_pending" && (
                           <p className="mt-2 text-xs text-muted-foreground">
-                            Payment deadline:{" "}
+                            Deadline:{" "}
                             {new Date(
                               application.payment_deadline_at
                             ).toLocaleString("en-IN")}
@@ -726,7 +580,7 @@ function OrganiserReviewPage() {
                       )}
                     </div>
 
-                    {/* REJECTION REASON */}
+                    {/* REJECTION */}
 
                     {application.rejection_reason && (
                       <div className="mt-4 rounded-xl bg-destructive/10 p-3">
@@ -740,11 +594,9 @@ function OrganiserReviewPage() {
                       </div>
                     )}
 
-                    {/* ACTION BUTTONS */}
+                    {/* ACTIONS */}
 
                     <div className="mt-5 space-y-2">
-                      {/* PENDING */}
-
                       {isPending && (
                         <div className="grid grid-cols-2 gap-2">
                           <button
@@ -783,8 +635,6 @@ function OrganiserReviewPage() {
                         </div>
                       )}
 
-                      {/* WHATSAPP */}
-
                       {(isAccepted || isRejected) && (
                         <button
                           type="button"
@@ -804,8 +654,6 @@ function OrganiserReviewPage() {
                         </button>
                       )}
 
-                      {/* PHONE NOT AVAILABLE */}
-
                       {(isAccepted || isRejected) &&
                         !application.applicant_phone && (
                           <p className="text-center text-xs text-muted-foreground">
@@ -814,8 +662,6 @@ function OrganiserReviewPage() {
                           </p>
                         )}
                     </div>
-
-                    {/* APPLICATION DATE */}
 
                     <div className="mt-4 text-[11px] text-muted-foreground">
                       Applied{" "}
@@ -858,7 +704,8 @@ function createWhatsAppMessage(
     application.applicant_name || "there";
 
   if (
-    application.status === "payment_pending"
+    application.status === "payment_pending" ||
+    application.status === "confirmed"
   ) {
     const deadline = application.payment_deadline_at
       ? new Date(
@@ -960,7 +807,9 @@ function getPaymentLabel(
     return "Payment Confirmed";
   }
 
-  if (application.status === "payment_pending") {
+  if (
+    application.status === "payment_pending"
+  ) {
     return "Payment Pending";
   }
 
@@ -970,6 +819,10 @@ function getPaymentLabel(
 
   return "Not paid";
 }
+
+/* ---------------------------------------------
+   ANSWER
+--------------------------------------------- */
 
 function formatAnswer(
   answer: string | string[] | undefined
