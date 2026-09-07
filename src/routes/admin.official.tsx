@@ -64,6 +64,7 @@ const emptyForm = {
   booking_type: "instant" as "instant" | "selection",
   organiser_user_id: "",
   selection_payment_deadline_minutes: "30",
+  razorpay_enabled: false,
 };
 type Form = typeof emptyForm;
 
@@ -99,6 +100,8 @@ function toForm(e: OfficialEvent): Form {
     organiser_user_id: e.organiser_user_id ?? "",
     selection_payment_deadline_minutes: String(
       e.selection_payment_deadline_minutes ?? 30
+      ),
+      razorpay_enabled: e.razorpay_enabled ?? false,
     ),
   };
 }
