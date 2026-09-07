@@ -129,7 +129,11 @@ async function handleSubmitApplication() {
 }
   if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
   if (!e) return <div className="p-6 text-sm text-muted-foreground">This event is no longer available.</div>;
-
+const canBook =
+    e.booking_type !== "selection" ||
+    application?.status === "accepted" ||
+    application?.status === "payment_pending" ||
+    application?.status === "confirmed";
   const when = new Date(e.starts_at).toLocaleString([], {
     weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit",
   });
@@ -404,7 +408,7 @@ async function handleSubmitApplication() {
     )}
   </section>
 )}
-        {passes.length > 0 && (
+        {canBook  && passes.length > 0 && (
           <section id="passes" className="rounded-2xl border border-border bg-card p-4">
             <h2 className="text-sm font-semibold">Available passes</h2>
             <div className="mt-2 space-y-2">
@@ -441,7 +445,7 @@ async function handleSubmitApplication() {
         )}
 
 
-        {(e.pass_info || e.pass_price != null || e.pass_quantity != null) && (
+        {canBook &&  (e.pass_info || e.pass_price != null || e.pass_quantity != null) && (
           <section className="rounded-2xl border border-border bg-card p-4">
             <h2 className="text-sm font-semibold">Passes</h2>
             {e.pass_price != null && (
@@ -500,7 +504,7 @@ async function handleSubmitApplication() {
           </a>
         )}
 
-        {wa && passes.length === 0 && (
+        {canBook && wa && passes.length === 0 && (
           <a
             href={wa}
             target="_blank"
@@ -512,7 +516,7 @@ async function handleSubmitApplication() {
         )}
       </div>
 
-      {(passes.length > 0 || wa) && (
+      {canBook && (passes.length > 0 || wa) && (
         <div className="fixed inset-x-0 bottom-16 z-50 border-t border-border bg-background/95 p-3 pb-3 backdrop-blur">
           <div className="mx-auto max-w-md">
             {passes.length > 0 ? (
