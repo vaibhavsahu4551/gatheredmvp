@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { generateCheckinLink, revokeCheckinLinks } from "@/lib/checkin";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PhotoCropModal } from "@/components/PhotoCropModal";
@@ -106,6 +107,7 @@ function AdminOfficialEvents() {
   const [rows, setRows] = useState<OfficialEvent[]>([]);
   const [questionsFor, setQuestionsFor] = useState<string | null>(null);
   const [applicationsFor, setApplicationsFor] = useState<string | null>(null);
+  const [checkinBusy, setCheckinBusy] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<OfficialEvent | null>(null);
@@ -232,6 +234,62 @@ function AdminOfficialEvents() {
   className="underline"
 >
   Share
+</button>
+                <button
+  onClick={async () => {
+    setCheckinBusy(r.id);
+    try {
+      const result = await generateCheckinLink(r.id);
+      await navigator.clipboard.writeText(result.url);
+      toast.success("Check-in link copied!");
+    } catch (err: any) {
+      toast.error(err.message || "Couldn't generate check-in link");
+    } finally {
+      setCheckinBusy(null);
+    }
+  }}
+  disabled={checkinBusy === r.id}
+  className="underline"
+>
+  {checkinBusy === r.id ? "…" : "Copy check-in link"}
+</button>
+<button
+  onClick={async () => {
+    if (!confirm("Regenerate check-in link? The old link will stop working.")) return;
+    setCheckinBusy(r.id);
+    try {
+      await revokeCheckinLinks(r.id);
+      const result = await generateCheckinLink(r.id);
+      await navigator.clipboard.writeText(result.url);
+      toast.success("New check-in link copied!");
+    } catch (err: any) {
+      toast.error(err.message || "Couldn't regenerate check-in link");
+    } finally {
+      setCheckinBusy(null);
+    }
+  }}
+  disabled={checkinBusy === r.id}
+  className="underline"
+>
+  Regenerate
+</button>
+<button
+  onClick={async () => {
+    if (!confirm("Revoke all check-in links for this event?")) return;
+    setCheckinBusy(r.id);
+    try {
+      await revokeCheckinLinks(r.id);
+      toast.success("Check-in links revoked");
+    } catch (err: any) {
+      toast.error(err.message || "Couldn't revoke");
+    } finally {
+      setCheckinBusy(null);
+    }
+  }}
+  disabled={checkinBusy === r.id}
+  className="text-destructive underline"
+>
+  Revoke check-in
 </button>
                 <button onClick={() => { setEditing(r); setShowForm(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="underline">Edit</button>
                 <button onClick={() => remove(r)} className="text-destructive underline">Delete</button>
