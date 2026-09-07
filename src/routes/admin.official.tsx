@@ -351,7 +351,7 @@ function OfficialQuestionManager({
   }
 
   async function removeQuestion(question: OfficialApplicationQuestion) {
-    if (!confirm(Delete "${question.question_text}"?)) {
+    if (!confirm(`Delete "${question.question_text}"?`)) {
       return;
     }
 
@@ -543,7 +543,7 @@ function OfficialQuestionManager({
                           e.target.value
                         )
                       }
-                      placeholder={Choice ${index + 1}}
+                      placeholder={`Choice ${index + 1}`}
                       className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none"
                     />
 
