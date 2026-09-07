@@ -73,6 +73,78 @@ async function getCurrentUserId() {
 export async function getApplicationQuestions(
   eventId: string
 ): Promise<OfficialApplicationQuestion[]> {
+  export type CreateOfficialApplicationQuestionInput = {
+  eventId: string;
+  questionText: string;
+  questionType: OfficialApplicationQuestionType;
+  choices?: string[] | null;
+  isRequired?: boolean;
+  sortOrder?: number;
+};
+
+export type UpdateOfficialApplicationQuestionInput = {
+  questionId: string;
+  questionText: string;
+  questionType: OfficialApplicationQuestionType;
+  choices?: string[] | null;
+  isRequired?: boolean;
+  sortOrder?: number;
+};
+
+export async function createApplicationQuestion(
+  input: CreateOfficialApplicationQuestionInput
+): Promise<OfficialApplicationQuestion> {
+  const { data, error } = await supabase.rpc(
+    "admin_create_official_event_application_question",
+    {
+      p_event_id: input.eventId,
+      p_question_text: input.questionText,
+      p_question_type: input.questionType,
+      p_choices: input.choices ?? null,
+      p_is_required: input.isRequired ?? true,
+      p_sort_order: input.sortOrder ?? 0,
+    }
+  );
+
+  if (error) throw error;
+
+  return data as OfficialApplicationQuestion;
+}
+
+export async function updateApplicationQuestion(
+  input: UpdateOfficialApplicationQuestionInput
+): Promise<OfficialApplicationQuestion> {
+  const { data, error } = await supabase.rpc(
+    "admin_update_official_event_application_question",
+    {
+      p_question_id: input.questionId,
+      p_question_text: input.questionText,
+      p_question_type: input.questionType,
+      p_choices: input.choices ?? null,
+      p_is_required: input.isRequired ?? true,
+      p_sort_order: input.sortOrder ?? 0,
+    }
+  );
+
+  if (error) throw error;
+
+  return data as OfficialApplicationQuestion;
+}
+
+export async function deleteApplicationQuestion(
+  questionId: string
+): Promise<boolean> {
+  const { data, error } = await supabase.rpc(
+    "admin_delete_official_event_application_question",
+    {
+      p_question_id: questionId,
+    }
+  );
+
+  if (error) throw error;
+
+  return Boolean(data);
+}
   const { data, error } = await supabase
     .from("official_event_application_questions")
     .select("*")
