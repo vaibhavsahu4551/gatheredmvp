@@ -631,7 +631,9 @@ function OfficialForm({
   const [f, setF] = useState<Form>(initial);
   const [busy, setBusy] = useState(false);
   const [cropFile, setCropFile] = useState<File | null>(null);
+  const [ticketCropFile, setTicketCropFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState("");
+  const [ticketPreview, setTicketPreview] = useState("");
   const set = (k: keyof Form, v: any) => setF((p) => ({ ...p, [k]: v }));
 
   useEffect(() => {
@@ -640,7 +642,13 @@ function OfficialForm({
     return () => { alive = false; };
   }, [f.cover_url]);
 
-  async function pick(key: "cover_url" | "organizer_logo", file?: File | null) {
+  useEffect(() => {
+    let alive = true;
+    resolveOfficialMedia(f.ticket_bg_url).then((u) => alive && setTicketPreview(u)).catch(() => {});
+    return () => { alive = false; };
+  }, [f.ticket_bg_url]);
+
+  async function pick(key: "cover_url" | "organizer_logo" | "ticket_bg_url", file?: File | null) {
     if (!file) return;
     try {
       const { data: { user } } = await supabase.auth.getUser();
