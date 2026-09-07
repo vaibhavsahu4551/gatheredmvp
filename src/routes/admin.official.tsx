@@ -717,7 +717,8 @@ function OfficialForm({
   const [busy, setBusy] = useState(false);
   const [cropFile, setCropFile] = useState<File | null>(null);
   const [ticketCropFile, setTicketCropFile] = useState<File | null>(null);
-  const [coverPreview, setCoverPreview] = useState("");
+  const [ticketAspect, setTicketAspect] = useState<number>(9 / 16);
+const [coverPreview, setCoverPreview] = useState("");
   const [ticketPreview, setTicketPreview] = useState("");
   const set = (k: keyof Form, v: any) => setF((p) => ({ ...p, [k]: v }));
 
@@ -870,6 +871,51 @@ function OfficialForm({
           />
         )}
       </Field>
+<Field label="Ticket background image">
+  <div className="overflow-hidden rounded-xl border border-border bg-muted aspect-[9/16] w-full max-w-[220px]">
+    {ticketPreview ? (
+      <img src={ticketPreview} alt="" className="h-full w-full object-cover" />
+    ) : (
+      <div className="flex h-full items-center justify-center text-[11px] text-muted-foreground">No ticket background yet</div>
+    )}
+  </div>
+  <div className="mt-2">
+    <label className="text-xs font-medium">Aspect ratio for crop</label>
+    <select
+      value={ticketAspect}
+      onChange={(e) => setTicketAspect(Number(e.target.value))}
+      className={`${inputCls} mt-1`}
+    >
+      <option value={9 / 16}>9:16 (Portrait ticket)</option>
+      <option value={5 / 4}>5:4</option>
+      <option value={7 / 5}>7:5</option>
+      <option value={4 / 3}>4:3</option>
+      <option value={5 / 3}>5:3</option>
+      <option value={3 / 2}>3:2</option>
+    </select>
+  </div>
+  <div className="mt-2 flex items-center gap-2">
+    <input
+      type="file"
+      accept="image/*"
+      onChange={(e) => { const file = e.target.files?.[0]; if (file) setTicketCropFile(file); e.target.value = ""; }}
+      className="text-xs"
+    />
+  </div>
+  <p className="mt-1 text-[11px] text-muted-foreground">This image appears behind the ticket details when a user downloads their pass.</p>
+  <input value={f.ticket_bg_url} onChange={(e) => set("ticket_bg_url", e.target.value)} placeholder="or paste an image URL" className={`${inputCls} mt-1`} />
+  {ticketCropFile && (
+    <PhotoCropModal
+      file={ticketCropFile}
+      aspect={ticketAspect}
+      round={false}
+      size={1440}
+      title="Crop the ticket background"
+      onCancel={() => setTicketCropFile(null)}
+      onConfirm={async (cropped) => { setTicketCropFile(null); await pick("ticket_bg_url", cropped); }}
+    />
+  )}
+</Field>
 
       <Field label="Organizer logo (optional)">
         <input type="file" accept="image/*" onChange={(e) => pick("organizer_logo", e.target.files?.[0])} className="text-xs" />
