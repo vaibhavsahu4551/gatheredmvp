@@ -926,6 +926,138 @@ export type Database = {
         }
         Relationships: []
       }
+      official_event_application_questions: {
+        Row: {
+          choices: Json | null
+          created_at: string
+          event_id: string
+          id: string
+          is_required: boolean
+          question_text: string
+          question_type: string
+          sort_order: number
+        }
+        Insert: {
+          choices?: Json | null
+          created_at?: string
+          event_id: string
+          id?: string
+          is_required?: boolean
+          question_text: string
+          question_type?: string
+          sort_order?: number
+        }
+        Update: {
+          choices?: Json | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          is_required?: boolean
+          question_text?: string
+          question_type?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "official_event_application_questions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "official_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      official_event_applications: {
+        Row: {
+          accepted_at: string | null
+          answers: Json
+          created_at: string
+          event_id: string
+          id: string
+          payment_deadline_at: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          answers?: Json
+          created_at?: string
+          event_id: string
+          id?: string
+          payment_deadline_at?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          answers?: Json
+          created_at?: string
+          event_id?: string
+          id?: string
+          payment_deadline_at?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "official_event_applications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "official_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      official_event_organiser_tokens: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          event_id: string
+          expires_at: string | null
+          id: string
+          revoked_at: string | null
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          expires_at?: string | null
+          id?: string
+          revoked_at?: string | null
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          expires_at?: string | null
+          id?: string
+          revoked_at?: string | null
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "official_event_organiser_tokens_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "official_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       official_event_passes: {
         Row: {
           active: boolean
@@ -978,6 +1110,7 @@ export type Database = {
       }
       official_events: {
         Row: {
+          booking_type: string
           booking_whatsapp: string | null
           category: string
           city: string
@@ -993,6 +1126,7 @@ export type Database = {
           is_featured: boolean
           is_official: boolean
           is_pinned: boolean
+          organiser_user_id: string | null
           organizer_logo: string | null
           organizer_name: string
           pass_info: string | null
@@ -1000,6 +1134,7 @@ export type Database = {
           pass_quantity: number | null
           price_text: string | null
           published: boolean
+          selection_payment_deadline_minutes: number
           starts_at: string
           terms: string | null
           ticket_url: string | null
@@ -1008,6 +1143,7 @@ export type Database = {
           venue: string
         }
         Insert: {
+          booking_type?: string
           booking_whatsapp?: string | null
           category?: string
           city?: string
@@ -1023,6 +1159,7 @@ export type Database = {
           is_featured?: boolean
           is_official?: boolean
           is_pinned?: boolean
+          organiser_user_id?: string | null
           organizer_logo?: string | null
           organizer_name?: string
           pass_info?: string | null
@@ -1030,6 +1167,7 @@ export type Database = {
           pass_quantity?: number | null
           price_text?: string | null
           published?: boolean
+          selection_payment_deadline_minutes?: number
           starts_at: string
           terms?: string | null
           ticket_url?: string | null
@@ -1038,6 +1176,7 @@ export type Database = {
           venue?: string
         }
         Update: {
+          booking_type?: string
           booking_whatsapp?: string | null
           category?: string
           city?: string
@@ -1053,6 +1192,7 @@ export type Database = {
           is_featured?: boolean
           is_official?: boolean
           is_pinned?: boolean
+          organiser_user_id?: string | null
           organizer_logo?: string | null
           organizer_name?: string
           pass_info?: string | null
@@ -1060,6 +1200,7 @@ export type Database = {
           pass_quantity?: number | null
           price_text?: string | null
           published?: boolean
+          selection_payment_deadline_minutes?: number
           starts_at?: string
           terms?: string | null
           ticket_url?: string | null
@@ -1948,6 +2089,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_official_event_application: {
+        Args: { p_application_id: string }
+        Returns: {
+          accepted_at: string | null
+          answers: Json
+          created_at: string
+          event_id: string
+          id: string
+          payment_deadline_at: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "official_event_applications"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_adjust_points: {
         Args: { _amount: number; _reason: string; _user: string }
         Returns: undefined
@@ -2275,6 +2439,10 @@ export type Database = {
         Returns: string
       }
       event_is_closed: { Args: { _event: string }; Returns: boolean }
+      generate_official_event_organiser_link: {
+        Args: { p_event_id: string }
+        Returns: Json
+      }
       get_dm_unread: {
         Args: never
         Returns: {
@@ -2367,6 +2535,23 @@ export type Database = {
         }[]
       }
       join_circle_by_code: { Args: { _code: string }; Returns: string }
+      list_official_event_applications: {
+        Args: { p_event_id: string }
+        Returns: {
+          accepted_at: string
+          answers: Json
+          created_at: string
+          event_id: string
+          id: string
+          payment_deadline_at: string
+          rejection_reason: string
+          reviewed_at: string
+          reviewed_by: string
+          status: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       mark_dm_read: { Args: { _thread: string }; Returns: undefined }
       pride_my_cohost_invites: {
         Args: never
@@ -2395,6 +2580,29 @@ export type Database = {
       }
       pride_suspended: { Args: { _user: string }; Returns: boolean }
       redeem_reward: { Args: { _kind: string }; Returns: string }
+      reject_official_event_application: {
+        Args: { p_application_id: string; p_rejection_reason?: string }
+        Returns: {
+          accepted_at: string | null
+          answers: Json
+          created_at: string
+          event_id: string
+          id: string
+          payment_deadline_at: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "official_event_applications"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       respond_event_application: {
         Args: { _application_id: string; _decision: string }
         Returns: {
