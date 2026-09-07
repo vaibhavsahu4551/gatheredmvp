@@ -48,6 +48,7 @@ export type OfficialEvent = {
   booking_type: "instant" | "selection";
 organiser_user_id: string | null;
 selection_payment_deadline_minutes: number;
+  razorpay_enabled: boolean;
   created_at: string;
   updated_at: string;
 };
