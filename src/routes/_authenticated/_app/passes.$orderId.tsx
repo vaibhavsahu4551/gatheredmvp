@@ -34,6 +34,7 @@ function TicketDetail() {
   const [event, setEvent] = useState<OfficialEvent | null>(null);
   const [qr, setQr] = useState("");
   const [ticketBg, setTicketBg] = useState("");
+  const [coverImg, setCoverImg] = useState("");
   const [loading, setLoading] = useState(true);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -45,13 +46,18 @@ function TicketDetail() {
         setOrder(o);
         setLoading(false);
         if (!o) return;
-                getOfficialEvent(o.event_id).then((e) => {
+          
+         getOfficialEvent(o.event_id).then((e) => {
           if (!alive) return;
           setEvent(e);
           if (e?.ticket_bg_url) {
             resolveOfficialMedia(e.ticket_bg_url).then((u) => alive && setTicketBg(u)).catch(() => {});
           }
+          if (e?.cover_url) {
+            resolveOfficialMedia(e.cover_url).then((u) => alive && setCoverImg(u)).catch(() => {});
+          }
         }).catch(() => {});
+
         if (o.ticket_status === "ACTIVE" && o.payment_status === "APPROVED") {
           const url = await QRCode.toDataURL(
             JSON.stringify({ t: o.order_code, o: o.id, e: o.event_id, q: o.quantity }),
@@ -77,7 +83,7 @@ function TicketDetail() {
         bgImg.src = ticketBg;
         await new Promise((res, rej) => { bgImg.onload = res; bgImg.onerror = rej; });
         ctx.drawImage(bgImg, 0, 0, c.width, c.height);
-        ctx.fillStyle = "rgba(255,255,255,0.80)";
+        ctx.fillStyle = "rgba(255,255,255,0.95)";
         ctx.fillRect(0, 0, c.width, c.height);
       } catch {
         /* background failed to load — fall back to plain white */
@@ -139,7 +145,7 @@ function TicketDetail() {
           {ticketBg && (
             <>
               <img src={ticketBg} alt="" className="absolute inset-0 h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-background/80" />
+              <div className="absolute inset-0 bg-background/95" />
             </>
           )}
                     <div className="relative flex items-center justify-between px-5 pt-4">
@@ -148,14 +154,15 @@ function TicketDetail() {
           </div>
 
           <div className="relative flex gap-3 px-5 pt-3">
-            {event?.cover_url && (
+               {coverImg && (
               <img
-                src={event.cover_url}
-                alt={`${event.title} cover`}
+                src={coverImg}
+                alt={`${event?.title} cover`}
                 loading="lazy"
                 className="h-20 w-20 shrink-0 rounded-xl object-cover shadow-sm"
               />
             )}
+
             <div className="min-w-0 flex-1">
               <h2 className="text-base font-extrabold leading-snug">{event?.title ?? "Official event"}</h2>
               <div className="mt-1 flex items-center gap-2 text-[12px] text-muted-foreground">
