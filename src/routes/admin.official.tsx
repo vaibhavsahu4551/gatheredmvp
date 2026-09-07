@@ -223,6 +223,16 @@ function AdminOfficialEvents() {
   {applicationsFor === r.id ? "Hide applications" : "Applications"}
 </button>
                 <button onClick={() => setPassesFor((v) => (v === r.id ? null : r.id))} className="underline">{passesFor === r.id ? "Hide passes" : "Passes"}</button>
+                <button
+  onClick={() => {
+    const link = https://gathrmeet.in/official/${r.id};
+    navigator.clipboard.writeText(link);
+    toast.success("Event link copied!");
+  }}
+  className="underline"
+>
+  Share
+</button>
                 <button onClick={() => { setEditing(r); setShowForm(true); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="underline">Edit</button>
                 <button onClick={() => remove(r)} className="text-destructive underline">Delete</button>
               </div>
