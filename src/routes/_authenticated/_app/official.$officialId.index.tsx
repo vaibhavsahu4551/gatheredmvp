@@ -101,7 +101,7 @@ async function handleSubmitApplication() {
       (Array.isArray(answer) && answer.length === 0)
     ) {
       setApplicationError(
-        Please answer: ${q.question_text}
+        `Please answer: ${q.question_text}`
       );
       return;
     }
