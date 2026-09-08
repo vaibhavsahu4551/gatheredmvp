@@ -59,12 +59,14 @@ export const Route = createFileRoute("/api/public/telegram-webhook")({
           console.error(
             "Telegram webhook secrets are not configured"
           );
+
           return new Response("Not configured", {
             status: 500,
           });
         }
 
-        // Telegram webhook authentication.
+        // Verify that the request came through the
+        // Telegram webhook configured with our secret.
         const incomingSecret =
           request.headers.get(
             "x-telegram-bot-api-secret-token"
@@ -88,13 +90,13 @@ export const Route = createFileRoute("/api/public/telegram-webhook")({
 
         const callback = payload?.callback_query;
 
-        // Ignore normal Telegram updates.
+        // Ignore updates that are not button presses.
         if (!callback) {
           return new Response("ok");
         }
 
         const callbackId = String(callback.id ?? "");
-        const data = String(callback.data ?? "");
+        const callbackData = String(callback.data ?? "");
 
         const message = callback.message;
 
@@ -106,47 +108,67 @@ export const Route = createFileRoute("/api/public/telegram-webhook")({
           message?.message_id ?? 0
         );
 
-        // Only the configured admin chat can approve/reject orders.
+        // Only the configured Telegram admin chat
+        // can approve/reject orders.
         if (chatId !== String(adminChatId)) {
-          await telegramApi(botToken, "answerCallbackQuery", {
-            callback_query_id: callbackId,
-            text: "Unauthorized",
-            show_alert: true,
-          }).catch(() => {});
+          await telegramApi(
+            botToken,
+            "answerCallbackQuery",
+            {
+              callback_query_id: callbackId,
+              text: "Unauthorized",
+              show_alert: true,
+            }
+          ).catch(() => {});
 
           return new Response("Forbidden", {
             status: 403,
           });
         }
 
-        // Expected:
-        // official:approve:<orderId>
-        // official:reject:<orderId>
-        const match = data.match(
-          /^official:(approve|reject):([0-9a-fA-F-]{36})$/
+        const approveMatch = callbackData.match(
+          /^official:approve:([0-9a-fA-F-]{36})$/
         );
 
-        if (!match) {
-          await telegramApi(botToken, "answerCallbackQuery", {
-            callback_query_id: callbackId,
-            text: "Invalid action",
-            show_alert: true,
-          }).catch(() => {});
+        const rejectMatch = callbackData.match(
+          /^official:reject:([0-9a-fA-F-]{36})$/
+        );
+
+        const rejectReasonMatch = callbackData.match(
+          /^official:reject_reason:([0-9a-fA-F-]{36}):([A-Z_]+)$/
+        );
+
+        if (
+          !approveMatch &&
+          !rejectMatch &&
+          !rejectReasonMatch
+        ) {
+          await telegramApi(
+            botToken,
+            "answerCallbackQuery",
+            {
+              callback_query_id: callbackId,
+              text: "Invalid action",
+              show_alert: true,
+            }
+          ).catch(() => {});
 
           return new Response("Invalid action", {
             status: 400,
           });
         }
 
-        const action = match[1];
-        const orderId = match[2];
-
         const { supabaseAdmin } = await import(
           "@/integrations/supabase/client.server"
         );
 
         try {
-          if (action === "approve") {
+          // ==========================================
+          // APPROVE
+          // ==========================================
+          if (approveMatch) {
+            const orderId = approveMatch[1];
+
             const { data: order, error } =
               await supabaseAdmin.rpc(
                 "telegram_approve_official_order",
@@ -170,6 +192,19 @@ export const Route = createFileRoute("/api/public/telegram-webhook")({
               }
             );
 
+            const approvedText =
+              `✅ <b>PAYMENT APPROVED</b>\n\n` +
+              `<b>Order:</b> ${escapeHtml(
+                approvedOrder.order_code
+              )}\n` +
+              `<b>Customer:</b> ${escapeHtml(
+                approvedOrder.customer_name
+              )}\n` +
+              `<b>Amount:</b> ₹${Number(
+                approvedOrder.amount
+              ).toLocaleString("en-IN")}\n\n` +
+              `🎫 <b>Ticket:</b> ACTIVE`;
+
             if (message?.photo) {
               await telegramApi(
                 botToken,
@@ -177,14 +212,7 @@ export const Route = createFileRoute("/api/public/telegram-webhook")({
                 {
                   chat_id: chatId,
                   message_id: messageId,
-                  caption:
-                    `✅ <b>APPROVED</b>\n\n` +
-                    `<b>Order:</b> ${approvedOrder.order_code}\n` +
-                    `<b>Customer:</b> ${approvedOrder.customer_name}\n` +
-                    `<b>Amount:</b> ₹${Number(
-                      approvedOrder.amount
-                    ).toLocaleString("en-IN")}\n\n` +
-                    `Ticket is now ACTIVE.`,
+                  caption: approvedText,
                   parse_mode: "HTML",
                   reply_markup: {
                     inline_keyboard: [],
@@ -198,14 +226,7 @@ export const Route = createFileRoute("/api/public/telegram-webhook")({
                 {
                   chat_id: chatId,
                   message_id: messageId,
-                  text:
-                    `✅ <b>APPROVED</b>\n\n` +
-                    `<b>Order:</b> ${approvedOrder.order_code}\n` +
-                    `<b>Customer:</b> ${approvedOrder.customer_name}\n` +
-                    `<b>Amount:</b> ₹${Number(
-                      approvedOrder.amount
-                    ).toLocaleString("en-IN")}\n\n` +
-                    `Ticket is now ACTIVE.`,
+                  text: approvedText,
                   parse_mode: "HTML",
                   reply_markup: {
                     inline_keyboard: [],
@@ -215,14 +236,18 @@ export const Route = createFileRoute("/api/public/telegram-webhook")({
             }
           }
 
-          if (action === "reject") {
+          // ==========================================
+          // REJECT BUTTON
+          // ==========================================
+          if (rejectMatch) {
+            const orderId = rejectMatch[1];
+
             await telegramApi(
               botToken,
               "answerCallbackQuery",
               {
                 callback_query_id: callbackId,
                 text: "Choose a rejection reason",
-                show_alert: false,
               }
             );
 
@@ -260,25 +285,117 @@ export const Route = createFileRoute("/api/public/telegram-webhook")({
               }
             );
           }
+
+          // ==========================================
+          // REJECT WITH REASON
+          // ==========================================
+          if (rejectReasonMatch) {
+            const orderId = rejectReasonMatch[1];
+            const reasonCode = rejectReasonMatch[2];
+
+            const reasons: Record<string, string> = {
+              UTR_NOT_FOUND: "UTR not found",
+              PAYMENT_NOT_RECEIVED: "Payment not received",
+              INVALID_SCREENSHOT: "Invalid payment screenshot",
+            };
+
+            const reason =
+              reasons[reasonCode];
+
+            if (!reason) {
+              throw new Error(
+                "Invalid rejection reason"
+              );
+            }
+
+            const { data: order, error } =
+              await supabaseAdmin.rpc(
+                "telegram_reject_official_order",
+                {
+                  p_order_id: orderId,
+                  p_reason: reason,
+                }
+              );
+
+            if (error) {
+              throw error;
+            }
+
+            const rejectedOrder = order as any;
+
+            await telegramApi(
+              botToken,
+              "answerCallbackQuery",
+              {
+                callback_query_id: callbackId,
+                text: "Order rejected",
+              }
+            );
+
+            const rejectedText =
+              `❌ <b>PAYMENT REJECTED</b>\n\n` +
+              `<b>Order:</b> ${escapeHtml(
+                rejectedOrder.order_code
+              )}\n` +
+              `<b>Customer:</b> ${escapeHtml(
+                rejectedOrder.customer_name
+              )}\n` +
+              `<b>Amount:</b> ₹${Number(
+                rejectedOrder.amount
+              ).toLocaleString("en-IN")}\n` +
+              `<b>Reason:</b> ${escapeHtml(
+                reason
+              )}\n\n` +
+              `🎫 <b>Ticket:</b> CANCELLED`;
+
+            if (message?.photo) {
+              await telegramApi(
+                botToken,
+                "editMessageCaption",
+                {
+                  chat_id: chatId,
+                  message_id: messageId,
+                  caption: rejectedText,
+                  parse_mode: "HTML",
+                  reply_markup: {
+                    inline_keyboard: [],
+                  },
+                }
+              );
+            } else {
+              await telegramApi(
+                botToken,
+                "editMessageText",
+                {
+                  chat_id: chatId,
+                  message_id: messageId,
+                  text: rejectedText,
+                  parse_mode: "HTML",
+                  reply_markup: {
+                    inline_keyboard: [],
+                  },
+                }
+              );
+            }
+          }
         } catch (error: any) {
-          const messageText =
-            error?.message ??
-            "Unable to process this order";
+          console.error(
+            "Telegram order action failed:",
+            error
+          );
 
           await telegramApi(
             botToken,
             "answerCallbackQuery",
             {
               callback_query_id: callbackId,
-              text: messageText.slice(0, 190),
+              text: (
+                error?.message ??
+                "Unable to process order"
+              ).slice(0, 190),
               show_alert: true,
             }
           ).catch(() => {});
-
-          console.error(
-            "Telegram order action failed:",
-            error
-          );
         }
 
         return new Response("ok");
@@ -286,3 +403,10 @@ export const Route = createFileRoute("/api/public/telegram-webhook")({
     },
   },
 });
+
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
