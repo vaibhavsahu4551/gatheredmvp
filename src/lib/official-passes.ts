@@ -111,32 +111,52 @@ export type OrderSubmission = {
   customerName: string;
   customerPhone: string;
   customerEmail?: string | null;
+  couponId?:  string | null;
+  discountAmount?: number;
 };
 
 /** Creates a PENDING order. Never grants a ticket — admin approval does that. */
 export async function submitOrder(s: OrderSubmission) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Please sign in to book passes");
-  const { data, error } = await supabase
-    .from(ORDERS)
-    .insert({
-      user_id: user.id,
-      event_id: s.eventId,
-      pass_id: s.pass.id,
-      pass_name: s.pass.name,
-      quantity: s.quantity,
-      amount: Number((s.pass.price * s.quantity).toFixed(2)),
-      utr: s.utr.trim(),
-      screenshot_path: s.screenshotPath,
-      customer_name: s.customerName.trim(),
-      customer_phone: s.customerPhone.trim(),
-      customer_email: s.customerEmail?.trim() || null,
-      payment_status: "PENDING",
-      ticket_status: "PENDING",
-    } as any)
-    .select("*")
-    .single();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("Please sign in to book passes");
+  }
+
+  const subtotal = Number(
+    (s.pass.price * s.quantity).toFixed(2)
+  );
+
+  const discountAmount = Number(
+    (s.discountAmount ?? 0).toFixed(2)
+  );
+
+  const finalAmount = Number(
+    Math.max(0, subtotal - discountAmount).toFixed(2)
+  );
+
+  const { data, error } = await supabase.rpc(
+    "create_official_order_with_coupon",
+    {
+      p_event_id: s.eventId,
+      p_pass_id: s.pass.id,
+      p_pass_name: s.pass.name,
+      p_quantity: s.quantity,
+      p_amount: finalAmount,
+      p_utr: s.utr.trim(),
+      p_screenshot_path: s.screenshotPath,
+      p_customer_name: s.customerName.trim(),
+      p_customer_phone: s.customerPhone.trim(),
+      p_customer_email: s.customerEmail?.trim() || null,
+      p_coupon_id: s.couponId ?? null,
+      p_discount_amount: discountAmount,
+    } as any
+  );
+
   if (error) throw error;
+
   return data as unknown as OfficialOrder;
 }
 
