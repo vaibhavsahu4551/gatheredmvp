@@ -210,9 +210,37 @@ const amount = Math.max(0, subtotal - discountAmount);
               <div className="text-[12px] text-muted-foreground">₹{Number(pass.price).toLocaleString("en-IN")} per pass</div>
             </div>
             <div className="flex items-center gap-2">
-              <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} className="h-8 w-8 rounded-full border border-border text-lg leading-none">−</button>
-              <span className="w-6 text-center text-sm font-bold">{qty}</span>
-              <button type="button" onClick={() => setQty((q) => Math.min(maxQty, q + 1))} className="h-8 w-8 rounded-full border border-border text-lg leading-none">+</button>
+           <button
+  type="button"
+  onClick={() => {
+    setQty((q) => Math.max(1, q - 1));
+    if (coupon) {
+      setCoupon(null);
+      setCouponCode("");
+      toast.info("Quantity changed — please re-apply your coupon");
+    }
+  }}
+  className="h-8 w-8 rounded-full border border-border text-lg leading-none"
+>
+  −
+</button>
+
+<span className="w-6 text-center text-sm font-bold">{qty}</span>
+
+<button
+  type="button"
+  onClick={() => {
+    setQty((q) => Math.min(maxQty, q + 1));
+    if (coupon) {
+      setCoupon(null);
+      setCouponCode("");
+      toast.info("Quantity changed — please re-apply your coupon");
+    }
+  }}
+  className="h-8 w-8 rounded-full border border-border text-lg leading-none"
+>
+  +
+</button>
             </div>
           </div>
         <div className="mt-4 border-t border-border pt-4">
