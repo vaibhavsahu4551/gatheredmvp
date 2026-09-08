@@ -1020,6 +1020,111 @@ export type Database = {
           },
         ]
       }
+      official_event_coupon_uses: {
+        Row: {
+          coupon_id: string
+          created_at: string
+          discount_amount: number
+          event_id: string
+          id: string
+          order_id: string | null
+          user_id: string
+        }
+        Insert: {
+          coupon_id: string
+          created_at?: string
+          discount_amount: number
+          event_id: string
+          id?: string
+          order_id?: string | null
+          user_id: string
+        }
+        Update: {
+          coupon_id?: string
+          created_at?: string
+          discount_amount?: number
+          event_id?: string
+          id?: string
+          order_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "official_event_coupon_uses_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "official_event_coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "official_event_coupon_uses_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "official_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "official_event_coupon_uses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "official_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      official_event_coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          event_id: string
+          expires_at: string | null
+          id: string
+          per_user_limit: number
+          starts_at: string | null
+          updated_at: string
+          usage_limit: number | null
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          discount_type: string
+          discount_value: number
+          event_id: string
+          expires_at?: string | null
+          id?: string
+          per_user_limit?: number
+          starts_at?: string | null
+          updated_at?: string
+          usage_limit?: number | null
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          event_id?: string
+          expires_at?: string | null
+          id?: string
+          per_user_limit?: number
+          starts_at?: string | null
+          updated_at?: string
+          usage_limit?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "official_event_coupons_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "official_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       official_event_organiser_tokens: {
         Row: {
           created_at: string
@@ -1143,6 +1248,7 @@ export type Database = {
           pass_quantity: number | null
           price_text: string | null
           published: boolean
+          razorpay_enabled: boolean
           selection_payment_deadline_minutes: number
           starts_at: string
           terms: string | null
@@ -1177,6 +1283,7 @@ export type Database = {
           pass_quantity?: number | null
           price_text?: string | null
           published?: boolean
+          razorpay_enabled?: boolean
           selection_payment_deadline_minutes?: number
           starts_at: string
           terms?: string | null
@@ -1211,6 +1318,7 @@ export type Database = {
           pass_quantity?: number | null
           price_text?: string | null
           published?: boolean
+          razorpay_enabled?: boolean
           selection_payment_deadline_minutes?: number
           starts_at?: string
           terms?: string | null
@@ -2166,6 +2274,39 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_create_official_event_coupon: {
+        Args: {
+          p_active?: boolean
+          p_code: string
+          p_discount_type: string
+          p_discount_value: number
+          p_event_id: string
+          p_expires_at?: string
+          p_per_user_limit?: number
+          p_starts_at?: string
+          p_usage_limit?: number
+        }
+        Returns: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          event_id: string
+          expires_at: string | null
+          id: string
+          per_user_limit: number
+          starts_at: string | null
+          updated_at: string
+          usage_limit: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "official_event_coupons"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_delete_challenge: { Args: { _id: string }; Returns: undefined }
       admin_delete_icebreaker_prompt: {
         Args: { _id: string }
@@ -2174,6 +2315,10 @@ export type Database = {
       admin_delete_official_event_application_question: {
         Args: { p_question_id: string }
         Returns: boolean
+      }
+      admin_delete_official_event_coupon: {
+        Args: { p_coupon_id: string }
+        Returns: Json
       }
       admin_delete_post: { Args: { _id: string }; Returns: undefined }
       admin_delete_story: { Args: { _story: string }; Returns: undefined }
@@ -2264,6 +2409,29 @@ export type Database = {
           last_used: string
           uses: number
         }[]
+      }
+      admin_list_official_event_coupons: {
+        Args: { p_event_id: string }
+        Returns: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          event_id: string
+          expires_at: string | null
+          id: string
+          per_user_limit: number
+          starts_at: string | null
+          updated_at: string
+          usage_limit: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "official_event_coupons"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       admin_list_points_tx: {
         Args: { _kind?: string; _limit?: number; _user?: string }
@@ -2449,6 +2617,39 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_update_official_event_coupon: {
+        Args: {
+          p_active?: boolean
+          p_code: string
+          p_coupon_id: string
+          p_discount_type: string
+          p_discount_value: number
+          p_expires_at?: string
+          p_per_user_limit?: number
+          p_starts_at?: string
+          p_usage_limit?: number
+        }
+        Returns: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          event_id: string
+          expires_at: string | null
+          id: string
+          per_user_limit: number
+          starts_at: string | null
+          updated_at: string
+          usage_limit: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "official_event_coupons"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_upsert_badge_catalog: {
         Args: {
           _active: boolean
@@ -2518,6 +2719,50 @@ export type Database = {
         Args: { _event: string; _hours: number; _phone: string }
         Returns: string
       }
+      create_official_order_with_coupon: {
+        Args: {
+          p_amount: number
+          p_coupon_id?: string
+          p_customer_email: string
+          p_customer_name: string
+          p_customer_phone: string
+          p_discount_amount?: number
+          p_event_id: string
+          p_pass_id: string
+          p_pass_name: string
+          p_quantity: number
+          p_screenshot_path: string
+          p_utr: string
+        }
+        Returns: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          event_id: string
+          id: string
+          order_code: string
+          pass_id: string | null
+          pass_name: string
+          payment_status: string
+          quantity: number
+          screenshot_path: string | null
+          ticket_status: string
+          updated_at: string
+          user_id: string
+          utr: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "official_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       event_is_closed: { Args: { _event: string }; Returns: boolean }
       generate_official_event_checkin_link: {
         Args: { p_days?: number; p_event_id: string; p_pin?: string }
@@ -2582,6 +2827,14 @@ export type Database = {
           referred_by: string
         }[]
       }
+      get_official_event_applications_by_organiser_token: {
+        Args: { p_event_id: string; p_token: string }
+        Returns: Json
+      }
+      get_official_event_organiser_review_data: {
+        Args: { p_event_id: string; p_token: string }
+        Returns: Json
+      }
       get_pride_identities: {
         Args: { _pride_ids: string[] }
         Returns: {
@@ -2637,6 +2890,19 @@ export type Database = {
         }[]
       }
       mark_dm_read: { Args: { _thread: string }; Returns: undefined }
+      organiser_accept_official_event_application: {
+        Args: { p_application_id: string; p_event_id: string; p_token: string }
+        Returns: Json
+      }
+      organiser_reject_official_event_application: {
+        Args: {
+          p_application_id: string
+          p_event_id: string
+          p_rejection_reason: string
+          p_token: string
+        }
+        Returns: Json
+      }
       pride_my_cohost_invites: {
         Args: never
         Returns: {
@@ -2714,6 +2980,19 @@ export type Database = {
       submit_verification: { Args: { _path: string }; Returns: undefined }
       sweep_empty_events: { Args: never; Returns: undefined }
       use_boost_credit: { Args: { _event?: string }; Returns: string }
+      validate_official_event_coupon: {
+        Args: {
+          p_coupon_code: string
+          p_event_id: string
+          p_subtotal: number
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      validate_official_event_organiser_token: {
+        Args: { p_event_id: string; p_token: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin"

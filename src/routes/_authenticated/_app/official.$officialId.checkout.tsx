@@ -157,7 +157,7 @@ const amount = Math.max(0, subtotal - discountAmount);
         customerName: name,
         customerPhone: phone,
         customerEmail: email,
-        couponId: coupon? .coupon_id ?? null,
+        couponId: coupon?.coupon_id ?? null,
         discountAmount,
       });
       setDone(true);
