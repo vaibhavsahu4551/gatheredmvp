@@ -124,7 +124,26 @@ function OrderRow({ o, onApprove, onReject, onTicket }: {
           <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${tone}`}>{o.payment_status}</span>
           <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold">{o.ticket_status}</span>
         </div>
-        <div className="text-[12px]">{o.pass_name} × {o.quantity} · <b>₹{Number(o.amount).toLocaleString("en-IN")}</b></div>
+       <div className="text-[12px]">
+  {o.pass_name} × {o.quantity} ·{" "}
+  <b>₹{Number(o.amount).toLocaleString("en-IN")}</b>
+</div>
+
+{o.coupon_code ? (
+  <div className="rounded-lg bg-muted/60 px-2.5 py-2 text-[11px]">
+    <div>
+      Coupon: <b>{o.coupon_code}</b>
+    </div>
+    <div className="text-muted-foreground">
+      Subtotal: ₹{Number(o.subtotal ?? o.amount).toLocaleString("en-IN")}
+      {" · "}
+      Discount: ₹{Number(o.discount_amount ?? 0).toLocaleString("en-IN")}
+    </div>
+    <div className="font-semibold">
+      Payable: ₹{Number(o.amount).toLocaleString("en-IN")}
+    </div>
+  </div>
+) : null}
         <div className="text-[11px] text-muted-foreground">UTR: {o.utr}</div>
         <div className="text-[11px] text-muted-foreground">{o.customer_name} · {o.customer_phone}{o.customer_email ? ` · ${o.customer_email}` : ""}</div>
         <div className="text-[11px] text-muted-foreground">{new Date(o.created_at).toLocaleString()}</div>
