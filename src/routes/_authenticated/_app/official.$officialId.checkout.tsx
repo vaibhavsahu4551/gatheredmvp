@@ -12,7 +12,9 @@ import {
   submitOrder,
   upiPayLink,
   uploadPaymentProof,
+  validateCoupon,
   type OfficialPass,
+  type CouponValidationResult,
 } from "@/lib/official-passes";
 
 export const Route = createFileRoute("/_authenticated/_app/official/$officialId/checkout")({
@@ -52,6 +54,9 @@ function Checkout() {
   const [preview, setPreview] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [coupon, setCoupon] = useState<CouponValidationResult | null>(null);
+  const [couponBusy, setCouponBusy] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -90,8 +95,47 @@ function Checkout() {
     setPreview(URL.createObjectURL(f));
   }
 
-  const amount = pass ? Number(pass.price) * qty : 0;
+  const subtotal = pass ? Number(pass.price) * qty : 0;
+const discountAmount = coupon?.discount_amount ?? 0;
+const amount = Math.max(0, subtotal - discountAmount);
   const maxQty = pass && pass.total_quantity > 0 ? Math.max(1, Math.min(10, passRemaining(pass))) : 10;
+  async function applyCoupon() {
+    const code = couponCode.trim();
+
+    if (!code) {
+      return toast.error("Enter a coupon code");
+    }
+
+    if (!pass) return;
+
+    setCouponBusy(true);
+
+    try {
+      const result = await validateCoupon(
+        officialId,
+        code,
+        subtotal
+      );
+
+      setCoupon(result);
+      setCouponCode(result.code);
+
+      toast.success(
+        `Coupon applied — ₹${result.discount_amount.toLocaleString("en-IN")} saved`
+      );
+    } catch (err: any) {
+      setCoupon(null);
+      toast.error(err?.message ?? "Invalid coupon code");
+    } finally {
+      setCouponBusy(false);
+    }
+  }
+
+  function removeCoupon() {
+    setCoupon(null);
+    setCouponCode("");
+    toast.success("Coupon removed");
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -169,10 +213,74 @@ function Checkout() {
               <button type="button" onClick={() => setQty((q) => Math.min(maxQty, q + 1))} className="h-8 w-8 rounded-full border border-border text-lg leading-none">+</button>
             </div>
           </div>
-          <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-            <span className="text-sm font-semibold">Total payable</span>
-            <span className="text-lg font-extrabold">₹{amount.toLocaleString("en-IN")}</span>
-          </div>
+        <div className="mt-4 border-t border-border pt-4">
+  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+    Have a coupon?
+  </div>
+
+  <div className="mt-2 flex gap-2">
+    <input
+      value={couponCode}
+      onChange={(e) => {
+        setCouponCode(e.target.value.toUpperCase());
+
+        if (coupon) {
+          setCoupon(null);
+        }
+      }}
+      placeholder="Enter coupon code"
+      className={inputCls}
+      disabled={couponBusy}
+    />
+
+    {coupon ? (
+      <button
+        type="button"
+        onClick={removeCoupon}
+        className="shrink-0 rounded-xl border border-border px-4 py-2.5 text-sm font-semibold"
+      >
+        Remove
+      </button>
+    ) : (
+      <button
+        type="button"
+        onClick={applyCoupon}
+        disabled={couponBusy}
+        className="shrink-0 rounded-xl bg-foreground px-4 py-2.5 text-sm font-semibold text-background disabled:opacity-60"
+      >
+        {couponBusy ? "Checking…" : "Apply"}
+      </button>
+    )}
+  </div>
+
+  {coupon && (
+    <div className="mt-3 rounded-xl bg-green-500/10 p-3 text-sm">
+      <div className="flex items-center justify-between">
+        <span>Subtotal</span>
+        <span>₹{subtotal.toLocaleString("en-IN")}</span>
+      </div>
+
+      <div className="mt-1 flex items-center justify-between text-green-600">
+        <span>
+          Discount ({coupon.code})
+        </span>
+        <span>
+          −₹{discountAmount.toLocaleString("en-IN")}
+        </span>
+      </div>
+    </div>
+  )}
+
+  <div className="mt-3 flex items-center justify-between">
+    <span className="text-sm font-semibold">
+      Total payable
+    </span>
+
+    <span className="text-lg font-extrabold">
+      ₹{amount.toLocaleString("en-IN")}
+    </span>
+  </div>
+</div>
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-4">
