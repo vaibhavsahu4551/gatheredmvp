@@ -1,0 +1,1 @@
+ALTER TABLE public.official_orders ADD COLUMN IF NOT EXISTS telegram_notified_at timestamptz;

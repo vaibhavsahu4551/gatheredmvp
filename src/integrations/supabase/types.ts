@@ -1346,6 +1346,7 @@ export type Database = {
           payment_status: string
           quantity: number
           screenshot_path: string | null
+          telegram_notified_at: string | null
           ticket_status: string
           updated_at: string
           user_id: string
@@ -1368,6 +1369,7 @@ export type Database = {
           payment_status?: string
           quantity: number
           screenshot_path?: string | null
+          telegram_notified_at?: string | null
           ticket_status?: string
           updated_at?: string
           user_id: string
@@ -1390,6 +1392,7 @@ export type Database = {
           payment_status?: string
           quantity?: number
           screenshot_path?: string | null
+          telegram_notified_at?: string | null
           ticket_status?: string
           updated_at?: string
           user_id?: string
@@ -2749,6 +2752,7 @@ export type Database = {
           payment_status: string
           quantity: number
           screenshot_path: string | null
+          telegram_notified_at: string | null
           ticket_status: string
           updated_at: string
           user_id: string
