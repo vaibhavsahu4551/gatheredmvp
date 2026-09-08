@@ -28,7 +28,10 @@ export type OfficialOrder = {
   pass_id: string | null;
   pass_name: string;
   quantity: number;
+
+  // Final amount actually payable/paid after coupon
   amount: number;
+
   utr: string;
   screenshot_path: string | null;
   customer_name: string;
@@ -40,6 +43,11 @@ export type OfficialOrder = {
   verified_at: string | null;
   created_at: string;
   updated_at: string;
+
+  // Coupon details
+  coupon_code?: string | null;
+  discount_amount?: number | null;
+  subtotal?: number | null;
 };
 
 const PASSES = "official_event_passes" as any;
