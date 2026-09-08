@@ -232,3 +232,146 @@ export function upiPayLink(opts: { upiId: string; payeeName?: string | null; amo
   });
   return `upi://pay?${p.toString()}`;
 }
+/* ---------------- coupons ---------------- */
+
+export type CouponDiscountType = "PERCENTAGE" | "FIXED";
+
+export type OfficialEventCoupon = {
+  id: string;
+  event_id: string;
+  code: string;
+  discount_type: CouponDiscountType;
+  discount_value: number;
+  usage_limit: number | null;
+  per_user_limit: number;
+  starts_at: string | null;
+  expires_at: string | null;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CouponValidationResult = {
+  valid: boolean;
+  coupon_id: string;
+  code: string;
+  discount_type: CouponDiscountType;
+  discount_value: number;
+  discount_amount: number;
+  subtotal: number;
+  final_amount: number;
+};
+
+export async function adminListCoupons(eventId: string) {
+  const { data, error } = await supabase.rpc(
+    "admin_list_official_event_coupons",
+    {
+      p_event_id: eventId,
+    } as any
+  );
+
+  if (error) throw error;
+
+  return (data ?? []) as unknown as OfficialEventCoupon[];
+}
+
+export async function adminCreateCoupon(
+  eventId: string,
+  input: {
+    code: string;
+    discountType: CouponDiscountType;
+    discountValue: number;
+    usageLimit?: number | null;
+    perUserLimit?: number;
+    startsAt?: string | null;
+    expiresAt?: string | null;
+    active?: boolean;
+  }
+) {
+  const { error } = await supabase.rpc(
+    "admin_create_official_event_coupon",
+    {
+      p_event_id: eventId,
+      p_code: input.code.trim(),
+      p_discount_type: input.discountType,
+      p_discount_value: Number(input.discountValue),
+      p_usage_limit: input.usageLimit ?? null,
+      p_per_user_limit: input.perUserLimit ?? 1,
+      p_starts_at: input.startsAt ?? null,
+      p_expires_at: input.expiresAt ?? null,
+      p_active: input.active ?? true,
+    } as any
+  );
+
+  if (error) throw error;
+}
+
+export async function adminUpdateCoupon(
+  id: string,
+  input: {
+    code: string;
+    discountType: CouponDiscountType;
+    discountValue: number;
+    usageLimit?: number | null;
+    perUserLimit?: number;
+    startsAt?: string | null;
+    expiresAt?: string | null;
+    active?: boolean;
+  }
+) {
+  const { error } = await supabase.rpc(
+    "admin_update_official_event_coupon",
+    {
+      p_coupon_id: id,
+      p_code: input.code.trim(),
+      p_discount_type: input.discountType,
+      p_discount_value: Number(input.discountValue),
+      p_usage_limit: input.usageLimit ?? null,
+      p_per_user_limit: input.perUserLimit ?? 1,
+      p_starts_at: input.startsAt ?? null,
+      p_expires_at: input.expiresAt ?? null,
+      p_active: input.active ?? true,
+    } as any
+  );
+
+  if (error) throw error;
+}
+
+export async function adminDeleteCoupon(id: string) {
+  const { error } = await supabase.rpc(
+    "admin_delete_official_event_coupon",
+    {
+      p_coupon_id: id,
+    } as any
+  );
+
+  if (error) throw error;
+}
+
+export async function validateCoupon(
+  eventId: string,
+  couponCode: string,
+  subtotal: number
+) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("Please sign in to apply a coupon");
+  }
+
+  const { data, error } = await supabase.rpc(
+    "validate_official_event_coupon",
+    {
+      p_event_id: eventId,
+      p_coupon_code: couponCode.trim(),
+      p_user_id: user.id,
+      p_subtotal: Number(subtotal),
+    } as any
+  );
+
+  if (error) throw error;
+
+  return data as CouponValidationResult;
+}
