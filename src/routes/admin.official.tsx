@@ -30,7 +30,14 @@ import {
   type OfficialEvent,
   type OfficialEventInput,
 } from "@/lib/official-events";
-
+import {
+  adminListCoupons,
+  adminCreateCoupon,
+  adminUpdateCoupon,
+  adminDeleteCoupon,
+  type OfficialEventCoupon,
+  type CouponDiscountType,
+} from "@/lib/official-passes";
 export const Route = createFileRoute("/admin/official")({
   component: AdminOfficialEvents,
 });
@@ -115,7 +122,7 @@ function AdminOfficialEvents() {
   const [editing, setEditing] = useState<OfficialEvent | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [passesFor, setPassesFor] = useState<string | null>(null);
-
+const [couponsFor, setCouponsFor] = useState<string | null>(null);
 
   async function refresh() {
     setLoading(true);
@@ -228,6 +235,14 @@ function AdminOfficialEvents() {
 </button>
                 <button onClick={() => setPassesFor((v) => (v === r.id ? null : r.id))} className="underline">{passesFor === r.id ? "Hide passes" : "Passes"}</button>
                 <button
+  onClick={() =>
+    setCouponsFor((v) => (v === r.id ? null : r.id))
+  }
+  className="underline"
+>
+  {couponsFor === r.id ? "Hide coupons" : "Coupons"}
+</button>
+                <button
   onClick={() => {
     const link = `https://gathrmeet.in/official/${r.id}`;
     navigator.clipboard.writeText(link);
@@ -300,6 +315,9 @@ function AdminOfficialEvents() {
             {passesFor === r.id && <PassManager eventId={r.id} />}
             {questionsFor === r.id && (
   <OfficialQuestionManager eventId={r.id} />
+)}
+            {couponsFor === r.id && (
+  <OfficialCouponManager eventId={r.id} />
 )}
             {applicationsFor === r.id && (
   <OfficialApplicationsManager eventId={r.id} />
