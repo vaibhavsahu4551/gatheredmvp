@@ -148,7 +148,7 @@ const amount = Math.max(0, subtotal - discountAmount);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Please sign in to book passes");
       const screenshotPath = file ? await uploadPaymentProof(user.id, file) : null;
-      await submitOrder({
+      const created = await submitOrder({
         eventId: officialId,
         pass: { id: pass.id, name: pass.name, price: Number(pass.price) },
         quantity: qty,
@@ -160,7 +160,15 @@ const amount = Math.max(0, subtotal - discountAmount);
         couponId: coupon?.coupon_id ?? null,
         discountAmount,
       });
+      if ((created as any)?.id) {
+        try {
+          await notifyOfficialOrder({ data: { orderId: (created as any).id } });
+        } catch {
+          /* notification is best-effort; the order is already saved */
+        }
+      }
       setDone(true);
+
     } catch (err: any) {
       toast.error(err.message ?? "Couldn't submit payment");
     } finally {
