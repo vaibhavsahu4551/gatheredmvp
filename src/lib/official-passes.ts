@@ -203,13 +203,80 @@ export async function myOrdersForEvent(eventId: string) {
 
 /* ---------------- admin orders ---------------- */
 
-export async function adminListOrders(filter: { status?: PaymentStatus | "ALL"; q?: string } = {}) {
-  let query = supabase.from(ORDERS).select("*").order("created_at", { ascending: false }).limit(300);
-  if (filter.status && filter.status !== "ALL") query = query.eq("payment_status", filter.status);
-  if (filter.q?.trim()) query = query.or(`order_code.ilike.%${filter.q.trim()}%,utr.ilike.%${filter.q.trim()}%,customer_phone.ilike.%${filter.q.trim()}%`);
+export async function adminListOrders(
+  filter: { status?: PaymentStatus | "ALL"; q?: string } = {}
+) {
+  let query = supabase
+    .from(ORDERS)
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(300);
+
+  if (filter.status && filter.status !== "ALL") {
+    query = query.eq("payment_status", filter.status);
+  }
+
+  if (filter.q?.trim()) {
+    query = query.or(
+      `order_code.ilike.%${filter.q.trim()}%,utr.ilike.%${filter.q.trim()}%,customer_phone.ilike.%${filter.q.trim()}%`
+    );
+  }
+
   const { data, error } = await query;
+
   if (error) throw error;
-  return (data ?? []) as unknown as OfficialOrder[];
+
+  const orders = (data ?? []) as unknown as OfficialOrder[];
+
+  // Attach coupon details to each order.
+  const ordersWithCoupons = await Promise.all(
+    orders.map(async (order) => {
+      const { data: couponUse, error: couponError } = await supabase
+        .from("official_event_coupon_uses")
+        .select(
+          `
+            discount_amount,
+            official_event_coupons (
+              code
+            )
+          `
+        )
+        .eq("order_id", order.id)
+        .maybeSingle();
+
+      // Coupon information is optional, so don't fail the whole
+      // order list if an order has no coupon.
+      if (couponError || !couponUse) {
+        return {
+          ...order,
+          coupon_code: null,
+          discount_amount: 0,
+          subtotal: Number(order.amount),
+        };
+      }
+
+      const couponData = couponUse.official_event_coupons as
+        | { code: string }
+        | { code: string }[]
+        | null;
+
+      const couponCode = Array.isArray(couponData)
+        ? couponData[0]?.code ?? null
+        : couponData?.code ?? null;
+
+      const discountAmount = Number(couponUse.discount_amount ?? 0);
+      const finalAmount = Number(order.amount);
+
+      return {
+        ...order,
+        coupon_code: couponCode,
+        discount_amount: discountAmount,
+        subtotal: Number((finalAmount + discountAmount).toFixed(2)),
+      };
+    })
+  );
+
+  return ordersWithCoupons;
 }
 
 export async function adminApproveOrder(id: string, notes?: string) {
