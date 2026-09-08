@@ -16,6 +16,7 @@ import {
   type OfficialPass,
   type CouponValidationResult,
 } from "@/lib/official-passes";
+import { notifyOfficialOrder } from "@/lib/telegram-order.functions";
 
 export const Route = createFileRoute("/_authenticated/_app/official/$officialId/checkout")({
   validateSearch: (s: Record<string, unknown>) => ({
