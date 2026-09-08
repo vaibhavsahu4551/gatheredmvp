@@ -16,6 +16,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as OfficialOfficialIdRouteImport } from './routes/official.$officialId'
 import { Route as CheckinTokenRouteImport } from './routes/checkin.$token'
 import { Route as AdminVerificationRouteImport } from './routes/admin.verification'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -35,6 +36,8 @@ import { Route as AdminEngagementRouteImport } from './routes/admin.engagement'
 import { Route as AdminBadgesRouteImport } from './routes/admin.badges'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/_app'
+import { Route as OfficialOfficialIdIndexRouteImport } from './routes/official.$officialId.index'
+import { Route as OrganiserReviewEventIdRouteImport } from './routes/organiser.review.$eventId'
 import { Route as ApiPublicSendPushRouteImport } from './routes/api/public/send-push'
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
 import { Route as AuthenticatedAppVerifyRouteImport } from './routes/_authenticated/_app/verify'
@@ -70,11 +73,9 @@ import { Route as AuthenticatedAppPrideNotificationsRouteImport } from './routes
 import { Route as AuthenticatedAppPrideGuidelinesRouteImport } from './routes/_authenticated/_app/pride.guidelines'
 import { Route as AuthenticatedAppPostsPostIdRouteImport } from './routes/_authenticated/_app/posts.$postId'
 import { Route as AuthenticatedAppPassesOrderIdRouteImport } from './routes/_authenticated/_app/passes.$orderId'
-import { Route as AuthenticatedAppOfficialOfficialIdRouteImport } from './routes/_authenticated/_app/official.$officialId'
 import { Route as AuthenticatedAppMessagesThreadIdRouteImport } from './routes/_authenticated/_app/messages.$threadId'
 import { Route as AuthenticatedAppCirclesCircleIdRouteImport } from './routes/_authenticated/_app/circles.$circleId'
 import { Route as AuthenticatedAppChatGroupIdRouteImport } from './routes/_authenticated/_app/chat.$groupId'
-import { Route as AuthenticatedAppOfficialOfficialIdIndexRouteImport } from './routes/_authenticated/_app/official.$officialId.index'
 import { Route as AuthenticatedAppEventsEventIdIndexRouteImport } from './routes/_authenticated/_app/events.$eventId.index'
 import { Route as AuthenticatedAppOfficialOfficialIdCheckoutRouteImport } from './routes/_authenticated/_app/official.$officialId.checkout'
 import { Route as AuthenticatedAppEventsEventIdEditRouteImport } from './routes/_authenticated/_app/events.$eventId.edit'
@@ -113,6 +114,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const OfficialOfficialIdRoute = OfficialOfficialIdRouteImport.update({
+  id: '/official/$officialId',
+  path: '/official/$officialId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CheckinTokenRoute = CheckinTokenRouteImport.update({
   id: '/checkin/$token',
@@ -207,6 +213,16 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/_app',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const OfficialOfficialIdIndexRoute = OfficialOfficialIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OfficialOfficialIdRoute,
+} as any)
+const OrganiserReviewEventIdRoute = OrganiserReviewEventIdRouteImport.update({
+  id: '/organiser/review/$eventId',
+  path: '/organiser/review/$eventId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicSendPushRoute = ApiPublicSendPushRouteImport.update({
   id: '/api/public/send-push',
@@ -412,12 +428,6 @@ const AuthenticatedAppPassesOrderIdRoute =
     path: '/passes/$orderId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedAppOfficialOfficialIdRoute =
-  AuthenticatedAppOfficialOfficialIdRouteImport.update({
-    id: '/official/$officialId',
-    path: '/official/$officialId',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
 const AuthenticatedAppMessagesThreadIdRoute =
   AuthenticatedAppMessagesThreadIdRouteImport.update({
     id: '/messages/$threadId',
@@ -436,12 +446,6 @@ const AuthenticatedAppChatGroupIdRoute =
     path: '/chat/$groupId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedAppOfficialOfficialIdIndexRoute =
-  AuthenticatedAppOfficialOfficialIdIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedAppOfficialOfficialIdRoute,
-  } as any)
 const AuthenticatedAppEventsEventIdIndexRoute =
   AuthenticatedAppEventsEventIdIndexRouteImport.update({
     id: '/events/$eventId/',
@@ -450,9 +454,9 @@ const AuthenticatedAppEventsEventIdIndexRoute =
   } as any)
 const AuthenticatedAppOfficialOfficialIdCheckoutRoute =
   AuthenticatedAppOfficialOfficialIdCheckoutRouteImport.update({
-    id: '/checkout',
-    path: '/checkout',
-    getParentRoute: () => AuthenticatedAppOfficialOfficialIdRoute,
+    id: '/official/$officialId/checkout',
+    path: '/official/$officialId/checkout',
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppEventsEventIdEditRoute =
   AuthenticatedAppEventsEventIdEditRouteImport.update({
@@ -491,6 +495,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
   '/checkin/$token': typeof CheckinTokenRoute
+  '/official/$officialId': typeof OfficialOfficialIdRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/create': typeof AuthenticatedAppCreateRoute
   '/discover': typeof AuthenticatedAppDiscoverRoute
@@ -503,10 +508,11 @@ export interface FileRoutesByFullPath {
   '/verify': typeof AuthenticatedAppVerifyRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/api/public/send-push': typeof ApiPublicSendPushRoute
+  '/organiser/review/$eventId': typeof OrganiserReviewEventIdRoute
+  '/official/$officialId/': typeof OfficialOfficialIdIndexRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
-  '/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRouteWithChildren
   '/passes/$orderId': typeof AuthenticatedAppPassesOrderIdRoute
   '/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
@@ -535,7 +541,6 @@ export interface FileRoutesByFullPath {
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/official/$officialId/checkout': typeof AuthenticatedAppOfficialOfficialIdCheckoutRoute
   '/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
-  '/official/$officialId/': typeof AuthenticatedAppOfficialOfficialIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -572,6 +577,8 @@ export interface FileRoutesByTo {
   '/verify': typeof AuthenticatedAppVerifyRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/api/public/send-push': typeof ApiPublicSendPushRoute
+  '/organiser/review/$eventId': typeof OrganiserReviewEventIdRoute
+  '/official/$officialId': typeof OfficialOfficialIdIndexRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
@@ -603,7 +610,6 @@ export interface FileRoutesByTo {
   '/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/official/$officialId/checkout': typeof AuthenticatedAppOfficialOfficialIdCheckoutRoute
   '/events/$eventId': typeof AuthenticatedAppEventsEventIdIndexRoute
-  '/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -632,6 +638,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/admin/verification': typeof AdminVerificationRoute
   '/checkin/$token': typeof CheckinTokenRoute
+  '/official/$officialId': typeof OfficialOfficialIdRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/_authenticated/_app/create': typeof AuthenticatedAppCreateRoute
   '/_authenticated/_app/discover': typeof AuthenticatedAppDiscoverRoute
@@ -644,10 +651,11 @@ export interface FileRoutesById {
   '/_authenticated/_app/verify': typeof AuthenticatedAppVerifyRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/api/public/send-push': typeof ApiPublicSendPushRoute
+  '/organiser/review/$eventId': typeof OrganiserReviewEventIdRoute
+  '/official/$officialId/': typeof OfficialOfficialIdIndexRoute
   '/_authenticated/_app/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
   '/_authenticated/_app/circles/$circleId': typeof AuthenticatedAppCirclesCircleIdRoute
   '/_authenticated/_app/messages/$threadId': typeof AuthenticatedAppMessagesThreadIdRoute
-  '/_authenticated/_app/official/$officialId': typeof AuthenticatedAppOfficialOfficialIdRouteWithChildren
   '/_authenticated/_app/passes/$orderId': typeof AuthenticatedAppPassesOrderIdRoute
   '/_authenticated/_app/posts/$postId': typeof AuthenticatedAppPostsPostIdRoute
   '/_authenticated/_app/pride/guidelines': typeof AuthenticatedAppPrideGuidelinesRoute
@@ -676,7 +684,6 @@ export interface FileRoutesById {
   '/_authenticated/_app/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
   '/_authenticated/_app/official/$officialId/checkout': typeof AuthenticatedAppOfficialOfficialIdCheckoutRoute
   '/_authenticated/_app/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
-  '/_authenticated/_app/official/$officialId/': typeof AuthenticatedAppOfficialOfficialIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -704,6 +711,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/verification'
     | '/checkin/$token'
+    | '/official/$officialId'
     | '/admin/'
     | '/create'
     | '/discover'
@@ -716,10 +724,11 @@ export interface FileRouteTypes {
     | '/verify'
     | '/api/public/razorpay-webhook'
     | '/api/public/send-push'
+    | '/organiser/review/$eventId'
+    | '/official/$officialId/'
     | '/chat/$groupId'
     | '/circles/$circleId'
     | '/messages/$threadId'
-    | '/official/$officialId'
     | '/passes/$orderId'
     | '/posts/$postId'
     | '/pride/guidelines'
@@ -748,7 +757,6 @@ export interface FileRouteTypes {
     | '/events/$eventId/edit'
     | '/official/$officialId/checkout'
     | '/events/$eventId/'
-    | '/official/$officialId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -785,6 +793,8 @@ export interface FileRouteTypes {
     | '/verify'
     | '/api/public/razorpay-webhook'
     | '/api/public/send-push'
+    | '/organiser/review/$eventId'
+    | '/official/$officialId'
     | '/chat/$groupId'
     | '/circles/$circleId'
     | '/messages/$threadId'
@@ -816,7 +826,6 @@ export interface FileRouteTypes {
     | '/events/$eventId/edit'
     | '/official/$officialId/checkout'
     | '/events/$eventId'
-    | '/official/$officialId'
   id:
     | '__root__'
     | '/'
@@ -844,6 +853,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/verification'
     | '/checkin/$token'
+    | '/official/$officialId'
     | '/admin/'
     | '/_authenticated/_app/create'
     | '/_authenticated/_app/discover'
@@ -856,10 +866,11 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/verify'
     | '/api/public/razorpay-webhook'
     | '/api/public/send-push'
+    | '/organiser/review/$eventId'
+    | '/official/$officialId/'
     | '/_authenticated/_app/chat/$groupId'
     | '/_authenticated/_app/circles/$circleId'
     | '/_authenticated/_app/messages/$threadId'
-    | '/_authenticated/_app/official/$officialId'
     | '/_authenticated/_app/passes/$orderId'
     | '/_authenticated/_app/posts/$postId'
     | '/_authenticated/_app/pride/guidelines'
@@ -888,7 +899,6 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/events/$eventId/edit'
     | '/_authenticated/_app/official/$officialId/checkout'
     | '/_authenticated/_app/events/$eventId/'
-    | '/_authenticated/_app/official/$officialId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -899,8 +909,10 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   CheckinTokenRoute: typeof CheckinTokenRoute
+  OfficialOfficialIdRoute: typeof OfficialOfficialIdRouteWithChildren
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
   ApiPublicSendPushRoute: typeof ApiPublicSendPushRoute
+  OrganiserReviewEventIdRoute: typeof OrganiserReviewEventIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -953,6 +965,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/official/$officialId': {
+      id: '/official/$officialId'
+      path: '/official/$officialId'
+      fullPath: '/official/$officialId'
+      preLoaderRoute: typeof OfficialOfficialIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/checkin/$token': {
       id: '/checkin/$token'
@@ -1086,6 +1105,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/official/$officialId/': {
+      id: '/official/$officialId/'
+      path: '/'
+      fullPath: '/official/$officialId/'
+      preLoaderRoute: typeof OfficialOfficialIdIndexRouteImport
+      parentRoute: typeof OfficialOfficialIdRoute
+    }
+    '/organiser/review/$eventId': {
+      id: '/organiser/review/$eventId'
+      path: '/organiser/review/$eventId'
+      fullPath: '/organiser/review/$eventId'
+      preLoaderRoute: typeof OrganiserReviewEventIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/send-push': {
       id: '/api/public/send-push'
@@ -1332,13 +1365,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppPassesOrderIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/_app/official/$officialId': {
-      id: '/_authenticated/_app/official/$officialId'
-      path: '/official/$officialId'
-      fullPath: '/official/$officialId'
-      preLoaderRoute: typeof AuthenticatedAppOfficialOfficialIdRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
     '/_authenticated/_app/messages/$threadId': {
       id: '/_authenticated/_app/messages/$threadId'
       path: '/messages/$threadId'
@@ -1360,13 +1386,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppChatGroupIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/_app/official/$officialId/': {
-      id: '/_authenticated/_app/official/$officialId/'
-      path: '/'
-      fullPath: '/official/$officialId/'
-      preLoaderRoute: typeof AuthenticatedAppOfficialOfficialIdIndexRouteImport
-      parentRoute: typeof AuthenticatedAppOfficialOfficialIdRoute
-    }
     '/_authenticated/_app/events/$eventId/': {
       id: '/_authenticated/_app/events/$eventId/'
       path: '/events/$eventId'
@@ -1376,10 +1395,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/_app/official/$officialId/checkout': {
       id: '/_authenticated/_app/official/$officialId/checkout'
-      path: '/checkout'
+      path: '/official/$officialId/checkout'
       fullPath: '/official/$officialId/checkout'
       preLoaderRoute: typeof AuthenticatedAppOfficialOfficialIdCheckoutRouteImport
-      parentRoute: typeof AuthenticatedAppOfficialOfficialIdRoute
+      parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/events/$eventId/edit': {
       id: '/_authenticated/_app/events/$eventId/edit'
@@ -1398,24 +1417,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedAppOfficialOfficialIdRouteChildren {
-  AuthenticatedAppOfficialOfficialIdCheckoutRoute: typeof AuthenticatedAppOfficialOfficialIdCheckoutRoute
-  AuthenticatedAppOfficialOfficialIdIndexRoute: typeof AuthenticatedAppOfficialOfficialIdIndexRoute
-}
-
-const AuthenticatedAppOfficialOfficialIdRouteChildren: AuthenticatedAppOfficialOfficialIdRouteChildren =
-  {
-    AuthenticatedAppOfficialOfficialIdCheckoutRoute:
-      AuthenticatedAppOfficialOfficialIdCheckoutRoute,
-    AuthenticatedAppOfficialOfficialIdIndexRoute:
-      AuthenticatedAppOfficialOfficialIdIndexRoute,
-  }
-
-const AuthenticatedAppOfficialOfficialIdRouteWithChildren =
-  AuthenticatedAppOfficialOfficialIdRoute._addFileChildren(
-    AuthenticatedAppOfficialOfficialIdRouteChildren,
-  )
-
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppCreateRoute: typeof AuthenticatedAppCreateRoute
   AuthenticatedAppDiscoverRoute: typeof AuthenticatedAppDiscoverRoute
@@ -1429,7 +1430,6 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppChatGroupIdRoute: typeof AuthenticatedAppChatGroupIdRoute
   AuthenticatedAppCirclesCircleIdRoute: typeof AuthenticatedAppCirclesCircleIdRoute
   AuthenticatedAppMessagesThreadIdRoute: typeof AuthenticatedAppMessagesThreadIdRoute
-  AuthenticatedAppOfficialOfficialIdRoute: typeof AuthenticatedAppOfficialOfficialIdRouteWithChildren
   AuthenticatedAppPassesOrderIdRoute: typeof AuthenticatedAppPassesOrderIdRoute
   AuthenticatedAppPostsPostIdRoute: typeof AuthenticatedAppPostsPostIdRoute
   AuthenticatedAppPrideGuidelinesRoute: typeof AuthenticatedAppPrideGuidelinesRoute
@@ -1456,6 +1456,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppSettingsIndexRoute: typeof AuthenticatedAppSettingsIndexRoute
   AuthenticatedAppCirclesJoinCodeRoute: typeof AuthenticatedAppCirclesJoinCodeRoute
   AuthenticatedAppEventsEventIdEditRoute: typeof AuthenticatedAppEventsEventIdEditRoute
+  AuthenticatedAppOfficialOfficialIdCheckoutRoute: typeof AuthenticatedAppOfficialOfficialIdCheckoutRoute
   AuthenticatedAppEventsEventIdIndexRoute: typeof AuthenticatedAppEventsEventIdIndexRoute
 }
 
@@ -1472,8 +1473,6 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppChatGroupIdRoute: AuthenticatedAppChatGroupIdRoute,
   AuthenticatedAppCirclesCircleIdRoute: AuthenticatedAppCirclesCircleIdRoute,
   AuthenticatedAppMessagesThreadIdRoute: AuthenticatedAppMessagesThreadIdRoute,
-  AuthenticatedAppOfficialOfficialIdRoute:
-    AuthenticatedAppOfficialOfficialIdRouteWithChildren,
   AuthenticatedAppPassesOrderIdRoute: AuthenticatedAppPassesOrderIdRoute,
   AuthenticatedAppPostsPostIdRoute: AuthenticatedAppPostsPostIdRoute,
   AuthenticatedAppPrideGuidelinesRoute: AuthenticatedAppPrideGuidelinesRoute,
@@ -1502,6 +1501,8 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppCirclesJoinCodeRoute: AuthenticatedAppCirclesJoinCodeRoute,
   AuthenticatedAppEventsEventIdEditRoute:
     AuthenticatedAppEventsEventIdEditRoute,
+  AuthenticatedAppOfficialOfficialIdCheckoutRoute:
+    AuthenticatedAppOfficialOfficialIdCheckoutRoute,
   AuthenticatedAppEventsEventIdIndexRoute:
     AuthenticatedAppEventsEventIdIndexRoute,
 }
@@ -1564,6 +1565,17 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface OfficialOfficialIdRouteChildren {
+  OfficialOfficialIdIndexRoute: typeof OfficialOfficialIdIndexRoute
+}
+
+const OfficialOfficialIdRouteChildren: OfficialOfficialIdRouteChildren = {
+  OfficialOfficialIdIndexRoute: OfficialOfficialIdIndexRoute,
+}
+
+const OfficialOfficialIdRouteWithChildren =
+  OfficialOfficialIdRoute._addFileChildren(OfficialOfficialIdRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -1572,8 +1584,10 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   CheckinTokenRoute: CheckinTokenRoute,
+  OfficialOfficialIdRoute: OfficialOfficialIdRouteWithChildren,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
   ApiPublicSendPushRoute: ApiPublicSendPushRoute,
+  OrganiserReviewEventIdRoute: OrganiserReviewEventIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
