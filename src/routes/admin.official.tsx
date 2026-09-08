@@ -329,6 +329,477 @@ const [couponsFor, setCouponsFor] = useState<string | null>(null);
     </div>
   );
 }
+function OfficialCouponManager({ eventId }: { eventId: string }) {
+  const [coupons, setCoupons] = useState<OfficialEventCoupon[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const [code, setCode] = useState("");
+  const [discountType, setDiscountType] =
+    useState<CouponDiscountType>("PERCENTAGE");
+  const [discountValue, setDiscountValue] = useState("");
+  const [usageLimit, setUsageLimit] = useState("");
+  const [perUserLimit, setPerUserLimit] = useState("1");
+  const [startsAt, setStartsAt] = useState("");
+  const [expiresAt, setExpiresAt] = useState("");
+  const [active, setActive] = useState(true);
+
+  async function loadCoupons() {
+    setLoading(true);
+
+    try {
+      const data = await adminListCoupons(eventId);
+      setCoupons(data);
+    } catch (error: any) {
+      toast.error(error?.message || "Couldn't load coupons");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadCoupons();
+  }, [eventId]);
+
+  function resetForm() {
+    setEditingId(null);
+    setCode("");
+    setDiscountType("PERCENTAGE");
+    setDiscountValue("");
+    setUsageLimit("");
+    setPerUserLimit("1");
+    setStartsAt("");
+    setExpiresAt("");
+    setActive(true);
+  }
+
+  function startEdit(coupon: OfficialEventCoupon) {
+    setEditingId(coupon.id);
+    setCode(coupon.code);
+    setDiscountType(coupon.discount_type);
+    setDiscountValue(String(coupon.discount_value));
+    setUsageLimit(
+      coupon.usage_limit != null
+        ? String(coupon.usage_limit)
+        : ""
+    );
+    setPerUserLimit(String(coupon.per_user_limit));
+
+    setStartsAt(
+      coupon.starts_at
+        ? new Date(coupon.starts_at)
+            .toISOString()
+            .slice(0, 16)
+        : ""
+    );
+
+    setExpiresAt(
+      coupon.expires_at
+        ? new Date(coupon.expires_at)
+            .toISOString()
+            .slice(0, 16)
+        : ""
+    );
+
+    setActive(coupon.active);
+  }
+
+  async function saveCoupon() {
+    const cleanCode = code.trim().toUpperCase();
+    const value = Number(discountValue);
+
+    if (!cleanCode) {
+      toast.error("Please enter a coupon code.");
+      return;
+    }
+
+    if (!value || value <= 0) {
+      toast.error("Please enter a valid discount value.");
+      return;
+    }
+
+    if (
+      discountType === "PERCENTAGE" &&
+      value > 100
+    ) {
+      toast.error("Percentage discount cannot exceed 100%.");
+      return;
+    }
+
+    const perUser = Number(perUserLimit);
+
+    if (!perUser || perUser <= 0) {
+      toast.error("Per-user limit must be at least 1.");
+      return;
+    }
+
+    const usage =
+      usageLimit.trim() === ""
+        ? null
+        : Number(usageLimit);
+
+    if (
+      usage !== null &&
+      (!Number.isInteger(usage) || usage <= 0)
+    ) {
+      toast.error("Usage limit must be a positive whole number.");
+      return;
+    }
+
+    if (startsAt && expiresAt) {
+      const start = new Date(startsAt).getTime();
+      const end = new Date(expiresAt).getTime();
+
+      if (end <= start) {
+        toast.error("Expiry must be after start time.");
+        return;
+      }
+    }
+
+    setSaving(true);
+
+    try {
+      const input = {
+        code: cleanCode,
+        discountType,
+        discountValue: value,
+        usageLimit: usage,
+        perUserLimit: perUser,
+        startsAt: startsAt
+          ? new Date(startsAt).toISOString()
+          : null,
+        expiresAt: expiresAt
+          ? new Date(expiresAt).toISOString()
+          : null,
+        active,
+      };
+
+      if (editingId) {
+        await adminUpdateCoupon(editingId, input);
+        toast.success("Coupon updated");
+      } else {
+        await adminCreateCoupon(eventId, input);
+        toast.success("Coupon created");
+      }
+
+      resetForm();
+      await loadCoupons();
+    } catch (error: any) {
+      toast.error(
+        error?.message || "Couldn't save coupon"
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function removeCoupon(coupon: OfficialEventCoupon) {
+    if (
+      !confirm(
+        `Delete coupon "${coupon.code}"? This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await adminDeleteCoupon(coupon.id);
+
+      toast.success("Coupon deleted");
+
+      if (editingId === coupon.id) {
+        resetForm();
+      }
+
+      await loadCoupons();
+    } catch (error: any) {
+      toast.error(
+        error?.message || "Couldn't delete coupon"
+      );
+    }
+  }
+
+  return (
+    <div className="mt-3 rounded-xl border border-border bg-muted/20 p-4">
+      <div className="mb-4">
+        <h3 className="font-semibold">
+          Coupons
+        </h3>
+
+        <p className="text-xs text-muted-foreground">
+          Create discount coupons specifically for this event.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="py-4 text-center text-sm text-muted-foreground">
+          Loading coupons…
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {coupons.length === 0 && (
+            <div className="rounded-lg border border-dashed border-border p-4 text-center text-sm text-muted-foreground">
+              No coupons created yet.
+            </div>
+          )}
+
+          {coupons.map((coupon) => (
+            <div
+              key={coupon.id}
+              className="rounded-lg border border-border bg-background p-3"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-semibold">
+                      {coupon.code}
+                    </span>
+
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                        coupon.active
+                          ? "bg-green-500/15 text-green-600"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {coupon.active
+                        ? "Active"
+                        : "Inactive"}
+                    </span>
+                  </div>
+
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    {coupon.discount_type === "PERCENTAGE"
+                      ? `${coupon.discount_value}% OFF`
+                      : `₹${coupon.discount_value} OFF`}
+                    {" · "}
+                    Per user: {coupon.per_user_limit}
+                    {" · "}
+                    Total:{" "}
+                    {coupon.usage_limit ?? "Unlimited"}
+                  </div>
+
+                  {(coupon.starts_at ||
+                    coupon.expires_at) && (
+                    <div className="mt-1 text-[11px] text-muted-foreground">
+                      {coupon.starts_at
+                        ? `Starts: ${new Date(
+                            coupon.starts_at
+                          ).toLocaleString()}`
+                        : "Starts: Immediately"}
+                      {" · "}
+                      {coupon.expires_at
+                        ? `Expires: ${new Date(
+                            coupon.expires_at
+                          ).toLocaleString()}`
+                        : "No expiry"}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex shrink-0 gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => startEdit(coupon)}
+                    className="underline"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => removeCoupon(coupon)}
+                    className="text-destructive underline"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-4 rounded-xl border border-border bg-background p-4">
+        <div className="mb-3">
+          <h4 className="text-sm font-semibold">
+            {editingId
+              ? "Edit Coupon"
+              : "Create Coupon"}
+          </h4>
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs font-medium">
+              Coupon Code
+            </label>
+
+            <input
+              value={code}
+              onChange={(e) =>
+                setCode(e.target.value.toUpperCase())
+              }
+              placeholder="e.g. GATHR50"
+              className={inputCls}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label className="text-xs font-medium">
+                Discount Type
+              </label>
+
+              <select
+                value={discountType}
+                onChange={(e) =>
+                  setDiscountType(
+                    e.target.value as CouponDiscountType
+                  )
+                }
+                className={inputCls}
+              >
+                <option value="PERCENTAGE">
+                  Percentage (%)
+                </option>
+
+                <option value="FIXED">
+                  Fixed amount (₹)
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-medium">
+                Discount Value
+              </label>
+
+              <input
+                type="number"
+                min="0.01"
+                step="0.01"
+                value={discountValue}
+                onChange={(e) =>
+                  setDiscountValue(e.target.value)
+                }
+                placeholder={
+                  discountType === "PERCENTAGE"
+                    ? "50"
+                    : "100"
+                }
+                className={inputCls}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium">
+                Total Usage Limit
+              </label>
+
+              <input
+                type="number"
+                min="1"
+                step="1"
+                value={usageLimit}
+                onChange={(e) =>
+                  setUsageLimit(e.target.value)
+                }
+                placeholder="Leave blank for unlimited"
+                className={inputCls}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium">
+                Per User Limit
+              </label>
+
+              <input
+                type="number"
+                min="1"
+                step="1"
+                value={perUserLimit}
+                onChange={(e) =>
+                  setPerUserLimit(e.target.value)
+                }
+                className={inputCls}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium">
+                Start Date & Time
+              </label>
+
+              <input
+                type="datetime-local"
+                value={startsAt}
+                onChange={(e) =>
+                  setStartsAt(e.target.value)
+                }
+                className={inputCls}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium">
+                Expiry Date & Time
+              </label>
+
+              <input
+                type="datetime-local"
+                value={expiresAt}
+                onChange={(e) =>
+                  setExpiresAt(e.target.value)
+                }
+                className={inputCls}
+              />
+            </div>
+          </div>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={active}
+              onChange={(e) =>
+                setActive(e.target.checked)
+              }
+            />
+            Active coupon
+          </label>
+
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={saveCoupon}
+              disabled={saving}
+              className="rounded-lg bg-foreground px-4 py-2 text-sm font-semibold text-background disabled:opacity-60"
+            >
+              {saving
+                ? "Saving…"
+                : editingId
+                  ? "Update Coupon"
+                  : "Create Coupon"}
+            </button>
+
+            {editingId && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="rounded-lg border border-border px-4 py-2 text-sm"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 function OfficialQuestionManager({
   eventId,
 }: {
