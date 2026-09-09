@@ -21,6 +21,7 @@ import { StoryRail } from "@/components/StoryRail";
 import { OfficialEventCard } from "@/components/OfficialEventCard";
 import { listPublishedOfficialEvents, type OfficialEvent } from "@/lib/official-events";
 import { PeopleSuggestions } from "@/components/PeopleSuggestions";
+import { MyPassesRail } from "@/components/MyPassesRail";
 import { IcebreakerCard } from "@/components/IcebreakerCard";
 import { WeeklyChallengeCard } from "@/components/WeeklyChallengeCard";
 import { Lock } from "lucide-react";
@@ -270,13 +271,6 @@ function HomeFeed() {
     return true;
   }), [events, cat, girlsOnly, q]);
 
-  const starterEvents = useMemo(
-    () =>
-      events
-        .filter((e) => (e as any).beginner_friendly && (e as any).venue_type !== "residence")
-        .slice(0, 8),
-    [events],
-  );
 
   const filteredPosts = useMemo(() => posts.filter((p) => {
     if (cat !== "All") return false;
