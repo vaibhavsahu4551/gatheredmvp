@@ -72,7 +72,12 @@ export function EventCard({
       <div className="flex gap-3 p-3">
         {/* Left: details */}
         <div className="flex-1 min-w-0 flex flex-col">
-          <div className="flex items-center gap-1.5 mb-1.5">
+          <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+            {hosting && (
+              <span className="rounded-full bg-primary/15 text-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+                Hosting
+              </span>
+            )}
             {e.event_type && (
               <span
                 className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow-sm"
