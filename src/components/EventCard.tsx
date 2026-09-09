@@ -20,6 +20,7 @@ export function EventCard({
   host,
   hostPremium,
   hostVerified,
+  hosting,
   prideHost,
 }: {
   e: EventRow;
@@ -27,6 +28,8 @@ export function EventCard({
   host?: { full_name: string | null; created_at?: string | null };
   hostPremium?: boolean;
   hostVerified?: boolean;
+  /** True when the signed-in user hosts this event. */
+  hosting?: boolean;
   /** When set (Pride surfaces), shown in place of the real host. */
   prideHost?: { display_name: string } | null;
 }) {
