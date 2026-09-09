@@ -146,6 +146,7 @@ function HomeFeed() {
       ]);
       const meId = user?.id ?? "";
       meIdRef.current = meId;
+      setMeId(meId);
       blockedRef.current = blocked;
 
       const evFiltered = ev.filter((e) => !blocked.has(e.host_id));
