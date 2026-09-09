@@ -89,6 +89,15 @@ function OrganiserReviewPage() {
 
   const [openId, setOpenId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [whatsappApplication, setWhatsappApplication] =
+  useState<Application | null>(null);
+
+const [whatsappMessage, setWhatsappMessage] =
+  useState("");
+
+const [whatsappOpen, setWhatsappOpen] =
+  
+  useState(false);
 
   useEffect(() => {
     loadPage();
@@ -318,35 +327,46 @@ function OrganiserReviewPage() {
   // WHATSAPP
   // -----------------------------------------
 
-  function openWhatsApp(application: Application) {
-    if (!application.applicant_phone) {
-      alert(
-        "Applicant phone number is not available."
-      );
-      return;
-    }
-
-    const phone = cleanPhoneNumber(
-      application.applicant_phone
-    );
-
-    const message = createWhatsAppMessage(
-      application,
-      eventTitle,
-      eventPrice,
-      eventTicketUrl
-    );
-
-    const whatsappUrl =
-      `https://wa.me/${phone}?text=` +
-      encodeURIComponent(message);
-
-    window.open(
-      whatsappUrl,
-      "_blank",
-      "noopener,noreferrer"
-    );
+function openWhatsApp(application: Application) {
+  if (!application.applicant_phone) {
+    alert("Applicant phone number is not available.");
+    return;
   }
+
+  const message = createWhatsAppMessage(
+    application,
+    eventTitle,
+    eventPrice,
+    eventTicketUrl
+  );
+
+  setWhatsappApplication(application);
+  setWhatsappMessage(message);
+  setWhatsappOpen(true);
+}
+
+function sendWhatsAppMessage() {
+  if (!whatsappApplication?.applicant_phone) {
+    alert("Applicant phone number is not available.");
+    return;
+  }
+
+  const phone = cleanPhoneNumber(
+    whatsappApplication.applicant_phone
+  );
+
+  const whatsappUrl =
+    `https://wa.me/${phone}?text=` +
+    encodeURIComponent(whatsappMessage);
+
+  window.open(
+    whatsappUrl,
+    "_blank",
+    "noopener,noreferrer"
+  );
+
+  setWhatsappOpen(false);
+}
 
   // -----------------------------------------
   // LOADING
@@ -686,6 +706,14 @@ function OrganiserReviewPage() {
       >
         Refresh status
       </button>
+      <WhatsAppMessageDialog
+        open={whatsappOpen}
+        application={whatsappApplication}
+        message={whatsappMessage}
+        onMessageChange={setWhatsappMessage}
+        onSend={sendWhatsAppMessage}
+        onClose={() => setWhatsappOpen(false)}
+      />
     </div>
   );
 }
@@ -923,6 +951,64 @@ function PaymentIcon({
   return (
     <div className="rounded-full bg-amber-500/10 p-2">
       <Clock3 className="h-5 w-5 text-amber-600" />
+    </div>
+  );
+}
+function WhatsAppMessageDialog({
+  open,
+  application,
+  message,
+  onMessageChange,
+  onSend,
+  onClose,
+}: {
+  open: boolean;
+  application: Application | null;
+  message: string;
+  onMessageChange: (value: string) => void;
+  onSend: () => void;
+  onClose: () => void;
+}) {
+  if (!open || !application) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div className="w-full max-w-lg rounded-2xl bg-background p-5 shadow-xl">
+        <h2 className="text-lg font-extrabold">
+          WhatsApp Message
+        </h2>
+
+        <p className="mt-1 text-xs text-muted-foreground">
+          Message edit kar sakte ho before sending.
+        </p>
+
+        <textarea
+          value={message}
+          onChange={(e) =>
+            onMessageChange(e.target.value)
+          }
+          className="mt-4 min-h-[220px] w-full resize-y rounded-xl border border-border bg-background p-3 text-sm outline-none focus:ring-2 focus:ring-primary"
+        />
+
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-border px-4 py-3 text-sm font-bold"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={onSend}
+            className="flex items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-bold text-white"
+          >
+            <MessageCircle className="h-4 w-4" />
+            Open WhatsApp
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
