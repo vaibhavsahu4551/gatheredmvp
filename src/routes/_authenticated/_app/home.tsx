@@ -66,6 +66,7 @@ function HomeFeed() {
   const [hasPremium, setHasPremium] = useState(false);
   const [advOpen, setAdvOpen] = useState(false);
   const [iAmNew, setIAmNew] = useState(false);
+  const [meId, setMeId] = useState("");
   useEffect(() => { getMyEntitlements().then((e) => setHasPremium(e.hasAccess)); }, []);
 
   const [posts, setPosts] = useState<PostItem[]>([]);
@@ -418,7 +419,7 @@ function HomeFeed() {
           <div className="text-sm text-muted-foreground text-center py-12">Nothing here yet in {city || "your city"}. Create the first event or post.</div>
         )}
         {items.map((it) => it.kind === "event" ? (
-          <EventCard key={"e" + it.id} e={it.ev} c={counts[it.id] ?? { boys: 0, girls: 0, total: 0 }} host={hosts[it.ev.host_id]} hostPremium={hostTiers[it.ev.host_id] === "premium"} hostVerified={verifiedHosts.has(it.ev.host_id)} />
+          <EventCard key={"e" + it.id} e={it.ev} c={counts[it.id] ?? { boys: 0, girls: 0, total: 0 }} host={hosts[it.ev.host_id]} hostPremium={hostTiers[it.ev.host_id] === "premium"} hostVerified={verifiedHosts.has(it.ev.host_id)} hosting={!!meId && it.ev.host_id === meId} />
         ) : (
           <PostCard key={"p" + it.id} p={it} img={imgs[it.id]} name={names[it.user_id]?.full_name ?? "Someone"}
             avatarPhoto={names[it.user_id]?.photo ?? null}
