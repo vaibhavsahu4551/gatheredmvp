@@ -146,7 +146,7 @@ function HomeFeed() {
       meIdRef.current = meId;
       blockedRef.current = blocked;
 
-      const evFiltered = ev.filter((e) => !blocked.has(e.host_id) && e.host_id !== meId);
+      const evFiltered = ev.filter((e) => !blocked.has(e.host_id));
       setEvents(evFiltered);
       setEventsOffset(ev.length);
       setEventsDone(ev.length < EVENTS_PAGE);
@@ -210,7 +210,7 @@ function HomeFeed() {
       const ev = await listEvents(undefined, { limit: EVENTS_PAGE, offset: eventsOffset });
       const meId = meIdRef.current;
       const blocked = blockedRef.current;
-      const batch = ev.filter((e) => !blocked.has(e.host_id) && e.host_id !== meId);
+      const batch = ev.filter((e) => !blocked.has(e.host_id));
       setEvents((prev) => [...prev, ...batch]);
       setEventsOffset((n) => n + ev.length);
       if (ev.length < EVENTS_PAGE) setEventsDone(true);
@@ -412,27 +412,7 @@ function HomeFeed() {
             <Link to="/premium" className="rounded-full bg-foreground text-background text-xs font-medium px-3 py-1.5">Upgrade</Link>
           </div>
         )}
-        {!loading && iAmNew && starterEvents.length > 0 && (
-          <section>
-            <div className="mb-2">
-              <div className="text-sm font-semibold">Starter events</div>
-              <div className="text-xs text-muted-foreground">Beginner-friendly meetups at public venues</div>
-            </div>
-            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x pb-1">
-              {starterEvents.map((e) => (
-                <div key={"s" + e.id} className="w-[85%] shrink-0 snap-start">
-                  <EventCard
-                    e={e}
-                    c={counts[e.id] ?? { boys: 0, girls: 0, total: 0 }}
-                    host={hosts[e.host_id]}
-                    hostPremium={hostTiers[e.host_id] === "premium"}
-                    hostVerified={verifiedHosts.has(e.host_id)}
-                  />
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+        <MyPassesRail />
         {loading && <FeedSkeleton />}
         {!loading && err && (
           <div className="text-center py-8 space-y-3">
