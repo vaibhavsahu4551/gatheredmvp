@@ -36,6 +36,22 @@ export function MyPassesRail() {
 
   if (loading) return null;
 
+  if (!rows.length) {
+    return (
+      <section>
+        <div className="mb-2">
+          <div className="text-sm font-semibold">🎟️ My passes</div>
+          <div className="text-xs text-muted-foreground">Your booked official event passes</div>
+        </div>
+        <div className="rounded-2xl border border-dashed border-border bg-card/50 p-5 text-center">
+          <Ticket className="mx-auto h-6 w-6 text-muted-foreground" />
+          <p className="mt-2 text-sm text-muted-foreground">You don't have any passes yet.</p>
+          <p className="text-xs text-muted-foreground">Book one from an official event to see it here.</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section>
       <div className="mb-2 flex items-end justify-between">
