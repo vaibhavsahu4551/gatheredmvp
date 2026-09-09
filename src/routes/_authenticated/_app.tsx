@@ -104,7 +104,7 @@ function BottomNav({ pride }: { pride: boolean }) {
   type NavItem = { to: "/home" | "/passes" | "/create" | "/chat" | "/profile" | "/pride"; label: string; icon: typeof Home; primary?: boolean };
   const items: NavItem[] = [
     { to: "/home", label: "Home", icon: Home },
-    { to: "/passes", label: "Passes", icon: Calendar },
+    { to: "/passes", label: "Passes", icon: Ticket },
     { to: "/create", label: "Create", icon: Plus, primary: true },
     { to: "/chat", label: "Chat", icon: MessageCircle },
     { to: "/profile", label: "Profile", icon: User },
