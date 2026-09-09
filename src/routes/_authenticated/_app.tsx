@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, useNavigate, Link, useLocation } from "@tansta
 import { useEffect, useState } from "react";
 import { loadMe } from "@/lib/huddl";
 import { supabase } from "@/integrations/supabase/client";
-import { Home, Calendar, Plus, MessageCircle, User, Sparkles } from "lucide-react";
+import { Home, Ticket, Plus, MessageCircle, User, Sparkles } from "lucide-react";
 import { useDmUnread } from "@/hooks/useDmUnread";
 import { enablePush, pushAsked, pushDeclined } from "@/lib/push";
 import { useMaintenance } from "@/hooks/useMaintenance";
@@ -101,10 +101,10 @@ function AppShell() {
 function BottomNav({ pride }: { pride: boolean }) {
   const { pathname } = useLocation();
   const { totalUnread } = useDmUnread();
-  type NavItem = { to: "/home" | "/events" | "/create" | "/chat" | "/profile" | "/pride"; label: string; icon: typeof Home; primary?: boolean };
+  type NavItem = { to: "/home" | "/passes" | "/create" | "/chat" | "/profile" | "/pride"; label: string; icon: typeof Home; primary?: boolean };
   const items: NavItem[] = [
     { to: "/home", label: "Home", icon: Home },
-    { to: "/events", label: "Events", icon: Calendar },
+    { to: "/passes", label: "Passes", icon: Calendar },
     { to: "/create", label: "Create", icon: Plus, primary: true },
     { to: "/chat", label: "Chat", icon: MessageCircle },
     { to: "/profile", label: "Profile", icon: User },
