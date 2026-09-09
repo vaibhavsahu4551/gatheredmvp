@@ -38,6 +38,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/_app'
 import { Route as OfficialOfficialIdIndexRouteImport } from './routes/official.$officialId.index'
 import { Route as OrganiserReviewEventIdRouteImport } from './routes/organiser.review.$eventId'
+import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram-webhook'
 import { Route as ApiPublicSendPushRouteImport } from './routes/api/public/send-push'
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
 import { Route as AuthenticatedAppVerifyRouteImport } from './routes/_authenticated/_app/verify'
@@ -224,6 +225,12 @@ const OrganiserReviewEventIdRoute = OrganiserReviewEventIdRouteImport.update({
   path: '/organiser/review/$eventId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTelegramWebhookRoute =
+  ApiPublicTelegramWebhookRouteImport.update({
+    id: '/api/public/telegram-webhook',
+    path: '/api/public/telegram-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicSendPushRoute = ApiPublicSendPushRouteImport.update({
   id: '/api/public/send-push',
   path: '/api/public/send-push',
@@ -508,6 +515,7 @@ export interface FileRoutesByFullPath {
   '/verify': typeof AuthenticatedAppVerifyRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/api/public/send-push': typeof ApiPublicSendPushRoute
+  '/api/public/telegram-webhook': typeof ApiPublicTelegramWebhookRoute
   '/organiser/review/$eventId': typeof OrganiserReviewEventIdRoute
   '/official/$officialId/': typeof OfficialOfficialIdIndexRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
@@ -577,6 +585,7 @@ export interface FileRoutesByTo {
   '/verify': typeof AuthenticatedAppVerifyRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/api/public/send-push': typeof ApiPublicSendPushRoute
+  '/api/public/telegram-webhook': typeof ApiPublicTelegramWebhookRoute
   '/organiser/review/$eventId': typeof OrganiserReviewEventIdRoute
   '/official/$officialId': typeof OfficialOfficialIdIndexRoute
   '/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
@@ -651,6 +660,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/verify': typeof AuthenticatedAppVerifyRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/api/public/send-push': typeof ApiPublicSendPushRoute
+  '/api/public/telegram-webhook': typeof ApiPublicTelegramWebhookRoute
   '/organiser/review/$eventId': typeof OrganiserReviewEventIdRoute
   '/official/$officialId/': typeof OfficialOfficialIdIndexRoute
   '/_authenticated/_app/chat/$groupId': typeof AuthenticatedAppChatGroupIdRoute
@@ -724,6 +734,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/api/public/razorpay-webhook'
     | '/api/public/send-push'
+    | '/api/public/telegram-webhook'
     | '/organiser/review/$eventId'
     | '/official/$officialId/'
     | '/chat/$groupId'
@@ -793,6 +804,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/api/public/razorpay-webhook'
     | '/api/public/send-push'
+    | '/api/public/telegram-webhook'
     | '/organiser/review/$eventId'
     | '/official/$officialId'
     | '/chat/$groupId'
@@ -866,6 +878,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/verify'
     | '/api/public/razorpay-webhook'
     | '/api/public/send-push'
+    | '/api/public/telegram-webhook'
     | '/organiser/review/$eventId'
     | '/official/$officialId/'
     | '/_authenticated/_app/chat/$groupId'
@@ -912,6 +925,7 @@ export interface RootRouteChildren {
   OfficialOfficialIdRoute: typeof OfficialOfficialIdRouteWithChildren
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
   ApiPublicSendPushRoute: typeof ApiPublicSendPushRoute
+  ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
   OrganiserReviewEventIdRoute: typeof OrganiserReviewEventIdRoute
 }
 
@@ -1118,6 +1132,13 @@ declare module '@tanstack/react-router' {
       path: '/organiser/review/$eventId'
       fullPath: '/organiser/review/$eventId'
       preLoaderRoute: typeof OrganiserReviewEventIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/telegram-webhook': {
+      id: '/api/public/telegram-webhook'
+      path: '/api/public/telegram-webhook'
+      fullPath: '/api/public/telegram-webhook'
+      preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/send-push': {
@@ -1587,6 +1608,7 @@ const rootRouteChildren: RootRouteChildren = {
   OfficialOfficialIdRoute: OfficialOfficialIdRouteWithChildren,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
   ApiPublicSendPushRoute: ApiPublicSendPushRoute,
+  ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
   OrganiserReviewEventIdRoute: OrganiserReviewEventIdRoute,
 }
 export const routeTree = rootRouteImport

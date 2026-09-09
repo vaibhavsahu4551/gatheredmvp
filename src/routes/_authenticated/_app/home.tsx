@@ -21,6 +21,7 @@ import { StoryRail } from "@/components/StoryRail";
 import { OfficialEventCard } from "@/components/OfficialEventCard";
 import { listPublishedOfficialEvents, type OfficialEvent } from "@/lib/official-events";
 import { PeopleSuggestions } from "@/components/PeopleSuggestions";
+import { MyPassesRail } from "@/components/MyPassesRail";
 import { IcebreakerCard } from "@/components/IcebreakerCard";
 import { WeeklyChallengeCard } from "@/components/WeeklyChallengeCard";
 import { Lock } from "lucide-react";
@@ -65,6 +66,7 @@ function HomeFeed() {
   const [hasPremium, setHasPremium] = useState(false);
   const [advOpen, setAdvOpen] = useState(false);
   const [iAmNew, setIAmNew] = useState(false);
+  const [meId, setMeId] = useState("");
   useEffect(() => { getMyEntitlements().then((e) => setHasPremium(e.hasAccess)); }, []);
 
   const [posts, setPosts] = useState<PostItem[]>([]);
@@ -144,9 +146,10 @@ function HomeFeed() {
       ]);
       const meId = user?.id ?? "";
       meIdRef.current = meId;
+      setMeId(meId);
       blockedRef.current = blocked;
 
-      const evFiltered = ev.filter((e) => !blocked.has(e.host_id) && e.host_id !== meId);
+      const evFiltered = ev.filter((e) => !blocked.has(e.host_id));
       setEvents(evFiltered);
       setEventsOffset(ev.length);
       setEventsDone(ev.length < EVENTS_PAGE);
@@ -210,7 +213,7 @@ function HomeFeed() {
       const ev = await listEvents(undefined, { limit: EVENTS_PAGE, offset: eventsOffset });
       const meId = meIdRef.current;
       const blocked = blockedRef.current;
-      const batch = ev.filter((e) => !blocked.has(e.host_id) && e.host_id !== meId);
+      const batch = ev.filter((e) => !blocked.has(e.host_id));
       setEvents((prev) => [...prev, ...batch]);
       setEventsOffset((n) => n + ev.length);
       if (ev.length < EVENTS_PAGE) setEventsDone(true);
@@ -270,13 +273,6 @@ function HomeFeed() {
     return true;
   }), [events, cat, girlsOnly, q]);
 
-  const starterEvents = useMemo(
-    () =>
-      events
-        .filter((e) => (e as any).beginner_friendly && (e as any).venue_type !== "residence")
-        .slice(0, 8),
-    [events],
-  );
 
   const filteredPosts = useMemo(() => posts.filter((p) => {
     if (cat !== "All") return false;
@@ -412,27 +408,7 @@ function HomeFeed() {
             <Link to="/premium" className="rounded-full bg-foreground text-background text-xs font-medium px-3 py-1.5">Upgrade</Link>
           </div>
         )}
-        {!loading && iAmNew && starterEvents.length > 0 && (
-          <section>
-            <div className="mb-2">
-              <div className="text-sm font-semibold">Starter events</div>
-              <div className="text-xs text-muted-foreground">Beginner-friendly meetups at public venues</div>
-            </div>
-            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x pb-1">
-              {starterEvents.map((e) => (
-                <div key={"s" + e.id} className="w-[85%] shrink-0 snap-start">
-                  <EventCard
-                    e={e}
-                    c={counts[e.id] ?? { boys: 0, girls: 0, total: 0 }}
-                    host={hosts[e.host_id]}
-                    hostPremium={hostTiers[e.host_id] === "premium"}
-                    hostVerified={verifiedHosts.has(e.host_id)}
-                  />
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+        <MyPassesRail />
         {loading && <FeedSkeleton />}
         {!loading && err && (
           <div className="text-center py-8 space-y-3">
@@ -444,7 +420,7 @@ function HomeFeed() {
           <div className="text-sm text-muted-foreground text-center py-12">Nothing here yet in {city || "your city"}. Create the first event or post.</div>
         )}
         {items.map((it) => it.kind === "event" ? (
-          <EventCard key={"e" + it.id} e={it.ev} c={counts[it.id] ?? { boys: 0, girls: 0, total: 0 }} host={hosts[it.ev.host_id]} hostPremium={hostTiers[it.ev.host_id] === "premium"} hostVerified={verifiedHosts.has(it.ev.host_id)} />
+          <EventCard key={"e" + it.id} e={it.ev} c={counts[it.id] ?? { boys: 0, girls: 0, total: 0 }} host={hosts[it.ev.host_id]} hostPremium={hostTiers[it.ev.host_id] === "premium"} hostVerified={verifiedHosts.has(it.ev.host_id)} hosting={!!meId && it.ev.host_id === meId} />
         ) : (
           <PostCard key={"p" + it.id} p={it} img={imgs[it.id]} name={names[it.user_id]?.full_name ?? "Someone"}
             avatarPhoto={names[it.user_id]?.photo ?? null}
