@@ -2983,6 +2983,70 @@ export type Database = {
       roll_weekly_challenge: { Args: never; Returns: string }
       submit_verification: { Args: { _path: string }; Returns: undefined }
       sweep_empty_events: { Args: never; Returns: undefined }
+      telegram_approve_official_order: {
+        Args: { p_order_id: string }
+        Returns: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          event_id: string
+          id: string
+          order_code: string
+          pass_id: string | null
+          pass_name: string
+          payment_status: string
+          quantity: number
+          screenshot_path: string | null
+          telegram_notified_at: string | null
+          ticket_status: string
+          updated_at: string
+          user_id: string
+          utr: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "official_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      telegram_reject_official_order: {
+        Args: { p_order_id: string; p_reason: string }
+        Returns: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          event_id: string
+          id: string
+          order_code: string
+          pass_id: string | null
+          pass_name: string
+          payment_status: string
+          quantity: number
+          screenshot_path: string | null
+          telegram_notified_at: string | null
+          ticket_status: string
+          updated_at: string
+          user_id: string
+          utr: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "official_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       use_boost_credit: { Args: { _event?: string }; Returns: string }
       validate_official_event_coupon: {
         Args: {
