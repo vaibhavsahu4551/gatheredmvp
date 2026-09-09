@@ -10,10 +10,11 @@ const chips: Record<string, { label: string; cls: string }> = {
   REJECTED: { label: "Rejected", cls: "bg-destructive/15 text-destructive" },
 };
 
-/** Horizontal rail of the signed-in user's official event passes. Hidden when empty. */
+/** Horizontal rail of the signed-in user's official event passes. Shows an empty state when none. */
 export function MyPassesRail() {
   const [rows, setRows] = useState<OfficialOrder[]>([]);
   const [events, setEvents] = useState<Record<string, OfficialEvent>>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let alive = true;
@@ -27,12 +28,13 @@ export function MyPassesRail() {
         const map: Record<string, OfficialEvent> = {};
         found.forEach((e) => { if (e) map[e.id] = e; });
         setEvents(map);
+        setLoading(false);
       })
-      .catch(() => {});
+      .catch(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
   }, []);
 
-  if (!rows.length) return null;
+  if (loading) return null;
 
   return (
     <section>
