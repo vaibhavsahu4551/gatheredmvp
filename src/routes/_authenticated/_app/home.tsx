@@ -315,28 +315,34 @@ function HomeFeed() {
           {unread > 0 && <span className="absolute -top-0.5 -right-0.5 h-5 min-w-5 px-1 rounded-full bg-gradient-brand text-white text-[10px] font-bold flex items-center justify-center">{unread}</span>}
         </Link>
       </header>
-      <StoryRail />
-      <PeopleSuggestions />
-
-      <div className="px-5 mt-3">
-
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search events and posts…"
-          className="w-full rounded-full border border-border bg-muted/40 px-4 py-2 text-sm" />
-      </div>
-      <div className="px-5 mt-3 flex gap-2 overflow-x-auto pb-2">
-        {["All", ...EVENT_TYPES].map((t) => (
-          <button key={t} onClick={() => setCat(t)}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border ${cat === t ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}>{t}</button>
-        ))}
-        <button onClick={() => setGirlsOnly((v) => !v)}
-          className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border ${girlsOnly ? "bg-pink-500 text-white border-pink-500" : "border-border text-muted-foreground"}`}>♀ preferred</button>
-        <button onClick={() => { if (!hasPremium) setAdvOpen(true); }}
-          className="shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border border-border text-muted-foreground inline-flex items-center gap-1">
-          {!hasPremium && <Lock className="h-3 w-3" />} Age & distance
-        </button>
-      </div>
-
-
+      {banner && (
+        <div className="px-5 mt-3">
+          <div className="rounded-2xl overflow-hidden border border-border bg-gradient-brand text-white shadow-sm">
+            {banner.image_url && <img src={banner.image_url} alt="" className="w-full h-32 object-cover" />}
+            <div className="p-4">
+              <div className="text-sm font-semibold">{banner.title}</div>
+              {banner.body && <div className="text-xs opacity-90 mt-1">{banner.body}</div>}
+              {banner.event_id && (
+                <Link to="/events/$eventId" params={{ eventId: banner.event_id }} className="inline-block mt-2 text-xs font-medium underline">
+                  View event →
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {premium && (
+        <div className="px-5 mt-3">
+          <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
+            <div className="h-9 w-9 rounded-full bg-gradient-brand flex items-center justify-center text-white text-lg">✨</div>
+            <div className="flex-1">
+              <div className="text-sm font-semibold">Gathr Premium</div>
+              <div className="text-xs text-muted-foreground">Unlock priority events and more.</div>
+            </div>
+            <Link to="/premium" className="rounded-full bg-foreground text-background text-xs font-medium px-3 py-1.5">Upgrade</Link>
+          </div>
+        </div>
+      )}
       <div className="mt-3 px-5 space-y-3 pb-4">
         {official.some((e) => e.is_pinned) && (
           <section>
@@ -384,30 +390,25 @@ function HomeFeed() {
         )}
         <IcebreakerCard city={city} />
         <WeeklyChallengeCard />
-        {banner && (
-          <div className="rounded-2xl overflow-hidden border border-border bg-gradient-brand text-white shadow-sm">
-            {banner.image_url && <img src={banner.image_url} alt="" className="w-full h-32 object-cover" />}
-            <div className="p-4">
-              <div className="text-sm font-semibold">{banner.title}</div>
-              {banner.body && <div className="text-xs opacity-90 mt-1">{banner.body}</div>}
-              {banner.event_id && (
-                <Link to="/events/$eventId" params={{ eventId: banner.event_id }} className="inline-block mt-2 text-xs font-medium underline">
-                  View event →
-                </Link>
-              )}
-            </div>
-          </div>
-        )}
-        {premium && (
-          <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-gradient-brand flex items-center justify-center text-white text-lg">✨</div>
-            <div className="flex-1">
-              <div className="text-sm font-semibold">Gathr Premium</div>
-              <div className="text-xs text-muted-foreground">Unlock priority events and more.</div>
-            </div>
-            <Link to="/premium" className="rounded-full bg-foreground text-background text-xs font-medium px-3 py-1.5">Upgrade</Link>
-          </div>
-        )}
+        <PeopleSuggestions />
+      </div>
+      <div className="px-5 mt-3">
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search events and posts…"
+          className="w-full rounded-full border border-border bg-muted/40 px-4 py-2 text-sm" />
+      </div>
+      <div className="px-5 mt-3 flex gap-2 overflow-x-auto pb-2">
+        {["All", ...EVENT_TYPES].map((t) => (
+          <button key={t} onClick={() => setCat(t)}
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border ${cat === t ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}>{t}</button>
+        ))}
+        <button onClick={() => setGirlsOnly((v) => !v)}
+          className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border ${girlsOnly ? "bg-pink-500 text-white border-pink-500" : "border-border text-muted-foreground"}`}>♀ preferred</button>
+        <button onClick={() => { if (!hasPremium) setAdvOpen(true); }}
+          className="shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border border-border text-muted-foreground inline-flex items-center gap-1">
+          {!hasPremium && <Lock className="h-3 w-3" />} Age & distance
+        </button>
+      </div>
+      <div className="mt-3 px-5 space-y-3 pb-4">
         <MyPassesRail />
         {loading && <FeedSkeleton />}
         {!loading && err && (
