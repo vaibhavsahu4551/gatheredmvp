@@ -61,7 +61,7 @@ export async function signedSelfieUrl(path: string): Promise<string> {
 export async function getVerifiedIds(ids: string[]): Promise<Set<string>> {
   const uniq = Array.from(new Set(ids.filter(Boolean)));
   if (!uniq.length) return new Set();
-  const { data } = await sb.from("profiles").select("id, is_verified").in("id", uniq);
+  const { data } = await sb.from("profiles_public").select("id, is_verified").in("id", uniq);
   return new Set((data ?? []).filter((p: any) => p.is_verified).map((p: any) => p.id));
 }
 
