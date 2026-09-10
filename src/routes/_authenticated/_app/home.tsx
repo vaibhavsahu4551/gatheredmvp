@@ -37,7 +37,7 @@ type FeedItem = PostItem | EventItem;
 const POSTS_PAGE = 10;
 const EVENTS_PAGE = 30;
 
-function HomeFeed() {
+export function HomeFeed() {
   const [city, setCity] = useState("");
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("All");
