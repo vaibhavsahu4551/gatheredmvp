@@ -66,7 +66,7 @@ export async function getUserTiers(ids: string[]): Promise<Record<string, "free"
   const uniq = Array.from(new Set(ids.filter(Boolean)));
   if (!uniq.length) return out;
   const { data } = await supabase
-    .from("profiles")
+    .from("profiles_public")
     .select("id, subscription_tier, premium_expires_at")
     .in("id", uniq);
   const now = Date.now();
