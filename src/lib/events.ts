@@ -103,7 +103,7 @@ export async function getProfilesLite(ids: string[]) {
   if (!ids.length) return {};
   const uniq = Array.from(new Set(ids.filter(Boolean)));
   if (!uniq.length) return {};
-  const { data, error } = await supabase.from("profiles").select("id, full_name, gender, photos, created_at").in("id", uniq);
+  const { data, error } = await supabase.from("profiles_public").select("id, full_name, gender, photos, created_at").in("id", uniq);
   if (error) throw error;
   const map: Record<string, { full_name: string | null; gender: string | null; photo: string | null; created_at?: string | null }> = {};
   for (const p of data ?? []) {
