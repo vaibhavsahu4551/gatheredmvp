@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { captureReferralFromUrl } from "@/lib/rewards";
 
 export const Route = createFileRoute("/")({
@@ -21,22 +20,20 @@ export const Route = createFileRoute("/")({
 function Splash() {
   const navigate = useNavigate();
 
-  useEffect(() => {
+    useEffect(() => {
     captureReferralFromUrl();
     let alive = true;
     const started = Date.now();
 
-    const go = (to: "/home" | "/auth") => {
-      const wait = Math.max(0, 1600 - (Date.now() - started));
-      setTimeout(() => { if (alive) navigate({ to }); }, wait);
+    const wait = Math.max(0, 1600 - (Date.now() - started));
+
+    setTimeout(() => {
+      if (alive) navigate({ to: "/home" });
+    }, wait);
+
+    return () => {
+      alive = false;
     };
-
-    supabase.auth
-      .getSession()
-      .then(({ data }) => go(data.session ? "/home" : "/auth"))
-      .catch(() => go("/auth"));
-
-    return () => { alive = false; };
   }, [navigate]);
 
   return (
