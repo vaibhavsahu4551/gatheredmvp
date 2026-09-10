@@ -28,7 +28,7 @@ import { WeeklyChallengeCard } from "@/components/WeeklyChallengeCard";
 import { Lock } from "lucide-react";
 
 
-export const Route = createFileRoute("/_authenticated/_app/home")({
+export const Route = createFileRoute("/_authenticated/_app/app-home")({
   component: HomeFeed,
 });
 
