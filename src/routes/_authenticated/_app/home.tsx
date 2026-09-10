@@ -17,7 +17,7 @@ import { getVerifiedIds } from "@/lib/verification";
 import { sortEventsByStatus } from "@/lib/event-status";
 
 import { UpgradePrompt } from "@/components/UpgradePrompt";
-import { StoryRail } from "@/components/StoryRail";
+
 import { OfficialEventCard } from "@/components/OfficialEventCard";
 import { listPublishedOfficialEvents, type OfficialEvent } from "@/lib/official-events";
 import { PeopleSuggestions } from "@/components/PeopleSuggestions";
