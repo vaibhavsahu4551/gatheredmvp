@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { BottomNav, useShowBottomNav } from "@/components/BottomNav";
 
 function NotFoundComponent() {
   return (
@@ -104,9 +105,13 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const showNav = useShowBottomNav();
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <div className={showNav ? "min-h-screen bg-background pb-24" : undefined}>
+        <Outlet />
+        {showNav && <BottomNav />}
+      </div>
       <Toaster />
     </QueryClientProvider>
   );

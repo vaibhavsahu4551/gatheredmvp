@@ -108,6 +108,7 @@ export async function getProfilesLite(ids: string[]) {
   const map: Record<string, { full_name: string | null; gender: string | null; photo: string | null; created_at?: string | null }> = {};
   for (const p of data ?? []) {
     const photos = ((p as any).photos as string[] | null) ?? [];
+    if (!p.id) continue;
     map[p.id] = { full_name: p.full_name, gender: p.gender, photo: photos[0] ?? null, created_at: (p as any).created_at ?? null };
   }
   return map;
