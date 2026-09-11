@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as HomeRouteImport } from './routes/home'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
@@ -47,9 +48,9 @@ import { Route as AuthenticatedAppRequestsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAppPremiumRouteImport } from './routes/_authenticated/_app/premium'
 import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/_app/notifications'
 import { Route as AuthenticatedAppIcebreakerRouteImport } from './routes/_authenticated/_app/icebreaker'
-import { Route as AuthenticatedAppHomeRouteImport } from './routes/_authenticated/_app/home'
 import { Route as AuthenticatedAppDiscoverRouteImport } from './routes/_authenticated/_app/discover'
 import { Route as AuthenticatedAppCreateRouteImport } from './routes/_authenticated/_app/create'
+import { Route as AuthenticatedAppAppHomeRouteImport } from './routes/_authenticated/_app/app-home'
 import { Route as AuthenticatedAppSettingsIndexRouteImport } from './routes/_authenticated/_app/settings.index'
 import { Route as AuthenticatedAppRewardsIndexRouteImport } from './routes/_authenticated/_app/rewards.index'
 import { Route as AuthenticatedAppProfileIndexRouteImport } from './routes/_authenticated/_app/profile.index'
@@ -82,6 +83,11 @@ import { Route as AuthenticatedAppOfficialOfficialIdCheckoutRouteImport } from '
 import { Route as AuthenticatedAppEventsEventIdEditRouteImport } from './routes/_authenticated/_app/events.$eventId.edit'
 import { Route as AuthenticatedAppCirclesJoinCodeRouteImport } from './routes/_authenticated/_app/circles.join.$code'
 
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -276,11 +282,6 @@ const AuthenticatedAppIcebreakerRoute =
     path: '/icebreaker',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedAppHomeRoute = AuthenticatedAppHomeRouteImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
 const AuthenticatedAppDiscoverRoute =
   AuthenticatedAppDiscoverRouteImport.update({
     id: '/discover',
@@ -290,6 +291,11 @@ const AuthenticatedAppDiscoverRoute =
 const AuthenticatedAppCreateRoute = AuthenticatedAppCreateRouteImport.update({
   id: '/create',
   path: '/create',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppAppHomeRoute = AuthenticatedAppAppHomeRouteImport.update({
+  id: '/app-home',
+  path: '/app-home',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
 const AuthenticatedAppSettingsIndexRoute =
@@ -484,6 +490,7 @@ export interface FileRoutesByFullPath {
   '/admin-login': typeof AdminLoginRoute
   '/auth': typeof AuthRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/home': typeof HomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/engagement': typeof AdminEngagementRoute
@@ -504,9 +511,9 @@ export interface FileRoutesByFullPath {
   '/checkin/$token': typeof CheckinTokenRoute
   '/official/$officialId': typeof OfficialOfficialIdRouteWithChildren
   '/admin/': typeof AdminIndexRoute
+  '/app-home': typeof AuthenticatedAppAppHomeRoute
   '/create': typeof AuthenticatedAppCreateRoute
   '/discover': typeof AuthenticatedAppDiscoverRoute
-  '/home': typeof AuthenticatedAppHomeRoute
   '/icebreaker': typeof AuthenticatedAppIcebreakerRoute
   '/notifications': typeof AuthenticatedAppNotificationsRoute
   '/premium': typeof AuthenticatedAppPremiumRoute
@@ -555,6 +562,7 @@ export interface FileRoutesByTo {
   '/admin-login': typeof AdminLoginRoute
   '/auth': typeof AuthRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/home': typeof HomeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/badges': typeof AdminBadgesRoute
   '/admin/engagement': typeof AdminEngagementRoute
@@ -574,9 +582,9 @@ export interface FileRoutesByTo {
   '/admin/verification': typeof AdminVerificationRoute
   '/checkin/$token': typeof CheckinTokenRoute
   '/admin': typeof AdminIndexRoute
+  '/app-home': typeof AuthenticatedAppAppHomeRoute
   '/create': typeof AuthenticatedAppCreateRoute
   '/discover': typeof AuthenticatedAppDiscoverRoute
-  '/home': typeof AuthenticatedAppHomeRoute
   '/icebreaker': typeof AuthenticatedAppIcebreakerRoute
   '/notifications': typeof AuthenticatedAppNotificationsRoute
   '/premium': typeof AuthenticatedAppPremiumRoute
@@ -628,6 +636,7 @@ export interface FileRoutesById {
   '/admin-login': typeof AdminLoginRoute
   '/auth': typeof AuthRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/home': typeof HomeRoute
   '/_authenticated/_app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/badges': typeof AdminBadgesRoute
@@ -649,9 +658,9 @@ export interface FileRoutesById {
   '/checkin/$token': typeof CheckinTokenRoute
   '/official/$officialId': typeof OfficialOfficialIdRouteWithChildren
   '/admin/': typeof AdminIndexRoute
+  '/_authenticated/_app/app-home': typeof AuthenticatedAppAppHomeRoute
   '/_authenticated/_app/create': typeof AuthenticatedAppCreateRoute
   '/_authenticated/_app/discover': typeof AuthenticatedAppDiscoverRoute
-  '/_authenticated/_app/home': typeof AuthenticatedAppHomeRoute
   '/_authenticated/_app/icebreaker': typeof AuthenticatedAppIcebreakerRoute
   '/_authenticated/_app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/_authenticated/_app/premium': typeof AuthenticatedAppPremiumRoute
@@ -703,6 +712,7 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/auth'
     | '/forgot-password'
+    | '/home'
     | '/onboarding'
     | '/admin/badges'
     | '/admin/engagement'
@@ -723,9 +733,9 @@ export interface FileRouteTypes {
     | '/checkin/$token'
     | '/official/$officialId'
     | '/admin/'
+    | '/app-home'
     | '/create'
     | '/discover'
-    | '/home'
     | '/icebreaker'
     | '/notifications'
     | '/premium'
@@ -774,6 +784,7 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/auth'
     | '/forgot-password'
+    | '/home'
     | '/onboarding'
     | '/admin/badges'
     | '/admin/engagement'
@@ -793,9 +804,9 @@ export interface FileRouteTypes {
     | '/admin/verification'
     | '/checkin/$token'
     | '/admin'
+    | '/app-home'
     | '/create'
     | '/discover'
-    | '/home'
     | '/icebreaker'
     | '/notifications'
     | '/premium'
@@ -846,6 +857,7 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/auth'
     | '/forgot-password'
+    | '/home'
     | '/_authenticated/_app'
     | '/_authenticated/onboarding'
     | '/admin/badges'
@@ -867,9 +879,9 @@ export interface FileRouteTypes {
     | '/checkin/$token'
     | '/official/$officialId'
     | '/admin/'
+    | '/_authenticated/_app/app-home'
     | '/_authenticated/_app/create'
     | '/_authenticated/_app/discover'
-    | '/_authenticated/_app/home'
     | '/_authenticated/_app/icebreaker'
     | '/_authenticated/_app/notifications'
     | '/_authenticated/_app/premium'
@@ -921,6 +933,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AuthRoute: typeof AuthRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HomeRoute: typeof HomeRoute
   CheckinTokenRoute: typeof CheckinTokenRoute
   OfficialOfficialIdRoute: typeof OfficialOfficialIdRouteWithChildren
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
@@ -931,6 +944,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/forgot-password': {
       id: '/forgot-password'
       path: '/forgot-password'
@@ -1197,13 +1217,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppIcebreakerRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/_app/home': {
-      id: '/_authenticated/_app/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof AuthenticatedAppHomeRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
     '/_authenticated/_app/discover': {
       id: '/_authenticated/_app/discover'
       path: '/discover'
@@ -1216,6 +1229,13 @@ declare module '@tanstack/react-router' {
       path: '/create'
       fullPath: '/create'
       preLoaderRoute: typeof AuthenticatedAppCreateRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/app-home': {
+      id: '/_authenticated/_app/app-home'
+      path: '/app-home'
+      fullPath: '/app-home'
+      preLoaderRoute: typeof AuthenticatedAppAppHomeRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/settings/': {
@@ -1439,9 +1459,9 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAppRouteChildren {
+  AuthenticatedAppAppHomeRoute: typeof AuthenticatedAppAppHomeRoute
   AuthenticatedAppCreateRoute: typeof AuthenticatedAppCreateRoute
   AuthenticatedAppDiscoverRoute: typeof AuthenticatedAppDiscoverRoute
-  AuthenticatedAppHomeRoute: typeof AuthenticatedAppHomeRoute
   AuthenticatedAppIcebreakerRoute: typeof AuthenticatedAppIcebreakerRoute
   AuthenticatedAppNotificationsRoute: typeof AuthenticatedAppNotificationsRoute
   AuthenticatedAppPremiumRoute: typeof AuthenticatedAppPremiumRoute
@@ -1482,9 +1502,9 @@ interface AuthenticatedAppRouteChildren {
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
+  AuthenticatedAppAppHomeRoute: AuthenticatedAppAppHomeRoute,
   AuthenticatedAppCreateRoute: AuthenticatedAppCreateRoute,
   AuthenticatedAppDiscoverRoute: AuthenticatedAppDiscoverRoute,
-  AuthenticatedAppHomeRoute: AuthenticatedAppHomeRoute,
   AuthenticatedAppIcebreakerRoute: AuthenticatedAppIcebreakerRoute,
   AuthenticatedAppNotificationsRoute: AuthenticatedAppNotificationsRoute,
   AuthenticatedAppPremiumRoute: AuthenticatedAppPremiumRoute,
@@ -1604,6 +1624,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AuthRoute: AuthRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  HomeRoute: HomeRoute,
   CheckinTokenRoute: CheckinTokenRoute,
   OfficialOfficialIdRoute: OfficialOfficialIdRouteWithChildren,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,

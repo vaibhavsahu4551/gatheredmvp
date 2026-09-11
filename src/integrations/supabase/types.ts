@@ -2209,7 +2209,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      profiles_public: {
+        Row: {
+          city: string | null
+          created_at: string | null
+          full_name: string | null
+          gender: string | null
+          id: string | null
+          is_verified: boolean | null
+          photos: string[] | null
+          premium_expires_at: string | null
+          subscription_tier: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          gender?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          photos?: string[] | null
+          premium_expires_at?: string | null
+          subscription_tier?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          gender?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          photos?: string[] | null
+          premium_expires_at?: string | null
+          subscription_tier?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_official_event_application: {
