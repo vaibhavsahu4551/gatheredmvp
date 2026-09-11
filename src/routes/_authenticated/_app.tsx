@@ -12,9 +12,7 @@ export const Route = createFileRoute("/_authenticated/_app")({
 
 function AppShell() {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
   const [ready, setReady] = useState(false);
-  const [pride, setPride] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const maintenance = useMaintenance();
 
