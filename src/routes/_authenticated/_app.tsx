@@ -1,9 +1,7 @@
-import { createFileRoute, Outlet, useNavigate, Link, useLocation } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { loadMe } from "@/lib/huddl";
 import { supabase } from "@/integrations/supabase/client";
-import { Home, Ticket, Plus, MessageCircle, User, Sparkles } from "lucide-react";
-import { useDmUnread } from "@/hooks/useDmUnread";
 import { enablePush, pushAsked, pushDeclined } from "@/lib/push";
 import { useMaintenance } from "@/hooks/useMaintenance";
 import { MaintenanceScreen } from "@/components/MaintenanceScreen";
