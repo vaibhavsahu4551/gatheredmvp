@@ -73,7 +73,7 @@ export function OfficialEventCard({ e, compact }: { e: OfficialEvent; compact?: 
           <span className="truncate">{[e.venue, e.city].filter(Boolean).join(", ")}</span>
         </div>
 
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
           <div className="flex min-w-0 items-center gap-2">
             {logo ? (
               <img src={logo} alt="" className="h-7 w-7 rounded-full object-cover ring-1 ring-border" />
@@ -88,7 +88,7 @@ export function OfficialEventCard({ e, compact }: { e: OfficialEvent; compact?: 
             </div>
           </div>
           {priceLabel(e) && (
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[11px] font-bold">
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[11px] font-bold max-w-full whitespace-mormal">
               <Ticket className="h-3 w-3" /> {priceLabel(e)}
             </span>
           )}
