@@ -22,7 +22,7 @@ function AppShell() {
       .then((me) => {
         if (!me) { navigate({ to: "/auth" }); return; }
         if (!me.profile?.onboarding_complete) { navigate({ to: "/onboarding" }); return; }
-        setPride(!!me.profile?.pride_opt_in);
+        
         // Logging back in reactivates a temporarily deactivated account.
         (supabase as any)
           .from("user_settings")
