@@ -49,22 +49,6 @@ function AppShell() {
       });
   }, [navigate]);
 
-  // Refresh pride opt-in on every navigation so toggling it in Edit Profile
-  // reflects in the bottom nav immediately, without a refresh/re-login.
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase
-        .from("profiles")
-        .select("pride_opt_in")
-        .eq("id", user.id)
-        .maybeSingle();
-      if (alive && data) setPride(!!(data as any).pride_opt_in);
-    })();
-    return () => { alive = false; };
-  }, [pathname]);
 
   if (loadError) {
     return (
