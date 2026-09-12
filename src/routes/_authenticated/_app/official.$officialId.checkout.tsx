@@ -71,7 +71,10 @@ function Checkout() {
         if (!alive) return;
         setEvent(ev);
         setPass(passes.find((p) => p.id === passId) ?? passes[0] ?? null);
-        setUpi({ id: (settings as any)?.upi_id ?? "", payee: (settings as any)?.upi_payee_name ?? "Gathr" });
+       setUpi({
+  id: ev?.upi_id?.trim() || (settings as any)?.upi_id || "",
+  payee: ev?.upi_payee_name?.trim() || (settings as any)?.upi_payee_name || "Gathr",
+});
       } catch (e: any) {
         toast.error(e.message ?? "Couldn't load checkout");
       } finally {
