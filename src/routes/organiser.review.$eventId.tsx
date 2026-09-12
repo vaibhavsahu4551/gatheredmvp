@@ -348,40 +348,76 @@ const [whatsappOpen, setWhatsappOpen] =
   // WHATSAPP
   // -----------------------------------------
 
-function openWhatsApp(application: Application) {
-  if (!application.applicant_phone) {
-    alert("Applicant phone number is not available.");
-    return;
-  }
+function buildMessage(
+  application: Application,
+  kind: "accept" | "reject"
+) {
+  const template =
+    kind === "accept" ? acceptTemplate : rejectTemplate;
 
-  const message = createWhatsAppMessage(
-    application,
-    eventTitle,
-    eventPrice,
-    eventTicketUrl
+  return renderWhatsAppMessage(template, {
+    name: application.applicant_name,
+    event_name: eventTitle,
+    payment_deadline: application.payment_deadline_at
+      ? new Date(
+          application.payment_deadline_at
+        ).toLocaleString("en-IN")
+      : "",
+    payment_link: eventTicketUrl,
+    reason: application.rejection_reason,
+  });
+}
+
+/** Opens WhatsApp straight away with the message prefilled. */
+function launchWhatsApp(
+  application: Application,
+  kind: "accept" | "reject"
+) {
+  const phone = cleanWhatsAppPhone(
+    application.applicant_phone
   );
 
+  const message = buildMessage(application, kind);
+
+  if (!phone) {
+    setWhatsappApplication(application);
+    setWhatsappMessage(message);
+    setWhatsappOpen(true);
+    return false;
+  }
+
+  window.open(
+    whatsappLink(phone, message),
+    "_blank",
+    "noopener,noreferrer"
+  );
+
+  return true;
+}
+
+function openWhatsApp(application: Application) {
+  const kind =
+    application.status === "rejected" ? "reject" : "accept";
+
   setWhatsappApplication(application);
-  setWhatsappMessage(message);
+  setWhatsappMessage(buildMessage(application, kind));
   setWhatsappOpen(true);
 }
 
 function sendWhatsAppMessage() {
-  if (!whatsappApplication?.applicant_phone) {
-    alert("Applicant phone number is not available.");
+  const phone = cleanWhatsAppPhone(
+    whatsappApplication?.applicant_phone
+  );
+
+  if (!phone) {
+    alert(
+      "WhatsApp could not be opened: this applicant has no valid phone number."
+    );
     return;
   }
 
-  const phone = cleanPhoneNumber(
-    whatsappApplication.applicant_phone
-  );
-
-  const whatsappUrl =
-    `https://wa.me/${phone}?text=` +
-    encodeURIComponent(whatsappMessage);
-
   window.open(
-    whatsappUrl,
+    whatsappLink(phone, whatsappMessage),
     "_blank",
     "noopener,noreferrer"
   );
