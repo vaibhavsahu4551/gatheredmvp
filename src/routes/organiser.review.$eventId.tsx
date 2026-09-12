@@ -13,6 +13,13 @@ import {
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import {
+  DEFAULT_ACCEPT_MESSAGE,
+  DEFAULT_REJECT_MESSAGE,
+  cleanWhatsAppPhone,
+  renderWhatsAppMessage,
+  whatsappLink,
+} from "@/lib/whatsapp-messages";
 
 export const Route = createFileRoute("/organiser/review/$eventId")({
   head: () => ({
@@ -67,6 +74,8 @@ type ReviewData = {
     ticket_url: string | null;
     pass_price: number | null;
     price_text: string | null;
+    whatsapp_accept_message?: string | null;
+    whatsapp_reject_message?: string | null;
   } | null;
 
   questions: Question[];
@@ -86,6 +95,8 @@ function OrganiserReviewPage() {
   const [eventTitle, setEventTitle] = useState("");
   const [eventTicketUrl, setEventTicketUrl] = useState("");
   const [eventPrice, setEventPrice] = useState("");
+  const [acceptTemplate, setAcceptTemplate] = useState(DEFAULT_ACCEPT_MESSAGE);
+  const [rejectTemplate, setRejectTemplate] = useState(DEFAULT_REJECT_MESSAGE);
 
   const [openId, setOpenId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
