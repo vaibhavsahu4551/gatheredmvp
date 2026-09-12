@@ -74,6 +74,8 @@ const emptyForm = {
   organiser_user_id: "",
   selection_payment_deadline_minutes: "30",
   razorpay_enabled: false,
+  whatsapp_accept_message: "",
+  whatsapp_reject_message: "",
 };
 type Form = typeof emptyForm;
 
@@ -113,6 +115,8 @@ function toForm(e: OfficialEvent): Form {
       e.selection_payment_deadline_minutes ?? 30
       ),
       razorpay_enabled: e.razorpay_enabled ?? false,
+    whatsapp_accept_message: e.whatsapp_accept_message ?? "",
+    whatsapp_reject_message: e.whatsapp_reject_message ?? "",
   };
 }
 
@@ -1275,7 +1279,9 @@ const [coverPreview, setCoverPreview] = useState("");
         organiser_user_id: f.organiser_user_id.trim() || null,
         selection_payment_deadline_minutes:
           Number(f.selection_payment_deadline_minutes) || 30,
-        razorpay_enabled: f.razorpay_enabled
+        razorpay_enabled: f.razorpay_enabled,
+        whatsapp_accept_message: f.whatsapp_accept_message.trim() || null,
+        whatsapp_reject_message: f.whatsapp_reject_message.trim() || null,
       });
     } finally { setBusy(false); }
   }

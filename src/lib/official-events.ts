@@ -51,6 +51,8 @@ export type OfficialEvent = {
 organiser_user_id: string | null;
 selection_payment_deadline_minutes: number;
   razorpay_enabled: boolean;
+  whatsapp_accept_message: string | null;
+  whatsapp_reject_message: string | null;
   created_at: string;
   updated_at: string;
 };
