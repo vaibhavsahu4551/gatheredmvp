@@ -159,6 +159,16 @@ const [whatsappOpen, setWhatsappOpen] =
           : result.event.price_text || ""
       );
 
+      setAcceptTemplate(
+        (result.event.whatsapp_accept_message || "").trim() ||
+          DEFAULT_ACCEPT_MESSAGE
+      );
+
+      setRejectTemplate(
+        (result.event.whatsapp_reject_message || "").trim() ||
+          DEFAULT_REJECT_MESSAGE
+      );
+
       setQuestions(result.questions || []);
       setApplications(result.applications || []);
     } catch (err) {
