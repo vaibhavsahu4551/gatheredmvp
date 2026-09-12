@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PhotoCropModal } from "@/components/PhotoCropModal";
 import { PassManager } from "@/components/PassManager";
+import { DEFAULT_ACCEPT_MESSAGE, DEFAULT_REJECT_MESSAGE } from "@/lib/whatsapp-messages";
 import {
   createApplicationQuestion,
   deleteApplicationQuestion,
