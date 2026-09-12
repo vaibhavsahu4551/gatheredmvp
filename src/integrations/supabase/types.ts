@@ -1259,6 +1259,8 @@ export type Database = {
           upi_id: string | null
           upi_payee_name: string | null
           venue: string
+          whatsapp_accept_message: string | null
+          whatsapp_reject_message: string | null
         }
         Insert: {
           booking_type?: string
@@ -1296,6 +1298,8 @@ export type Database = {
           upi_id?: string | null
           upi_payee_name?: string | null
           venue?: string
+          whatsapp_accept_message?: string | null
+          whatsapp_reject_message?: string | null
         }
         Update: {
           booking_type?: string
@@ -1333,6 +1337,8 @@ export type Database = {
           upi_id?: string | null
           upi_payee_name?: string | null
           venue?: string
+          whatsapp_accept_message?: string | null
+          whatsapp_reject_message?: string | null
         }
         Relationships: []
       }
