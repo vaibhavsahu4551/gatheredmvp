@@ -244,9 +244,20 @@ const [whatsappOpen, setWhatsappOpen] =
 
       setOpenId(application.id);
 
-      alert(
-        "Application accepted. Payment deadline has been set."
-      );
+      const merged: Application = {
+        ...application,
+        ...(updated || {}),
+        applicant_name: application.applicant_name,
+        applicant_phone: application.applicant_phone,
+      };
+
+      const opened = launchWhatsApp(merged, "accept");
+
+      if (!opened) {
+        alert(
+          "Application accepted. WhatsApp could not be opened because this applicant has no valid phone number."
+        );
+      }
     } catch (err: any) {
       console.error("Accept failed:", err);
 
