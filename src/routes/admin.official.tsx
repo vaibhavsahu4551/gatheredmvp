@@ -1261,6 +1261,8 @@ const [coverPreview, setCoverPreview] = useState("");
         pass_info: f.pass_info.trim() || null,
         contact_phone: f.contact_phone.trim() || null,
         instructions: f.instructions.trim() || null,
+        upi_id: f.upi_id.trim() || null,
+        upi_payee_name: f.upi_payee_name.trim() || null,
         organizer_name: f.organizer_name.trim(),
         organizer_logo: f.organizer_logo.trim() || null,
         booking_whatsapp: f.booking_whatsapp.trim() || null,
@@ -1333,6 +1335,29 @@ const [coverPreview, setCoverPreview] = useState("");
         <Field label="Organizer name"><input value={f.organizer_name} onChange={(e) => set("organizer_name", e.target.value)} className={inputCls} /></Field>
         <Field label="Pass price (₹)"><input type="number" min="0" value={f.pass_price} onChange={(e) => set("pass_price", e.target.value)} className={inputCls} /></Field>
         <Field label="Passes available"><input type="number" min="0" value={f.pass_quantity} onChange={(e) => set("pass_quantity", e.target.value)} className={inputCls} /></Field>
+        <Field label="Event UPI ID (Optional)">
+  <input
+    value={f.upi_id}
+    onChange={(e) => set("upi_id", e.target.value)}
+    placeholder="example@upi"
+    className={inputCls}
+  />
+  <p className="mt-1 text-[11px] text-muted-foreground">
+    Leave blank to use Gathr's default UPI.
+  </p>
+</Field>
+
+<Field label="UPI Payee Name (Optional)">
+  <input
+    value={f.upi_payee_name}
+    onChange={(e) => set("upi_payee_name", e.target.value)}
+    placeholder="Event Organizer"
+    className={inputCls}
+  />
+  <p className="mt-1 text-[11px] text-muted-foreground">
+    Leave blank to use Gathr's default payee name.
+  </p>
+</Field>
         <Field label="Event contact number"><input value={f.contact_phone} onChange={(e) => set("contact_phone", e.target.value)} className={inputCls} /></Field>
         <Field label="WhatsApp booking number"><input value={f.booking_whatsapp} onChange={(e) => set("booking_whatsapp", e.target.value)} placeholder="Leave blank to use default" className={inputCls} /></Field>
       </div>
