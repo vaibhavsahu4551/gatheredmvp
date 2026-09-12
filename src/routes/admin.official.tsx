@@ -1455,6 +1455,41 @@ const [coverPreview, setCoverPreview] = useState("");
       <Field label="Event instructions"><textarea rows={2} value={f.instructions} onChange={(e) => set("instructions", e.target.value)} className={inputCls} /></Field>
       <Field label="Terms / information"><textarea rows={3} value={f.terms} onChange={(e) => set("terms", e.target.value)} className={inputCls} /></Field>
 
+      <div className="rounded-xl border border-border bg-background p-3">
+        <p className="text-sm font-semibold">WhatsApp Messages</p>
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          Use {"{name}"} for the applicant's name, {"{event_name}"} for the event name,
+          {" "}{"{payment_deadline}"} for the payment deadline and {"{payment_link}"} for the booking link.
+          {" "}{"{reason}"} is available in the reject message.
+        </p>
+
+        <div className="mt-3 space-y-3">
+          <Field label="Accept message">
+            <textarea
+              rows={5}
+              value={f.whatsapp_accept_message}
+              onChange={(e) => set("whatsapp_accept_message", e.target.value)}
+              placeholder={DEFAULT_ACCEPT_MESSAGE}
+              className={inputCls}
+            />
+          </Field>
+
+          <Field label="Reject message">
+            <textarea
+              rows={5}
+              value={f.whatsapp_reject_message}
+              onChange={(e) => set("whatsapp_reject_message", e.target.value)}
+              placeholder={DEFAULT_REJECT_MESSAGE}
+              className={inputCls}
+            />
+          </Field>
+        </div>
+
+        <p className="text-[11px] text-muted-foreground">
+          Leave blank to use the default Gathr message. Saved with the event below.
+        </p>
+      </div>
+
       <div className="flex flex-wrap gap-4 text-xs">
         <Check label="Published" checked={f.published} onChange={(v) => set("published", v)} />
         <Check label="Featured" checked={f.is_featured} onChange={(v) => set("is_featured", v)} />
