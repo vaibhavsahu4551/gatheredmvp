@@ -1256,6 +1256,8 @@ export type Database = {
           ticket_url: string | null
           title: string
           updated_at: string
+          upi_id: string | null
+          upi_payee_name: string | null
           venue: string
         }
         Insert: {
@@ -1291,6 +1293,8 @@ export type Database = {
           ticket_url?: string | null
           title: string
           updated_at?: string
+          upi_id?: string | null
+          upi_payee_name?: string | null
           venue?: string
         }
         Update: {
@@ -1326,6 +1330,8 @@ export type Database = {
           ticket_url?: string | null
           title?: string
           updated_at?: string
+          upi_id?: string | null
+          upi_payee_name?: string | null
           venue?: string
         }
         Relationships: []
