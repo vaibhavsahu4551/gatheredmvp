@@ -40,6 +40,8 @@ export type OfficialEvent = {
   pass_info: string | null;
   contact_phone: string | null;
   instructions: string | null;
+  upi_id: string | null;
+  upi_payee_name: string | null;
   is_official: boolean;
   created_by_type: "user" | "admin";
   published: boolean;
