@@ -94,7 +94,6 @@ function OrganiserReviewPage() {
 
   const [eventTitle, setEventTitle] = useState("");
   const [eventTicketUrl, setEventTicketUrl] = useState("");
-  const [eventPrice, setEventPrice] = useState("");
   const [acceptTemplate, setAcceptTemplate] = useState(DEFAULT_ACCEPT_MESSAGE);
   const [rejectTemplate, setRejectTemplate] = useState(DEFAULT_REJECT_MESSAGE);
 
@@ -153,12 +152,7 @@ const [whatsappOpen, setWhatsappOpen] =
 
       setEventTicketUrl(result.event.ticket_url || "");
 
-      setEventPrice(
-        result.event.pass_price != null
-          ? String(result.event.pass_price)
-          : result.event.price_text || ""
-      );
-
+    
       setAcceptTemplate(
         (result.event.whatsapp_accept_message || "").trim() ||
           DEFAULT_ACCEPT_MESSAGE
@@ -800,85 +794,8 @@ function sendWhatsAppMessage() {
   );
 }
 
-/* ---------------------------------------------
-   WHATSAPP MESSAGE
---------------------------------------------- */
 
-function createWhatsAppMessage(
-  application: Application,
-  eventTitle: string,
-  eventPrice: string,
-  ticketUrl: string
-) {
-  const name =
-    application.applicant_name || "there";
 
-  if (
-    application.status === "payment_pending" ||
-    application.status === "confirmed"
-  ) {
-    const deadline = application.payment_deadline_at
-      ? new Date(
-          application.payment_deadline_at
-        ).toLocaleString("en-IN")
-      : "the payment deadline";
-
-    return `Hi ${name}! 👋
-
-Your application for "${eventTitle}" on Gathr has been accepted. 🎉
-
-Please complete your payment before:
-${deadline}
-
-${
-  eventPrice
-    ? `Pass amount: ₹${eventPrice}\n`
-    : ""
-}${
-  ticketUrl
-    ? `Payment / booking link:\n${ticketUrl}\n`
-    : ""
-}
-Your spot will be confirmed after successful payment.
-
-Thank you,
-Team Gathr`;
-  }
-
-  return `Hi ${name},
-
-Thank you for applying for "${eventTitle}" on Gathr.
-
-Unfortunately, your application was not selected for this event.
-
-Reason:
-${
-    application.rejection_reason ||
-    "The organiser did not provide a specific reason."
-  }
-
-We hope to see you at another Gathr event. ❤️
-
-— Team Gathr`;
-}
-
-/* ---------------------------------------------
-   PHONE
---------------------------------------------- */
-
-function cleanPhoneNumber(phone: string) {
-  let cleaned = phone.replace(/\D/g, "");
-
-  if (cleaned.startsWith("0")) {
-    cleaned = "91" + cleaned.slice(1);
-  }
-
-  if (cleaned.length === 10) {
-    cleaned = "91" + cleaned;
-  }
-
-  return cleaned;
-}
 
 /* ---------------------------------------------
    STATUS
