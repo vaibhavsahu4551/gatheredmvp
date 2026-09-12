@@ -342,7 +342,21 @@ const [whatsappOpen, setWhatsappOpen] =
 
       setOpenId(application.id);
 
-      alert("Application rejected.");
+      const merged: Application = {
+        ...application,
+        ...(updated || {}),
+        rejection_reason: reason.trim(),
+        applicant_name: application.applicant_name,
+        applicant_phone: application.applicant_phone,
+      };
+
+      const opened = launchWhatsApp(merged, "reject");
+
+      if (!opened) {
+        alert(
+          "Application rejected. WhatsApp could not be opened because this applicant has no valid phone number."
+        );
+      }
     } catch (err: any) {
       console.error("Reject failed:", err);
 
