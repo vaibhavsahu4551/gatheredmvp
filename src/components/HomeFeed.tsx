@@ -388,19 +388,27 @@ export function HomeFeed() {
         <WeeklyChallengeCard />
         <PeopleSuggestions />
       </div>
-      <div className="px-5 mt-3">
+      <div className="px-5 mt-4">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search events and posts…"
-          className="w-full rounded-full border border-border bg-muted/40 px-4 py-2 text-sm" />
+          className="w-full rounded-full border border-border bg-muted px-4 py-2.5 text-sm shadow-[0_8px_20px_-12px_rgba(0,0,0,0.18)] focus:outline-none focus:ring-2 focus:ring-primary/30" />
       </div>
-      <div className="px-5 mt-3 flex gap-2 overflow-x-auto pb-2">
+      <div className="mt-3 flex gap-2 overflow-x-auto px-5 pb-2">
         {["All", ...EVENT_TYPES].map((t) => (
           <button key={t} onClick={() => setCat(t)}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border ${cat === t ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}>{t}</button>
+            className={`shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition ${
+              cat === t
+                ? "bg-gradient-brand text-white shadow-md border border-transparent"
+                : "border border-border bg-card text-muted-foreground"
+            }`}>{t}</button>
         ))}
         <button onClick={() => setGirlsOnly((v) => !v)}
-          className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border ${girlsOnly ? "bg-pink-500 text-white border-pink-500" : "border-border text-muted-foreground"}`}>♀ preferred</button>
+          className={`shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition ${
+            girlsOnly
+              ? "bg-pink-500 text-white shadow-md border border-transparent"
+              : "border border-border bg-card text-muted-foreground"
+          }`}>♀ preferred</button>
         <button onClick={() => { if (!hasPremium) setAdvOpen(true); }}
-          className="shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border border-border text-muted-foreground inline-flex items-center gap-1">
+          className="shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold border border-border bg-card text-muted-foreground inline-flex items-center gap-1">
           {!hasPremium && <Lock className="h-3 w-3" />} Age & distance
         </button>
       </div>
