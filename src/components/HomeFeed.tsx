@@ -350,11 +350,8 @@ export function HomeFeed() {
       <div className="mt-3 px-5 space-y-3 pb-4">
         {official.some((e) => e.is_pinned) && (
           <section>
-            <div className="mb-2">
-              <div className="text-sm font-semibold">📌 Official Events</div>
-              <div className="text-xs text-muted-foreground">Curated concerts, festivals and partner nights</div>
-            </div>
-            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x pb-1">
+            <SectionHeader title="Official Events" />
+            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x snap-mandatory pb-1">
               {official.filter((e) => e.is_pinned).map((e) => (
                 <div key={"p" + e.id} className="snap-start">
                   <OfficialEventCard e={e} compact />
@@ -365,11 +362,8 @@ export function HomeFeed() {
         )}
         {official.some((e) => e.is_featured && !e.is_pinned) && (
           <section>
-            <div className="mb-2">
-              <div className="text-sm font-semibold">🔥 Featured</div>
-              <div className="text-xs text-muted-foreground">Handpicked events happening near you</div>
-            </div>
-            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x pb-1">
+            <SectionHeader title="Featured" />
+            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x snap-mandatory pb-1">
               {official.filter((e) => e.is_featured && !e.is_pinned).map((e) => (
                 <div key={"f" + e.id} className="snap-start">
                   <OfficialEventCard e={e} compact />
@@ -380,10 +374,8 @@ export function HomeFeed() {
         )}
         {official.some((e) => !e.is_featured && !e.is_pinned) && (
           <section>
-            <div className="mb-2">
-              <div className="text-sm font-semibold">📅 Upcoming official events</div>
-            </div>
-            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x pb-1">
+            <SectionHeader title="Upcoming Official Events" />
+            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x snap-mandatory pb-1">
               {official.filter((e) => !e.is_featured && !e.is_pinned).map((e) => (
                 <div key={"u" + e.id} className="snap-start">
                   <OfficialEventCard e={e} compact />
