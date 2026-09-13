@@ -14,7 +14,7 @@ import { CityPickerModal } from "@/components/CityPickerModal";
 import { getActiveBanner, getAppSettings, type HomeBanner } from "@/lib/admin";
 import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { getVerifiedIds } from "@/lib/verification";
-import { sortEventsByStatus } from "@/lib/event-status";
+import { sortEventsByStatus, eventPhase } from "@/lib/event-status";
 
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 
@@ -290,11 +290,18 @@ export function HomeFeed() {
     ];
   }, [filteredEvents, filteredPosts, counts]);
 
+  // Horizontal "Trending Meetups" rail: top open/filling events.
+  const railEvents = useMemo(
+    () => sortEventsByStatus(filteredEvents, counts).filter((e) => eventPhase(e as any, counts[e.id]?.total ?? 0) !== "closed").slice(0, 8),
+    [filteredEvents, counts],
+  );
+
   return (
     <div>
       <header className="px-5 pt-8 pb-3 flex items-center justify-between">
         <div>
-          <div className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+          <div className="text-xl font-extrabold tracking-tight text-gradient-brand">Gathr</div>
+          <div className="mt-1 text-xs font-medium text-muted-foreground flex items-center gap-1">
             {city ? (
               <button onClick={() => setCityModal(true)} className="text-left">
                 📍 Showing events near <span className="text-foreground font-semibold underline">{city}</span>
@@ -307,9 +314,15 @@ export function HomeFeed() {
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">Happening near you</h1>
         </div>
-        <Link to="/notifications" className="relative h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+        <Link
+          to="/notifications"
+          aria-label="Notifications"
+          className="relative h-10 w-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center"
+        >
           <Bell className="h-5 w-5" />
-          {unread > 0 && <span className="absolute -top-0.5 -right-0.5 h-5 min-w-5 px-1 rounded-full bg-gradient-brand text-white text-[10px] font-bold flex items-center justify-center">{unread}</span>}
+          {unread > 0 && (
+            <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-gradient-brand ring-2 ring-card" />
+          )}
         </Link>
       </header>
       {banner && (
@@ -343,11 +356,8 @@ export function HomeFeed() {
       <div className="mt-3 px-5 space-y-3 pb-4">
         {official.some((e) => e.is_pinned) && (
           <section>
-            <div className="mb-2">
-              <div className="text-sm font-semibold">📌 Official Events</div>
-              <div className="text-xs text-muted-foreground">Curated concerts, festivals and partner nights</div>
-            </div>
-            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x pb-1">
+            <SectionHeader title="Official Events" />
+            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x snap-mandatory pb-1">
               {official.filter((e) => e.is_pinned).map((e) => (
                 <div key={"p" + e.id} className="snap-start">
                   <OfficialEventCard e={e} compact />
@@ -358,11 +368,8 @@ export function HomeFeed() {
         )}
         {official.some((e) => e.is_featured && !e.is_pinned) && (
           <section>
-            <div className="mb-2">
-              <div className="text-sm font-semibold">🔥 Featured</div>
-              <div className="text-xs text-muted-foreground">Handpicked events happening near you</div>
-            </div>
-            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x pb-1">
+            <SectionHeader title="Featured" />
+            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x snap-mandatory pb-1">
               {official.filter((e) => e.is_featured && !e.is_pinned).map((e) => (
                 <div key={"f" + e.id} className="snap-start">
                   <OfficialEventCard e={e} compact />
@@ -373,10 +380,8 @@ export function HomeFeed() {
         )}
         {official.some((e) => !e.is_featured && !e.is_pinned) && (
           <section>
-            <div className="mb-2">
-              <div className="text-sm font-semibold">📅 Upcoming official events</div>
-            </div>
-            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x pb-1">
+            <SectionHeader title="Upcoming Official Events" />
+            <div className="-mx-5 px-5 flex gap-3 overflow-x-auto snap-x snap-mandatory pb-1">
               {official.filter((e) => !e.is_featured && !e.is_pinned).map((e) => (
                 <div key={"u" + e.id} className="snap-start">
                   <OfficialEventCard e={e} compact />
@@ -389,24 +394,52 @@ export function HomeFeed() {
         <WeeklyChallengeCard />
         <PeopleSuggestions />
       </div>
-      <div className="px-5 mt-3">
+      <div className="px-5 mt-4">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search events and posts…"
-          className="w-full rounded-full border border-border bg-muted/40 px-4 py-2 text-sm" />
+          className="w-full rounded-full border border-border bg-muted px-4 py-2.5 text-sm shadow-[0_8px_20px_-12px_rgba(0,0,0,0.18)] focus:outline-none focus:ring-2 focus:ring-primary/30" />
       </div>
-      <div className="px-5 mt-3 flex gap-2 overflow-x-auto pb-2">
+      <div className="mt-3 flex gap-2 overflow-x-auto px-5 pb-2">
         {["All", ...EVENT_TYPES].map((t) => (
           <button key={t} onClick={() => setCat(t)}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border ${cat === t ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}>{t}</button>
+            className={`shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition ${
+              cat === t
+                ? "bg-gradient-brand text-white shadow-md border border-transparent"
+                : "border border-border bg-card text-muted-foreground"
+            }`}>{t}</button>
         ))}
         <button onClick={() => setGirlsOnly((v) => !v)}
-          className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border ${girlsOnly ? "bg-pink-500 text-white border-pink-500" : "border-border text-muted-foreground"}`}>♀ preferred</button>
+          className={`shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition ${
+            girlsOnly
+              ? "bg-pink-500 text-white shadow-md border border-transparent"
+              : "border border-border bg-card text-muted-foreground"
+          }`}>♀ preferred</button>
         <button onClick={() => { if (!hasPremium) setAdvOpen(true); }}
-          className="shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium border border-border text-muted-foreground inline-flex items-center gap-1">
+          className="shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold border border-border bg-card text-muted-foreground inline-flex items-center gap-1">
           {!hasPremium && <Lock className="h-3 w-3" />} Age & distance
         </button>
       </div>
       <div className="mt-3 px-5 space-y-3 pb-4">
         <MyPassesRail />
+        {!loading && !err && railEvents.length > 0 && (
+          <section>
+            <SectionHeader title="Trending Meetups" to="/events" />
+            <div className="-mx-5 px-5 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2">
+              {railEvents.map((ev) => (
+                <div key={"r" + ev.id} className="w-[290px] shrink-0 snap-start">
+                  <EventCard
+                    e={ev}
+                    c={counts[ev.id] ?? { boys: 0, girls: 0, total: 0 }}
+                    host={hosts[ev.host_id]}
+                    hostPremium={hostTiers[ev.host_id] === "premium"}
+                    hostVerified={verifiedHosts.has(ev.host_id)}
+                    hosting={!!meId && ev.host_id === meId}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+        <SectionHeader title="Recommended For You" />
         {loading && <FeedSkeleton />}
         {!loading && err && (
           <div className="text-center py-8 space-y-3">
@@ -435,6 +468,19 @@ export function HomeFeed() {
       </div>
       <CityPickerModal open={cityModal} onClose={() => setCityModal(false)} onSaved={(c) => { setCity(c); setLocState("idle"); }} />
       <UpgradePrompt open={advOpen} onClose={() => setAdvOpen(false)} title="Advanced filters are Premium" message="Filter by age range, distance and interest tags with Gathr Premium." />
+    </div>
+  );
+}
+
+function SectionHeader({ title, to }: { title: string; to?: string }) {
+  return (
+    <div className="mb-1 flex items-end justify-between gap-3">
+      <h2 className="text-[19px] font-bold tracking-tight">{title}</h2>
+      {to && (
+        <Link to={to} className="shrink-0 text-[13px] font-semibold text-primary">
+          See All
+        </Link>
+      )}
     </div>
   );
 }
