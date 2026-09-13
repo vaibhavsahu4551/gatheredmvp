@@ -920,8 +920,8 @@ function OfficialQuestionManager({
 
         await setPhoneFieldQuestion(
           eventId,
-          iaPhoneField ? editingID : null
-          );
+          isPhoneField ? editingId : null
+        );
 
         toast.success("Question updated");
       } else {
