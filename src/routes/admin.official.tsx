@@ -11,6 +11,7 @@ import {
   deleteApplicationQuestion,
   getApplicationQuestions,
   updateApplicationQuestion,
+  setPhoneFieldQuestion,
   listOfficialApplications,
   acceptApplication,
   rejectApplication,
@@ -824,6 +825,7 @@ function OfficialQuestionManager({
   const [questionType, setQuestionType] =
     useState<OfficialApplicationQuestionType>("text");
   const [isRequired, setIsRequired] = useState(true);
+  const [isPhoneField, setIsPhoneField] = useState(false);
   const [choices, setChoices] = useState<string[]>([""]);
 
   async function loadQuestions() {
@@ -848,6 +850,7 @@ function OfficialQuestionManager({
     setQuestionText("");
     setQuestionType("text");
     setIsRequired(true);
+    setIsPhoneField(false);
     setChoices([""]);
   }
 
@@ -856,6 +859,7 @@ function OfficialQuestionManager({
     setQuestionText(question.question_text);
     setQuestionType(question.question_type);
     setIsRequired(question.is_required);
+    setIsPhoneField(question.is_phone_field);
 
     setChoices(
       question.choices && question.choices.length > 0
@@ -914,9 +918,14 @@ function OfficialQuestionManager({
             questions.find((q) => q.id === editingId)?.sort_order ?? 0,
         });
 
+        await setPhoneFieldQuestion(
+          eventId,
+          iaPhoneField ? editingID : null
+          );
+
         toast.success("Question updated");
       } else {
-        await createApplicationQuestion({
+        const created = await createApplicationQuestion({
           eventId,
           questionText: questionText.trim(),
           questionType,
@@ -925,6 +934,9 @@ function OfficialQuestionManager({
           sortOrder: questions.length,
         });
 
+        if (isPhoneField) {
+          awair setPhoneFieldQuestion(eventId, created.id);
+        }
         toast.success("Question added");
       }
 
@@ -1168,6 +1180,22 @@ function OfficialQuestionManager({
             />
             Required question
           </label>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={isPhoneField}
+              onChange={(e) =>
+                setIsPhoneField(e.target.checked)
+              }
+            />
+            Use this as the applicant's WhatsApp contact number
+          </label>
+          <p className="text-[11px] text-muted-foreground">
+            Only one question per event can be marked this way. It's used
+            for the organiser's WhatsApp button when the applicant hasn't
+            saved a phone number on their profile.
+          </p>
 
           <div className="flex gap-2">
             <button
