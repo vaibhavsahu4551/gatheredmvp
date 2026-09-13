@@ -294,7 +294,8 @@ export function HomeFeed() {
     <div>
       <header className="px-5 pt-8 pb-3 flex items-center justify-between">
         <div>
-          <div className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+          <div className="text-xl font-extrabold tracking-tight text-gradient-brand">Gathr</div>
+          <div className="mt-1 text-xs font-medium text-muted-foreground flex items-center gap-1">
             {city ? (
               <button onClick={() => setCityModal(true)} className="text-left">
                 📍 Showing events near <span className="text-foreground font-semibold underline">{city}</span>
@@ -307,9 +308,15 @@ export function HomeFeed() {
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">Happening near you</h1>
         </div>
-        <Link to="/notifications" className="relative h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+        <Link
+          to="/notifications"
+          aria-label="Notifications"
+          className="relative h-10 w-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center"
+        >
           <Bell className="h-5 w-5" />
-          {unread > 0 && <span className="absolute -top-0.5 -right-0.5 h-5 min-w-5 px-1 rounded-full bg-gradient-brand text-white text-[10px] font-bold flex items-center justify-center">{unread}</span>}
+          {unread > 0 && (
+            <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-gradient-brand ring-2 ring-card" />
+          )}
         </Link>
       </header>
       {banner && (
