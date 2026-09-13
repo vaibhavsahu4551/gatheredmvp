@@ -935,7 +935,7 @@ function OfficialQuestionManager({
         });
 
         if (isPhoneField) {
-          awair setPhoneFieldQuestion(eventId, created.id);
+          await setPhoneFieldQuestion(eventId, created.id);
         }
         toast.success("Question added");
       }
