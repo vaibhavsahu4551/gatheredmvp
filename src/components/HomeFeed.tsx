@@ -290,6 +290,12 @@ export function HomeFeed() {
     ];
   }, [filteredEvents, filteredPosts, counts]);
 
+  // Horizontal "Trending Meetups" rail: top open/filling events.
+  const railEvents = useMemo(
+    () => sortEventsByStatus(filteredEvents, counts).filter((e) => eventPhase(e as any, counts[e.id]?.total ?? 0) !== "closed").slice(0, 8),
+    [filteredEvents, counts],
+  );
+
   return (
     <div>
       <header className="px-5 pt-8 pb-3 flex items-center justify-between">
