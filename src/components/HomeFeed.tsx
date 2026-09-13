@@ -14,7 +14,7 @@ import { CityPickerModal } from "@/components/CityPickerModal";
 import { getActiveBanner, getAppSettings, type HomeBanner } from "@/lib/admin";
 import { getMyEntitlements, getUserTiers } from "@/lib/entitlements";
 import { getVerifiedIds } from "@/lib/verification";
-import { sortEventsByStatus } from "@/lib/event-status";
+import { sortEventsByStatus, eventPhase } from "@/lib/event-status";
 
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 
@@ -420,6 +420,26 @@ export function HomeFeed() {
       </div>
       <div className="mt-3 px-5 space-y-3 pb-4">
         <MyPassesRail />
+        {!loading && !err && railEvents.length > 0 && (
+          <section>
+            <SectionHeader title="Trending Meetups" to="/events" />
+            <div className="-mx-5 px-5 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2">
+              {railEvents.map((ev) => (
+                <div key={"r" + ev.id} className="w-[290px] shrink-0 snap-start">
+                  <EventCard
+                    e={ev}
+                    c={counts[ev.id] ?? { boys: 0, girls: 0, total: 0 }}
+                    host={hosts[ev.host_id]}
+                    hostPremium={hostTiers[ev.host_id] === "premium"}
+                    hostVerified={verifiedHosts.has(ev.host_id)}
+                    hosting={!!meId && ev.host_id === meId}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+        <SectionHeader title="Recommended For You" />
         {loading && <FeedSkeleton />}
         {!loading && err && (
           <div className="text-center py-8 space-y-3">
