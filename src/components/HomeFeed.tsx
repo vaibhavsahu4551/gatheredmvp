@@ -472,6 +472,19 @@ export function HomeFeed() {
   );
 }
 
+function SectionHeader({ title, to }: { title: string; to?: string }) {
+  return (
+    <div className="mb-1 flex items-end justify-between gap-3">
+      <h2 className="text-[19px] font-bold tracking-tight">{title}</h2>
+      {to && (
+        <Link to={to} className="shrink-0 text-[13px] font-semibold text-primary">
+          See All
+        </Link>
+      )}
+    </div>
+  );
+}
+
 function FeedSkeleton() {
   return (
     <div className="space-y-3">
