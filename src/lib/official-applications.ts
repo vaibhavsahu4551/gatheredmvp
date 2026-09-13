@@ -21,6 +21,7 @@ export type OfficialApplicationQuestion = {
   question_type: OfficialApplicationQuestionType;
   choices: string[] | null;
   is_required: boolean;
+  is_phone_field: boolean;
   sort_order: number;
   created_at: string;
 };
@@ -120,6 +121,34 @@ export async function createApplicationQuestion(
   if (error) throw error;
 
   return data as unknown as OfficialApplicationQuestion;
+}
+
+/**
+ * Marks a single question as the "phone number" question for an event
+ * (used as a fallback for the organiser's WhatsApp button when the
+ * applicant's profile has no phone saved). Pass questionId = null to
+ * clear it for the whole event.
+ */
+export async function setPhoneFieldQuestion(
+  eventId: string,
+  questionId: string | null
+): Promise<void> {
+  // Only one question per event may be marked — clear existing first.
+  const { error: clearError } = await supabase
+    .from("official_event_application_questions")
+    .update({ is_phone_field: false })
+    .eq("event_id", eventId);
+
+  if (clearError) throw clearError;
+
+  if (!questionId) return;
+
+  const { error: setError } = await supabase
+    .from("official_event_application_questions")
+    .update({ is_phone_field: true })
+    .eq("id", questionId);
+
+  if (setError) throw setError;
 }
 
 export async function updateApplicationQuestion(
