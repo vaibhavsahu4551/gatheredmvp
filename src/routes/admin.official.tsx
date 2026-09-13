@@ -1023,9 +1023,17 @@ function OfficialQuestionManager({
                   <div className="mt-1 text-[11px] text-muted-foreground">
                     {question.question_type.replace("_", " ")}
                     {" · "}
-                    {question.is_required
+                 {question.is_required
                       ? "Required"
                       : "Optional"}
+                    {question.is_phone_field && (
+                      <>
+                        {" · "}
+                        <span className="font-medium">
+                          📞 WhatsApp contact
+                        </span>
+                      </>
+                    )}
                   </div>
 
                   {question.choices &&
