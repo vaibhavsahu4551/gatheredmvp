@@ -920,8 +920,8 @@ function OfficialQuestionManager({
 
         await setPhoneFieldQuestion(
           eventId,
-          iaPhoneField ? editingID : null
-          );
+          isPhoneField ? editingId : null
+        );
 
         toast.success("Question updated");
       } else {
@@ -935,7 +935,7 @@ function OfficialQuestionManager({
         });
 
         if (isPhoneField) {
-          awair setPhoneFieldQuestion(eventId, created.id);
+          await setPhoneFieldQuestion(eventId, created.id);
         }
         toast.success("Question added");
       }

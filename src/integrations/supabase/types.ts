@@ -932,6 +932,7 @@ export type Database = {
           created_at: string
           event_id: string
           id: string
+          is_phone_field: boolean
           is_required: boolean
           question_text: string
           question_type: string
@@ -942,6 +943,7 @@ export type Database = {
           created_at?: string
           event_id: string
           id?: string
+          is_phone_field?: boolean
           is_required?: boolean
           question_text: string
           question_type?: string
@@ -952,6 +954,7 @@ export type Database = {
           created_at?: string
           event_id?: string
           id?: string
+          is_phone_field?: boolean
           is_required?: boolean
           question_text?: string
           question_type?: string
@@ -2312,6 +2315,7 @@ export type Database = {
           created_at: string
           event_id: string
           id: string
+          is_phone_field: boolean
           is_required: boolean
           question_text: string
           question_type: string
@@ -2655,6 +2659,7 @@ export type Database = {
           created_at: string
           event_id: string
           id: string
+          is_phone_field: boolean
           is_required: boolean
           question_text: string
           question_type: string
