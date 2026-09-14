@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -96,10 +96,48 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head><HeadContent /></head>
       <body>
-        {children}
+        <StartupGate>{children}</StartupGate>
         <Scripts />
       </body>
     </html>
+  );
+}
+
+/** Keep all page and navigation components unmounted until startup finishes. */
+function StartupGate({ children }: { children: ReactNode }) {
+  const [phase, setPhase] = useState<"visible" | "fading" | "complete">("visible");
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fadeTimer = window.setTimeout(() => setPhase("fading"), 1600);
+    const completeTimer = window.setTimeout(() => setPhase("complete"), reducedMotion ? 1600 : 2000);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.clearTimeout(fadeTimer);
+      window.clearTimeout(completeTimer);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (phase === "complete") document.body.style.overflow = "";
+  }, [phase]);
+
+  if (phase === "complete") return children;
+
+  return (
+    <div className="startup-screen" role="status" aria-label="Loading Gathr">
+      <div className={`startup-content ${phase === "fading" ? "startup-fading" : ""}`}>
+        <div className="startup-wordmark">
+          <h1>Gathr</h1>
+          <p>Meet. Connect. Gathr.</p>
+        </div>
+        <div className="startup-dots" aria-hidden="true">
+          <span /><span /><span />
+        </div>
+      </div>
+    </div>
   );
 }
 
