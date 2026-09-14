@@ -1,4 +1,3 @@
-import gathrLogo from "@/assets/gathr-official-logo.png.asset.json";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
