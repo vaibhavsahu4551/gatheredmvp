@@ -133,6 +133,7 @@ function StartupGate({ children }: { children: ReactNode }) {
       <div className={`startup-content ${phase === "fading" ? "startup-fading" : ""}`}>
         <div className="startup-wordmark">
           <img src={gathrLogo.url} alt="Gathr" width={1365} height={768} className="startup-logo" fetchPriority="high" />
+          <p>Meet. Connect. Gathr.</p>
         </div>
         <div className="startup-dots" aria-hidden="true">
           <span /><span /><span />

@@ -116,8 +116,8 @@
 
 
 :root {
-  --splash-background: #b90069;
-  --splash-brand: #fff8f5;
+  --splash-background: linear-gradient(180deg, #F3EDE3 0%, #E8DFD0 100%);
+  --splash-brand: #C2185B;
   --splash-caption: #6B5A4B;
   --splash-text-shadow: 0 3px 0 rgba(0, 0, 0, 0.06);
 }
@@ -183,5 +183,4 @@
   .startup-wordmark, .startup-dots span { animation: none; }
 }
 
-.startup-logo { display: block; width: min(900px, 100vw); height: auto; }
-.startup-content { padding: 0; }
+.startup-logo { display: block; width: 220px; max-width: 100%; height: auto; margin-inline: auto; }
