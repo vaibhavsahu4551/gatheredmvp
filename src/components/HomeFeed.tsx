@@ -1,3 +1,4 @@
+import gathrLogo from "@/assets/gathr-official-logo.png.asset.json";
 import { Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Bell } from "lucide-react";
@@ -300,7 +301,7 @@ export function HomeFeed() {
     <div>
       <header className="px-5 pt-8 pb-3 flex items-center justify-between">
         <div>
-          <div className="text-xl font-extrabold tracking-tight text-gradient-brand">Gathr</div>
+          <img src={gathrLogo.url} alt="Gathr" width={128} height={72} className="h-[72px] w-32 rounded-lg object-contain" />
           <div className="mt-1 text-xs font-medium text-muted-foreground flex items-center gap-1">
             {city ? (
               <button onClick={() => setCityModal(true)} className="text-left">
