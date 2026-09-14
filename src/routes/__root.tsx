@@ -1,3 +1,4 @@
+import gathrLogo from "@/assets/gathr-official-logo.png.asset.json";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -74,7 +75,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "preload", as: "image", href: gathrLogo.url },
+      { rel: "icon", type: "image/png", href: "/favicon.png", sizes: "64x64" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: "/icon-32.png" },
       { rel: "icon", type: "image/png", sizes: "16x16", href: "/icon-16.png" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/icon-180.png" },
@@ -130,8 +132,7 @@ function StartupGate({ children }: { children: ReactNode }) {
     <div className="startup-screen" role="status" aria-label="Loading Gathr">
       <div className={`startup-content ${phase === "fading" ? "startup-fading" : ""}`}>
         <div className="startup-wordmark">
-          <h1>Gathr</h1>
-          <p>Meet. Connect. Gathr.</p>
+          <img src={gathrLogo.url} alt="Gathr" width={1365} height={768} className="startup-logo" fetchPriority="high" />
         </div>
         <div className="startup-dots" aria-hidden="true">
           <span /><span /><span />
