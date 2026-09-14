@@ -4,7 +4,7 @@ import { captureReferralFromUrl } from "@/lib/rewards";
 
 export const Route = createFileRoute("/")({
   ssr: false,
-  component: Splash,
+  component: EntryRedirect,
   head: () => ({
     meta: [
       { title: "Gathr — meet, connect, gathr" },
@@ -17,52 +17,13 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-function Splash() {
+function EntryRedirect() {
   const navigate = useNavigate();
 
-    useEffect(() => {
+  useEffect(() => {
     captureReferralFromUrl();
-    let alive = true;
-    const started = Date.now();
-
-    const wait = Math.max(0, 1600 - (Date.now() - started));
-
-    setTimeout(() => {
-      if (alive) navigate({ to: "/home" });
-    }, wait);
-
-    return () => {
-      alive = false;
-    };
+    navigate({ to: "/home", replace: true });
   }, [navigate]);
 
-  return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center px-8 text-center"
-      style={{ background: "linear-gradient(180deg, #F3EDE3 0%, #E8DFD0 100%)" }}
-    >
-      <div className="animate-in fade-in zoom-in-95 duration-700">
-        <h1
-          className="text-[76px] leading-none tracking-[-0.01em]"
-          style={{
-            fontFamily: '"Baloo 2", "Plus Jakarta Sans", system-ui, sans-serif',
-            fontWeight: 800,
-            color: "#C2185B",
-            textShadow: "0 3px 0 rgba(0,0,0,0.06)",
-          }}
-        >
-          Gathr
-        </h1>
-        <p className="mt-3 text-[13px] font-semibold tracking-[0.24em] uppercase" style={{ color: "#6B5A4B" }}>
-          Meet. Connect. Gathr.
-        </p>
-      </div>
-
-      <div className="absolute bottom-12 flex items-center gap-1.5">
-        <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: "#C2185B" }} />
-        <span className="h-1.5 w-1.5 rounded-full animate-pulse [animation-delay:150ms]" style={{ backgroundColor: "rgba(194,24,91,0.6)" }} />
-        <span className="h-1.5 w-1.5 rounded-full animate-pulse [animation-delay:300ms]" style={{ backgroundColor: "rgba(194,24,91,0.3)" }} />
-      </div>
-    </div>
-  );
+  return null;
 }
