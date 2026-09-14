@@ -74,7 +74,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "preload", as: "image", href: gathrLogo.url },
       { rel: "icon", type: "image/png", href: "/favicon.png", sizes: "64x64" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: "/icon-32.png" },
       { rel: "icon", type: "image/png", sizes: "16x16", href: "/icon-16.png" },
@@ -131,8 +130,7 @@ function StartupGate({ children }: { children: ReactNode }) {
     <div className="startup-screen" role="status" aria-label="Loading Gathr">
       <div className={`startup-content ${phase === "fading" ? "startup-fading" : ""}`}>
         <div className="startup-wordmark">
-          <img src={gathrLogo.url} alt="Gathr" width={1365} height={768} className="startup-logo" fetchPriority="high" />
-          <p>Meet. Connect. Gathr.</p>
+          <h1>GATHR</h1>
         </div>
         <div className="startup-dots" aria-hidden="true">
           <span /><span /><span />
