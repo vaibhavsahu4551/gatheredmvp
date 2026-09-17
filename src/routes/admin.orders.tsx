@@ -119,10 +119,14 @@ function OrderRow({ o, onApprove, onReject, onTicket }: {
       )}
 
       <div className="min-w-0 flex-1 space-y-1">
+        <div className="truncate text-sm font-bold">
+          {o.event_title ?? <span className="text-muted-foreground">Event unavailable</span>}
+        </div>
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-semibold">{o.order_code}</span>
+          <span className="text-xs font-semibold text-muted-foreground">{o.order_code}</span>
           <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${tone}`}>{o.payment_status}</span>
           <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold">{o.ticket_status}</span>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold">UPI</span>
         </div>
        <div className="text-[12px]">
   {o.pass_name} × {o.quantity} ·{" "}
