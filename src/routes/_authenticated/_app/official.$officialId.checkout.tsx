@@ -17,7 +17,56 @@ import {
   type CouponValidationResult,
 } from "@/lib/official-passes";
 import { notifyOfficialOrder } from "@/lib/telegram-order.functions";
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (document.getElementById("razorpay-checkout-js")) {
+      resolve(true);
+      return;
+    }
 
+    const script = document.createElement("script");
+    script.id = "razorpay-checkout-js";
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+
+    document.body.appendChild(script);
+  });
+}
+type RazorpayCheckoutResponse = {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+};
+
+type RazorpayInstance = {
+  open: () => void;
+};
+
+declare global {
+  interface Window {
+    Razorpay: new (options: {
+      key: string;
+      amount: number;
+      currency: string;
+      name: string;
+      description: string;
+      order_id: string;
+      prefill?: {
+        name?: string;
+        email?: string;
+        contact?: string;
+      };
+      theme?: {
+        color?: string;
+      };
+      handler: (response: RazorpayCheckoutResponse) => void | Promise<void>;
+      modal?: {
+        ondismiss?: () => void;
+      };
+    }) => RazorpayInstance;
+  }
+}
 export const Route = createFileRoute("/_authenticated/_app/official/$officialId/checkout")({
   validateSearch: (s: Record<string, unknown>) => ({
     passId: typeof s.passId === "string" ? s.passId : "",
@@ -142,43 +191,214 @@ const amount = Math.max(0, subtotal - discountAmount);
   }
 
   async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!pass) return;
-    if (!name.trim()) return toast.error("Enter your name");
-    if (phone.trim().replace(/\D/g, "").length < 10) return toast.error("Enter a valid mobile number");
-    if (utr.trim().length < 6) return toast.error("Enter the UPI reference / UTR number");
-    setBusy(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Please sign in to book passes");
-      const screenshotPath = file ? await uploadPaymentProof(user.id, file) : null;
-      const created = await submitOrder({
-        eventId: officialId,
-        pass: { id: pass.id, name: pass.name, price: Number(pass.price) },
-        quantity: qty,
-        utr,
-        screenshotPath,
-        customerName: name,
-        customerPhone: phone,
-        customerEmail: email,
-        couponId: coupon?.coupon_id ?? null,
-        discountAmount,
-      });
-      if ((created as any)?.id) {
-        try {
-          await notifyOfficialOrder({ data: { orderId: (created as any).id } });
-        } catch {
-          /* notification is best-effort; the order is already saved */
-        }
-      }
-      setDone(true);
+  e.preventDefault();
 
-    } catch (err: any) {
-      toast.error(err.message ?? "Couldn't submit payment");
-    } finally {
-      setBusy(false);
-    }
+  if (!pass) return;
+
+  if (!name.trim()) {
+    return toast.error("Enter your name");
   }
+
+  if (phone.trim().replace(/\D/g, "").length < 10) {
+    return toast.error("Enter a valid mobile number");
+  }
+
+  setBusy(true);
+
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("Please sign in to book passes");
+    }
+
+    /* ---------------------------------------------
+       RAZORPAY PAYMENT
+    --------------------------------------------- */
+
+    if (event?.razorpay_enabled) {
+      const loaded = await loadRazorpayScript();
+
+      if (!loaded) {
+        throw new Error("Unable to load Razorpay checkout");
+      }
+
+      const { data, error } = await supabase.functions.invoke(
+        "create-razorpay-order",
+        {
+          body: {
+            eventId: officialId,
+            passId: pass.id,
+            quantity: qty,
+            customerName: name.trim(),
+            customerPhone: phone.trim(),
+            customerEmail: email.trim() || null,
+          },
+        },
+      );
+
+      if (error) {
+        throw new Error(error.message || "Unable to create payment order");
+      }
+
+      if (!data?.success || !data?.razorpay_order_id || !data?.key_id) {
+        throw new Error(data?.error || "Unable to create Razorpay order");
+      }
+
+      const razorpay = new window.Razorpay({
+        key: data.key_id,
+        amount: data.amount,
+        currency: data.currency || "INR",
+        name: "Gathr",
+        description: `${event.title} — ${pass.name}`,
+        order_id: data.razorpay_order_id,
+
+        prefill: {
+          name: name.trim(),
+          email: email.trim() || undefined,
+          contact: phone.trim(),
+        },
+
+        theme: {
+          color: "#a855f7",
+        },
+
+        handler: async (response) => {
+          try {
+            setBusy(true);
+
+            const { data: verifyData, error: verifyError } =
+              await supabase.functions.invoke(
+                "verify-razorpay-payment",
+                {
+                  body: {
+                    eventId: officialId,
+                    passId: pass.id,
+                    quantity: qty,
+                    customerName: name.trim(),
+                    customerPhone: phone.trim(),
+                    customerEmail: email.trim() || null,
+
+                    amount,
+                    couponId: coupon?.coupon_id ?? null,
+                    discountAmount,
+
+                    razorpayOrderId:
+                      response.razorpay_order_id,
+
+                    razorpayPaymentId:
+                      response.razorpay_payment_id,
+
+                    razorpaySignature:
+                      response.razorpay_signature,
+                  },
+                },
+              );
+
+            if (verifyError) {
+              throw new Error(
+                verifyError.message ||
+                  "Payment verification failed",
+              );
+            }
+
+            if (!verifyData?.success) {
+              throw new Error(
+                verifyData?.error ||
+                  "Payment verification failed",
+              );
+            }
+
+            if (verifyData.order_id) {
+              try {
+                await notifyOfficialOrder({
+                  data: {
+                    orderId: verifyData.order_id,
+                  },
+                });
+              } catch {
+                /* notification is best-effort */
+              }
+            }
+
+            setDone(true);
+          } catch (err: any) {
+            toast.error(
+              err?.message ||
+                "Payment verification failed",
+            );
+          } finally {
+            setBusy(false);
+          }
+        },
+
+        modal: {
+          ondismiss: () => {
+            setBusy(false);
+            toast.info("Payment cancelled");
+          },
+        },
+      });
+
+      razorpay.open();
+
+      return;
+    }
+
+    /* ---------------------------------------------
+       EXISTING UPI / MANUAL PAYMENT
+    --------------------------------------------- */
+
+    if (utr.trim().length < 6) {
+      return toast.error(
+        "Enter the UPI reference / UTR number",
+      );
+    }
+
+    const screenshotPath = file
+      ? await uploadPaymentProof(user.id, file)
+      : null;
+
+    const created = await submitOrder({
+      eventId: officialId,
+      pass: {
+        id: pass.id,
+        name: pass.name,
+        price: Number(pass.price),
+      },
+      quantity: qty,
+      utr,
+      screenshotPath,
+      customerName: name,
+      customerPhone: phone,
+      customerEmail: email,
+      couponId: coupon?.coupon_id ?? null,
+      discountAmount,
+    });
+
+    if ((created as any)?.id) {
+      try {
+        await notifyOfficialOrder({
+          data: {
+            orderId: (created as any).id,
+          },
+        });
+      } catch {
+        /* notification is best-effort */
+      }
+    }
+
+    setDone(true);
+  } catch (err: any) {
+    toast.error(
+      err?.message ?? "Couldn't submit payment",
+    );
+  } finally {
+    setBusy(false);
+  }
+}
 
   if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
   if (!event || !pass) return <div className="p-6 text-sm text-muted-foreground">This pass is no longer available.</div>;
@@ -325,39 +545,137 @@ const amount = Math.max(0, subtotal - discountAmount);
 </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card p-4">
-          <div className="flex items-center gap-1.5 text-sm font-semibold"><Smartphone className="h-4 w-4" /> Pay by UPI</div>
-          {upi.id ? (
-            <>
-              <div className="mt-2 flex items-center gap-2 rounded-xl bg-muted px-3 py-2">
-                <span className="min-w-0 flex-1 truncate font-mono text-sm">{upi.id}</span>
-                <button
-                  type="button"
-                  onClick={() => { navigator.clipboard.writeText(upi.id); toast.success("UPI ID copied"); }}
-                  className="inline-flex items-center gap-1 rounded-full bg-foreground px-3 py-1.5 text-[11px] font-bold text-background"
-                >
-                  <Copy className="h-3 w-3" /> Copy
-                </button>
-              </div>
-              <p className="mt-1 text-[11px] text-muted-foreground">Payee: {upi.payee}</p>
-              <a href={payLink} className="mt-3 flex w-full items-center justify-center rounded-full bg-gradient-brand py-3 text-sm font-bold text-white">
-                Pay ₹{amount.toLocaleString("en-IN")} in UPI app
-              </a>
-            </>
-          ) : (
-            <p className="mt-2 text-[12px] text-muted-foreground">UPI details aren't configured yet. Please contact the organizer.</p>
-          )}
-        </section>
+        {event.razorpay_enabled ? (
+  <section className="rounded-2xl border border-border bg-card p-4">
+    <div className="flex items-center gap-1.5 text-sm font-semibold">
+      <ShieldCheck className="h-4 w-4" />
+      Pay securely with Razorpay
+    </div>
 
-        <form onSubmit={submit} className="space-y-3 rounded-2xl border border-border bg-card p-4">
+    <div className="mt-3 rounded-xl bg-muted p-4 text-center">
+      <div className="text-xs text-muted-foreground">
+        Total payable
+      </div>
+
+      <div className="mt-1 text-2xl font-extrabold">
+        ₹{amount.toLocaleString("en-IN")}
+      </div>
+
+      <p className="mt-2 text-[11px] text-muted-foreground">
+        You can pay using UPI, cards, net banking or other available
+        Razorpay payment methods.
+      </p>
+    </div>
+
+    <button
+      type="submit"
+      form="razorpay-checkout-form"
+      disabled={busy || passSoldOut(pass)}
+      className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-brand py-3.5 text-[15px] font-bold text-white disabled:opacity-60"
+    >
+      {busy ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <ShieldCheck className="h-4 w-4" />
+      )}
+
+      {passSoldOut(pass)
+        ? "Sold out"
+        : `Pay ₹${amount.toLocaleString("en-IN")} with Razorpay`}
+    </button>
+  </section>
+) : (
+  <section className="rounded-2xl border border-border bg-card p-4">
+    <div className="flex items-center gap-1.5 text-sm font-semibold">
+      <Smartphone className="h-4 w-4" />
+      Pay by UPI
+    </div>
+
+    {upi.id ? (
+      <>
+        <div className="mt-2 flex items-center gap-2 rounded-xl bg-muted px-3 py-2">
+          <span className="min-w-0 flex-1 truncate font-mono text-sm">
+            {upi.id}
+          </span>
+
+          <button
+            type="button"
+            onClick={() => {
+              navigator.clipboard.writeText(upi.id);
+              toast.success("UPI ID copied");
+            }}
+            className="inline-flex items-center gap-1 rounded-full bg-foreground px-3 py-1.5 text-[11px] font-bold text-background"
+          >
+            <Copy className="h-3 w-3" /> Copy
+          </button>
+        </div>
+
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          Payee: {upi.payee}
+        </p>
+
+        <a
+          href={payLink}
+          className="mt-3 flex w-full items-center justify-center rounded-full bg-gradient-brand py-3 text-sm font-bold text-white"
+        >
+          Pay ₹{amount.toLocaleString("en-IN")} in UPI app
+        </a>
+      </>
+    ) : (
+      <p className="mt-2 text-[12px] text-muted-foreground">
+        UPI details aren't configured yet. Please contact the organizer.
+      </p>
+    )}
+  </section>
+)}
+
+        <form
+  id="razorpay-checkout-form"
+  onSubmit={submit}
+  className="space-y-3 rounded-2xl border border-border bg-card p-4"
+>
           <div className="flex items-center gap-1.5 text-sm font-semibold"><ShieldCheck className="h-4 w-4" /> Submit payment details</div>
           <Field label="Full name"><input value={name} onChange={(e) => setName(e.target.value)} className={inputCls} placeholder="Your name" /></Field>
           <Field label="Mobile number"><input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" className={inputCls} placeholder="10-digit mobile" /></Field>
           <Field label="Email (optional)"><input value={email} onChange={(e) => setEmail(e.target.value)} inputMode="email" className={inputCls} placeholder="you@email.com" /></Field>
-          <Field label="UPI reference / UTR number"><input value={utr} onChange={(e) => setUtr(e.target.value)} className={inputCls} placeholder="12-digit UTR from your UPI app" /></Field>
+          {!event.razorpay_enabled && (
+  <Field label="UPI reference / UTR number">
+    <input
+      value={utr}
+      onChange={(e) => setUtr(e.target.value)}
+      className={inputCls}
+      placeholder="12-digit UTR from your UPI app"
+    />
+  </Field>
+)}
 
           <div>
-            <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Payment screenshot</div>
+           {!event.razorpay_enabled && (
+  <div>
+    <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+      Payment screenshot
+    </div>
+
+    <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-border p-3 text-sm text-muted-foreground">
+      <ImagePlus className="h-4 w-4" />
+      {file ? file.name : "Upload screenshot (recommended)"}
+      <input
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => pickFile(e.target.files?.[0])}
+      />
+    </label>
+
+    {preview && (
+      <img
+        src={preview}
+        alt=""
+        className="mt-2 max-h-56 rounded-xl object-contain"
+      />
+    )}
+  </div>
+)}
             <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-border p-3 text-sm text-muted-foreground">
               <ImagePlus className="h-4 w-4" />
               {file ? file.name : "Upload screenshot (recommended)"}
@@ -372,11 +690,17 @@ const amount = Math.max(0, subtotal - discountAmount);
             className="flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3.5 text-[15px] font-bold text-background disabled:opacity-60"
           >
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-            {passSoldOut(pass) ? "Sold out" : "Submit for verification"}
+          {passSoldOut(pass)
+  ? "Sold out"
+  : event.razorpay_enabled
+    ? `Pay ₹${amount.toLocaleString("en-IN")} with Razorpay`
+    : "Submit for verification"}
           </button>
           <p className="text-center text-[11px] text-muted-foreground">
-            Passes activate only after our team verifies your payment.
-          </p>
+  {event.razorpay_enabled
+    ? "Your pass will be activated after successful payment verification."
+    : "Passes activate only after our team verifies your payment."}
+</p>
         </form>
       </div>
     </div>
