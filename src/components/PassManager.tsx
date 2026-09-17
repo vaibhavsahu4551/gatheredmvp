@@ -17,6 +17,46 @@ export function PassManager({ eventId }: { eventId: string }) {
   const [price, setPrice] = useState("");
   const [qty, setQty] = useState("");
   const [desc, setDesc] = useState("");
+  const [editId, setEditId] = useState<string | null>(null);
+  const [eName, setEName] = useState("");
+  const [ePrice, setEPrice] = useState("");
+  const [eQty, setEQty] = useState("");
+  const [eDesc, setEDesc] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  function startEdit(p: OfficialPass) {
+    setEditId(p.id);
+    setEName(p.name);
+    setEPrice(String(p.price ?? 0));
+    setEQty(String(p.total_quantity ?? 0));
+    setEDesc(p.description ?? "");
+  }
+
+  async function saveEdit(p: OfficialPass) {
+    const nm = eName.trim();
+    const price = Number(ePrice || 0);
+    const qty = Number(eQty || 0);
+    if (!nm) { toast.error("Pass name is required"); return; }
+    if (!Number.isFinite(price) || price < 0) { toast.error("Price cannot be negative"); return; }
+    if (!Number.isFinite(qty) || qty < 0) { toast.error("Quantity cannot be negative"); return; }
+    if (qty > 0 && qty < p.sold_quantity) {
+      toast.error(`Quantity can't be lower than ${p.sold_quantity} already sold`);
+      return;
+    }
+    setSaving(true);
+    try {
+      await adminUpdatePass(p.id, {
+        name: nm,
+        price,
+        total_quantity: qty,
+        description: eDesc.trim() || null,
+      });
+      toast.success("Pass updated successfully.");
+      setEditId(null);
+      await refresh();
+    } catch (err: any) { toast.error(err.message ?? "Couldn't update pass"); }
+    finally { setSaving(false); }
+  }
 
   async function refresh() {
     setLoading(true);
