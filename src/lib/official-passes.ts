@@ -284,6 +284,7 @@ export async function adminListOrders(
 
       return {
         ...order,
+        event_title: eventTitles.get(order.event_id) ?? null,
         coupon_code: couponCode,
         discount_amount: discountAmount,
         subtotal: Number((finalAmount + discountAmount).toFixed(2)),
