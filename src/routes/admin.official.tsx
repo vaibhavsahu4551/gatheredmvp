@@ -1378,6 +1378,24 @@ const [coverPreview, setCoverPreview] = useState("");
         <Field label="Organizer name"><input value={f.organizer_name} onChange={(e) => set("organizer_name", e.target.value)} className={inputCls} /></Field>
         <Field label="Pass price (₹)"><input type="number" min="0" value={f.pass_price} onChange={(e) => set("pass_price", e.target.value)} className={inputCls} /></Field>
         <Field label="Passes available"><input type="number" min="0" value={f.pass_quantity} onChange={(e) => set("pass_quantity", e.target.value)} className={inputCls} /></Field>
+        <Field label="Payment Method">
+  <select
+    value={f.razorpay_enabled ? "razorpay" : "upi"}
+    onChange={(e) =>
+      set("razorpay_enabled", e.target.value === "razorpay")
+    }
+    className={inputCls}
+  >
+    <option value="upi">UPI / Manual Verification</option>
+    <option value="razorpay">Razorpay</option>
+  </select>
+
+  <p className="mt-1 text-[11px] text-muted-foreground">
+    Choose how users will pay for this event.
+  </p>
+</Field>
+        {!f.razorpay_enabled && (
+  <>
         <Field label="Event UPI ID (Optional)">
   <input
     value={f.upi_id}
@@ -1389,6 +1407,8 @@ const [coverPreview, setCoverPreview] = useState("");
     Leave blank to use Gathr's default UPI.
   </p>
 </Field>
+      </>
+)}
 
 <Field label="UPI Payee Name (Optional)">
   <input
