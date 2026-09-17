@@ -17,6 +17,46 @@ export function PassManager({ eventId }: { eventId: string }) {
   const [price, setPrice] = useState("");
   const [qty, setQty] = useState("");
   const [desc, setDesc] = useState("");
+  const [editId, setEditId] = useState<string | null>(null);
+  const [eName, setEName] = useState("");
+  const [ePrice, setEPrice] = useState("");
+  const [eQty, setEQty] = useState("");
+  const [eDesc, setEDesc] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  function startEdit(p: OfficialPass) {
+    setEditId(p.id);
+    setEName(p.name);
+    setEPrice(String(p.price ?? 0));
+    setEQty(String(p.total_quantity ?? 0));
+    setEDesc(p.description ?? "");
+  }
+
+  async function saveEdit(p: OfficialPass) {
+    const nm = eName.trim();
+    const price = Number(ePrice || 0);
+    const qty = Number(eQty || 0);
+    if (!nm) { toast.error("Pass name is required"); return; }
+    if (!Number.isFinite(price) || price < 0) { toast.error("Price cannot be negative"); return; }
+    if (!Number.isFinite(qty) || qty < 0) { toast.error("Quantity cannot be negative"); return; }
+    if (qty > 0 && qty < p.sold_quantity) {
+      toast.error(`Quantity can't be lower than ${p.sold_quantity} already sold`);
+      return;
+    }
+    setSaving(true);
+    try {
+      await adminUpdatePass(p.id, {
+        name: nm,
+        price,
+        total_quantity: qty,
+        description: eDesc.trim() || null,
+      });
+      toast.success("Pass updated successfully.");
+      setEditId(null);
+      await refresh();
+    } catch (err: any) { toast.error(err.message ?? "Couldn't update pass"); }
+    finally { setSaving(false); }
+  }
 
   async function refresh() {
     setLoading(true);
@@ -53,6 +93,29 @@ export function PassManager({ eventId }: { eventId: string }) {
       <div className="space-y-2 py-2">
         {rows.map((p) => (
           <div key={p.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background p-2 text-xs">
+            {editId === p.id ? (
+              <div className="w-full space-y-2">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <input value={eName} onChange={(e) => setEName(e.target.value)} placeholder="Pass name"
+                    className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs" />
+                  <input value={ePrice} onChange={(e) => setEPrice(e.target.value)} inputMode="decimal" placeholder="Price ₹"
+                    className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs" />
+                  <input value={eQty} onChange={(e) => setEQty(e.target.value)} inputMode="numeric" placeholder="Quantity (0 = unlimited)"
+                    className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs" />
+                  <input value={eDesc} onChange={(e) => setEDesc(e.target.value)} placeholder="Short note (optional)"
+                    className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <button disabled={saving} onClick={() => saveEdit(p)}
+                    className="rounded-lg bg-foreground px-3 py-1.5 text-xs text-background disabled:opacity-60">
+                    {saving ? "Saving…" : "Save changes"}
+                  </button>
+                  <button className="underline" onClick={() => setEditId(null)}>Cancel</button>
+                  <span className="text-[11px] text-muted-foreground">sold {p.sold_quantity}</span>
+                </div>
+              </div>
+            ) : (
+            <>
             <div className="min-w-0 flex-1">
               <div className="font-semibold">{p.name} · ₹{Number(p.price).toLocaleString("en-IN")}</div>
               <div className="text-[11px] text-muted-foreground">
@@ -60,6 +123,7 @@ export function PassManager({ eventId }: { eventId: string }) {
                 {p.description ? ` · ${p.description}` : ""}
               </div>
             </div>
+            <button className="underline" onClick={() => startEdit(p)}>Edit</button>
             <button className="underline" onClick={async () => {
               try { await adminUpdatePass(p.id, { active: !p.active }); refresh(); } catch (e: any) { toast.error(e.message); }
             }}>{p.active ? "Deactivate" : "Activate"}</button>
@@ -67,6 +131,8 @@ export function PassManager({ eventId }: { eventId: string }) {
               if (!confirm(`Delete pass "${p.name}"?`)) return;
               try { await adminDeletePass(p.id); refresh(); } catch (e: any) { toast.error(e.message); }
             }}>Delete</button>
+            </>
+            )}
           </div>
         ))}
       </div>
