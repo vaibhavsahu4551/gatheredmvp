@@ -48,6 +48,9 @@ export type OfficialOrder = {
   coupon_code?: string | null;
   discount_amount?: number | null;
   subtotal?: number | null;
+
+  // Joined for display only
+  event_title?: string | null;
 };
 
 const PASSES = "official_event_passes" as any;
