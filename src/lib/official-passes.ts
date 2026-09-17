@@ -39,6 +39,10 @@ export type OfficialOrder = {
   customer_email: string | null;
   payment_status: PaymentStatus;
   ticket_status: TicketStatus;
+  payment_method: "upi" | "razorpay";
+  razorpay_order_id: string | null;
+  razorpay_payment_id: string | null;
+  razorpay_signature: string | null;
   admin_notes: string | null;
   verified_at: string | null;
   created_at: string;
