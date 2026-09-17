@@ -131,6 +131,8 @@ export function PassManager({ eventId }: { eventId: string }) {
               if (!confirm(`Delete pass "${p.name}"?`)) return;
               try { await adminDeletePass(p.id); refresh(); } catch (e: any) { toast.error(e.message); }
             }}>Delete</button>
+            </>
+            )}
           </div>
         ))}
       </div>
