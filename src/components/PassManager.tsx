@@ -93,6 +93,29 @@ export function PassManager({ eventId }: { eventId: string }) {
       <div className="space-y-2 py-2">
         {rows.map((p) => (
           <div key={p.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background p-2 text-xs">
+            {editId === p.id ? (
+              <div className="w-full space-y-2">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <input value={eName} onChange={(e) => setEName(e.target.value)} placeholder="Pass name"
+                    className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs" />
+                  <input value={ePrice} onChange={(e) => setEPrice(e.target.value)} inputMode="decimal" placeholder="Price ₹"
+                    className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs" />
+                  <input value={eQty} onChange={(e) => setEQty(e.target.value)} inputMode="numeric" placeholder="Quantity (0 = unlimited)"
+                    className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs" />
+                  <input value={eDesc} onChange={(e) => setEDesc(e.target.value)} placeholder="Short note (optional)"
+                    className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <button disabled={saving} onClick={() => saveEdit(p)}
+                    className="rounded-lg bg-foreground px-3 py-1.5 text-xs text-background disabled:opacity-60">
+                    {saving ? "Saving…" : "Save changes"}
+                  </button>
+                  <button className="underline" onClick={() => setEditId(null)}>Cancel</button>
+                  <span className="text-[11px] text-muted-foreground">sold {p.sold_quantity}</span>
+                </div>
+              </div>
+            ) : (
+            <>
             <div className="min-w-0 flex-1">
               <div className="font-semibold">{p.name} · ₹{Number(p.price).toLocaleString("en-IN")}</div>
               <div className="text-[11px] text-muted-foreground">
@@ -100,6 +123,7 @@ export function PassManager({ eventId }: { eventId: string }) {
                 {p.description ? ` · ${p.description}` : ""}
               </div>
             </div>
+            <button className="underline" onClick={() => startEdit(p)}>Edit</button>
             <button className="underline" onClick={async () => {
               try { await adminUpdatePass(p.id, { active: !p.active }); refresh(); } catch (e: any) { toast.error(e.message); }
             }}>{p.active ? "Deactivate" : "Activate"}</button>
