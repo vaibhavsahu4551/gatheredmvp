@@ -48,6 +48,9 @@ export type OfficialOrder = {
   coupon_code?: string | null;
   discount_amount?: number | null;
   subtotal?: number | null;
+
+  // Joined for display only
+  event_title?: string | null;
 };
 
 const PASSES = "official_event_passes" as any;
@@ -228,6 +231,17 @@ export async function adminListOrders(
 
   const orders = (data ?? []) as unknown as OfficialOrder[];
 
+  // Resolve event titles in one query (orders already reference official_events.id).
+  const eventTitles = new Map<string, string>();
+  const eventIds = Array.from(new Set(orders.map((o) => o.event_id).filter(Boolean)));
+  if (eventIds.length) {
+    const { data: evs } = await supabase
+      .from("official_events")
+      .select("id,title")
+      .in("id", eventIds as string[]);
+    for (const ev of evs ?? []) eventTitles.set((ev as any).id, (ev as any).title);
+  }
+
   // Attach coupon details to each order.
   const ordersWithCoupons = await Promise.all(
     orders.map(async (order) => {
@@ -249,6 +263,7 @@ export async function adminListOrders(
       if (couponError || !couponUse) {
         return {
           ...order,
+          event_title: eventTitles.get(order.event_id) ?? null,
           coupon_code: null,
           discount_amount: 0,
           subtotal: Number(order.amount),
@@ -269,6 +284,7 @@ export async function adminListOrders(
 
       return {
         ...order,
+        event_title: eventTitles.get(order.event_id) ?? null,
         coupon_code: couponCode,
         discount_amount: discountAmount,
         subtotal: Number((finalAmount + discountAmount).toFixed(2)),
