@@ -263,6 +263,7 @@ export async function adminListOrders(
       if (couponError || !couponUse) {
         return {
           ...order,
+          event_title: eventTitles.get(order.event_id) ?? null,
           coupon_code: null,
           discount_amount: 0,
           subtotal: Number(order.amount),
