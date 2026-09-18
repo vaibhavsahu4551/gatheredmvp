@@ -1358,14 +1358,18 @@ export type Database = {
           order_code: string
           pass_id: string | null
           pass_name: string
+          payment_method: string
           payment_status: string
           quantity: number
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
           screenshot_path: string | null
           telegram_notified_at: string | null
           ticket_status: string
           updated_at: string
           user_id: string
-          utr: string
+          utr: string | null
           verified_at: string | null
           verified_by: string | null
         }
@@ -1381,14 +1385,18 @@ export type Database = {
           order_code?: string
           pass_id?: string | null
           pass_name: string
+          payment_method?: string
           payment_status?: string
           quantity: number
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
           screenshot_path?: string | null
           telegram_notified_at?: string | null
           ticket_status?: string
           updated_at?: string
           user_id: string
-          utr: string
+          utr?: string | null
           verified_at?: string | null
           verified_by?: string | null
         }
@@ -1404,14 +1412,18 @@ export type Database = {
           order_code?: string
           pass_id?: string | null
           pass_name?: string
+          payment_method?: string
           payment_status?: string
           quantity?: number
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
           screenshot_path?: string | null
           telegram_notified_at?: string | null
           ticket_status?: string
           updated_at?: string
           user_id?: string
-          utr?: string
+          utr?: string | null
           verified_at?: string | null
           verified_by?: string | null
         }
@@ -2801,14 +2813,67 @@ export type Database = {
           order_code: string
           pass_id: string | null
           pass_name: string
+          payment_method: string
           payment_status: string
           quantity: number
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
           screenshot_path: string | null
           telegram_notified_at: string | null
           ticket_status: string
           updated_at: string
           user_id: string
-          utr: string
+          utr: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "official_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_verified_razorpay_official_order: {
+        Args: {
+          p_coupon_id: string
+          p_customer_email: string
+          p_customer_name: string
+          p_customer_phone: string
+          p_event_id: string
+          p_paid_amount: number
+          p_pass_id: string
+          p_quantity: number
+          p_razorpay_order_id: string
+          p_razorpay_payment_id: string
+          p_razorpay_signature: string
+          p_user_id: string
+        }
+        Returns: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          event_id: string
+          id: string
+          order_code: string
+          pass_id: string | null
+          pass_name: string
+          payment_method: string
+          payment_status: string
+          quantity: number
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
+          screenshot_path: string | null
+          telegram_notified_at: string | null
+          ticket_status: string
+          updated_at: string
+          user_id: string
+          utr: string | null
           verified_at: string | null
           verified_by: string | null
         }
@@ -3049,14 +3114,18 @@ export type Database = {
           order_code: string
           pass_id: string | null
           pass_name: string
+          payment_method: string
           payment_status: string
           quantity: number
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
           screenshot_path: string | null
           telegram_notified_at: string | null
           ticket_status: string
           updated_at: string
           user_id: string
-          utr: string
+          utr: string | null
           verified_at: string | null
           verified_by: string | null
         }
@@ -3081,14 +3150,18 @@ export type Database = {
           order_code: string
           pass_id: string | null
           pass_name: string
+          payment_method: string
           payment_status: string
           quantity: number
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
           screenshot_path: string | null
           telegram_notified_at: string | null
           ticket_status: string
           updated_at: string
           user_id: string
-          utr: string
+          utr: string | null
           verified_at: string | null
           verified_by: string | null
         }

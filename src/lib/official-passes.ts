@@ -32,7 +32,7 @@ export type OfficialOrder = {
   // Final amount actually payable/paid after coupon
   amount: number;
 
-  utr: string;
+  utr: string | null;
   screenshot_path: string | null;
   customer_name: string;
   customer_phone: string;
