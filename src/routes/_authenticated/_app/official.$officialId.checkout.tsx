@@ -43,30 +43,26 @@ type RazorpayInstance = {
   open: () => void;
 };
 
-declare global {
-  interface Window {
-    Razorpay: new (options: {
-      key: string;
-      amount: number;
-      currency: string;
-      name: string;
-      description: string;
-      order_id: string;
-      prefill?: {
-        name?: string;
-        email?: string;
-        contact?: string;
-      };
-      theme?: {
-        color?: string;
-      };
-      handler: (response: RazorpayCheckoutResponse) => void | Promise<void>;
-      modal?: {
-        ondismiss?: () => void;
-      };
-    }) => RazorpayInstance;
-  }
-}
+type RazorpayConstructor = new (options: {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+  prefill?: {
+    name?: string;
+    email?: string;
+    contact?: string;
+  };
+  theme?: {
+    color?: string;
+  };
+  handler: (response: RazorpayCheckoutResponse) => void | Promise<void>;
+  modal?: {
+    ondismiss?: () => void;
+  };
+}) => RazorpayInstance;
 export const Route = createFileRoute("/_authenticated/_app/official/$officialId/checkout")({
   validateSearch: (s: Record<string, unknown>) => ({
     passId: typeof s.passId === "string" ? s.passId : "",
