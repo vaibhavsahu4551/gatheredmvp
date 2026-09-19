@@ -60,7 +60,7 @@ export function PhotoCropModal({
   const viewportH = Math.round(viewportW / aspect);
   const outW = size;
   const outH = Math.round(size / aspect);
-  const baseScale = (i: HTMLImageElement) => Math.max(viewportW / i.width, viewportH / i.height);
+  const baseScale = (i: HTMLImageElement) => Math.min(viewportW / i.width, viewportH / i.height);
 
   function clampOffset(next: { x: number; y: number }, z: number) {
     if (!img) return next;
