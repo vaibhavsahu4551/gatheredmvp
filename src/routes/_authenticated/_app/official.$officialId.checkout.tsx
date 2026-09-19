@@ -262,7 +262,7 @@ const amount = Math.max(0, subtotal - discountAmount);
           color: "#a855f7",
         },
 
-        handler: async (response) => {
+        handler: async (response: RazorpayCheckoutResponse) => {
           try {
             setBusy(true);
 
