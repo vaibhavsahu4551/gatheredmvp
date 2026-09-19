@@ -243,7 +243,8 @@ const amount = Math.max(0, subtotal - discountAmount);
         throw new Error(data?.error || "Unable to create Razorpay order");
       }
 
-      const razorpay = new window.Razorpay({
+      const RazorpayCtor = (window as unknown as { Razorpay: RazorpayConstructor }).Razorpay;
+      const razorpay = new RazorpayCtor({
         key: data.key_id,
         amount: data.amount,
         currency: data.currency || "INR",
