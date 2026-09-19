@@ -86,6 +86,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Baloo+2:wght@700;800&display=swap" },
       { rel: "stylesheet", href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Gathr",
+          alternateName: "Gathr Meet",
+          url: "https://gathrmeet.in/",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "Gathr",
+          url: "https://gathrmeet.in/",
+          logo: "https://gathrmeet.in/icon-512.png",
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
