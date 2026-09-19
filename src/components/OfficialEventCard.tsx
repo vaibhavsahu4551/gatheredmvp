@@ -31,8 +31,8 @@ export function OfficialEventCard({ e, compact }: { e: OfficialEvent; compact?: 
       params={{ officialId: e.id }}
       className={`group block overflow-hidden rounded-3xl bg-card shadow-card ring-1 ring-border/60 transition active:scale-[0.995] ${compact ? "w-[280px] shrink-0" : ""}`}
     >
-      <div className="relative aspect-[16/10] w-full bg-muted">
-        {cover && <img src={cover} alt="" loading="lazy" className="h-full w-full object-cover" />}
+      <div className="relative aspect-[3/4] w-full bg-muted">
+        {cover && <img src={cover} alt="" loading="lazy" className="h-full w-full object-contain" />}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
         <div className="absolute left-3 top-3 flex flex-wrap items-center gap-1.5">
