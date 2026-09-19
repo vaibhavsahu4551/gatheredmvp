@@ -56,10 +56,14 @@ export function PhotoCropModal({
     return () => el.removeEventListener("wheel", onWheel);
   }, [img]);
 
-  const viewportW = 288; // px, matches the on-screen crop box
-  const viewportH = Math.round(viewportW / aspect);
-  const outW = size;
-  const outH = Math.round(size / aspect);
+  const viewportW = 288;
+
+const effectiveAspect =
+  round || !img ? aspect : img.width / img.height;
+
+const viewportH = Math.round(viewportW / effectiveAspect);
+const outW = size;
+const outH = Math.round(size / effectiveAspect);
   const baseScale = (i: HTMLImageElement) => Math.min(viewportW / i.width, viewportH / i.height);
 
   function clampOffset(next: { x: number; y: number }, z: number) {
