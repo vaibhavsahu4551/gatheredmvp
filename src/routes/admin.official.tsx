@@ -1428,7 +1428,7 @@ const [coverPreview, setCoverPreview] = useState("");
       <Field label="Cover / banner">
         <div className="overflow-hidden rounded-xl border border-border bg-muted aspect-[16/10] w-full max-w-sm">
           {coverPreview ? (
-            <img src={coverPreview} alt="" className="h-full w-full object-cover" />
+            <img src={coverPreview} alt="" className="h-full w-full object-contain" />
           ) : (
             <div className="flex h-full items-center justify-center text-[11px] text-muted-foreground">No cover yet</div>
           )}
@@ -1458,7 +1458,7 @@ const [coverPreview, setCoverPreview] = useState("");
 <Field label="Ticket background image">
   <div className="overflow-hidden rounded-xl border border-border bg-muted aspect-[9/16] w-full max-w-[220px]">
     {ticketPreview ? (
-      <img src={ticketPreview} alt="" className="h-full w-full object-cover" />
+      <img src={ticketPreview} alt="" className="h-full w-full object-contain" />
     ) : (
       <div className="flex h-full items-center justify-center text-[11px] text-muted-foreground">No ticket background yet</div>
     )}
