@@ -153,7 +153,7 @@ const canBook =
 
   return (
     <div className="pb-28">
-      <div className="relative aspect-[4/3] w-full bg-muted">
+      <div className="relative aspect-[4/5] w-full bg-muted">
         {cover && <img src={cover} alt="" className="h-full w-full object-cover" />}
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-black/25" />
         <Link to="/home" className="absolute left-4 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur">
