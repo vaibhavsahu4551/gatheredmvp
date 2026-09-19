@@ -161,6 +161,7 @@ const canBook =
       className="block h-auto w-full object-contain"
     />
   )}
+  
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-black/25" />
         <Link to="/home" className="absolute left-4 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur">
           <ArrowLeft className="h-5 w-5" />
