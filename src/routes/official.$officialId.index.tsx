@@ -30,6 +30,18 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/official/$officialId/")({
   component: OfficialEventDetail,
+  head: ({ params }) => ({
+    meta: [
+      { title: "Official Event – Gathr" },
+      { name: "description", content: "Discover this official event on Gathr — the meetup and event platform where you can discover events, create your own meetup, and join plans happening around you." },
+      { property: "og:title", content: "Official Event – Gathr" },
+      { property: "og:description", content: "Discover this official event on Gathr and join the plan." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: `https://gathrmeet.in/official/${params.officialId}` },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: `https://gathrmeet.in/official/${params.officialId}` }],
+  }),
 });
 
 

@@ -7,13 +7,17 @@ export const Route = createFileRoute("/")({
   component: EntryRedirect,
   head: () => ({
     meta: [
-      { title: "Gathr — meet, connect, gathr" },
-      { name: "description", content: "Gathr is a group-only meetup app for 18+ verified people. Coffee, dinner, drinks, gaming, treks — plan real hangouts." },
-      { property: "og:title", content: "Gathr — meet, connect, gathr" },
-      { property: "og:description", content: "Group-only meetups for 18+ verified people. Plan real hangouts with people who show up." },
+      { title: "Gathr – Discover, Create & Join Meetups & Events" },
+      { name: "description", content: "Gathr is a meetup and event platform where you can discover events, create your own meetup, and join plans happening around you." },
+      { property: "og:title", content: "Gathr – Discover, Create & Join Meetups & Events" },
+      { property: "og:description", content: "Gathr is a meetup and event platform where you can discover events, create your own meetup, and join plans happening around you." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://gathrmeet.in/" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Gathr – Discover, Create & Join Meetups & Events" },
+      { name: "twitter:description", content: "Gathr is a meetup and event platform where you can discover events, create your own meetup, and join plans happening around you." },
     ],
+    links: [{ rel: "canonical", href: "https://gathrmeet.in/" }],
   }),
 });
 

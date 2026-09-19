@@ -43,30 +43,26 @@ type RazorpayInstance = {
   open: () => void;
 };
 
-declare global {
-  interface Window {
-    Razorpay: new (options: {
-      key: string;
-      amount: number;
-      currency: string;
-      name: string;
-      description: string;
-      order_id: string;
-      prefill?: {
-        name?: string;
-        email?: string;
-        contact?: string;
-      };
-      theme?: {
-        color?: string;
-      };
-      handler: (response: RazorpayCheckoutResponse) => void | Promise<void>;
-      modal?: {
-        ondismiss?: () => void;
-      };
-    }) => RazorpayInstance;
-  }
-}
+type RazorpayConstructor = new (options: {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+  prefill?: {
+    name?: string;
+    email?: string;
+    contact?: string;
+  };
+  theme?: {
+    color?: string;
+  };
+  handler: (response: RazorpayCheckoutResponse) => void | Promise<void>;
+  modal?: {
+    ondismiss?: () => void;
+  };
+}) => RazorpayInstance;
 export const Route = createFileRoute("/_authenticated/_app/official/$officialId/checkout")({
   validateSearch: (s: Record<string, unknown>) => ({
     passId: typeof s.passId === "string" ? s.passId : "",
@@ -247,7 +243,8 @@ const amount = Math.max(0, subtotal - discountAmount);
         throw new Error(data?.error || "Unable to create Razorpay order");
       }
 
-      const razorpay = new window.Razorpay({
+      const RazorpayCtor = (window as unknown as { Razorpay: RazorpayConstructor }).Razorpay;
+      const razorpay = new RazorpayCtor({
         key: data.key_id,
         amount: data.amount,
         currency: data.currency || "INR",
@@ -265,7 +262,7 @@ const amount = Math.max(0, subtotal - discountAmount);
           color: "#a855f7",
         },
 
-        handler: async (response) => {
+        handler: async (response: RazorpayCheckoutResponse) => {
           try {
             setBusy(true);
 
