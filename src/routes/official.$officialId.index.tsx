@@ -153,12 +153,12 @@ const canBook =
 
   return (
     <div className="pb-28">
-      <div className="relative w-full bg-muted">
+      <div className="relative w-full h-[44vh] min-h-[300px] overflow-hidden bg-muted">
   {cover && (
     <img
       src={cover}
       alt=""
-      className="block h-auto w-full object-contain"
+      className="block h-full w-full object-cover"
     />
   )}
   
