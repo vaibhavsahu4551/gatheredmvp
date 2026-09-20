@@ -153,7 +153,7 @@ const canBook =
 
   return (
     <div className="pb-28">
-      <div className="relative w-full h-[44vh] min-h-[300px] overflow-hidden bg-muted">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-muted">
   {cover && (
     <img
       src={cover}
