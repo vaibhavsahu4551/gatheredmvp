@@ -28,20 +28,39 @@ import {
   type OfficialApplicationQuestion,
 } from "@/lib/official-applications";
 import { supabase } from "@/integrations/supabase/client";
+import { getOfficialEventSeo } from "@/lib/official-event-seo.functions";
+
+const GATHR_SHARE_IMAGE = "https://gathrmeet.in/__l5e/assets-v1/9a99cb0a-7c14-4be1-8f90-90cbb85b6876/gathr-social-share.jpg";
 export const Route = createFileRoute("/official/$officialId/")({
   component: OfficialEventDetail,
-  head: ({ params }) => ({
-    meta: [
-      { title: "Official Event – Gathr" },
-      { name: "description", content: "Discover this official event on Gathr — the meetup and event platform where you can discover events, create your own meetup, and join plans happening around you." },
-      { property: "og:title", content: "Official Event – Gathr" },
-      { property: "og:description", content: "Discover this official event on Gathr and join the plan." },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: `https://gathrmeet.in/official/${params.officialId}` },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [{ rel: "canonical", href: `https://gathrmeet.in/official/${params.officialId}` }],
-  }),
+  loader: ({ params }) => getOfficialEventSeo({ data: { eventId: params.officialId } }),
+  head: ({ params, loaderData }) => {
+    const eventTitle = loaderData?.title?.trim();
+    const title = eventTitle ? `${eventTitle} – Gathr` : "Official Event – Gathr";
+    const description = loaderData?.description?.trim()
+      || (eventTitle ? `Discover ${eventTitle} on Gathr and get your pass.` : "Discover official events and get your pass on Gathr.");
+    const image = loaderData?.coverUrl || GATHR_SHARE_IMAGE;
+    const url = `https://gathrmeet.in/official/${params.officialId}`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "event" },
+        { property: "og:url", content: url },
+        { property: "og:site_name", content: "Gathr" },
+        { property: "og:image", content: image },
+        { property: "og:image:alt", content: eventTitle ? `${eventTitle} on Gathr` : "Official event on Gathr" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: image },
+        { name: "twitter:image:alt", content: eventTitle ? `${eventTitle} on Gathr` : "Official event on Gathr" },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
 });
 
 
