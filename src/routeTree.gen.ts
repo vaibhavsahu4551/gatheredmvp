@@ -60,6 +60,7 @@ import { Route as AuthenticatedAppMessagesIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/_app/events.index'
 import { Route as AuthenticatedAppCirclesIndexRouteImport } from './routes/_authenticated/_app/circles.index'
 import { Route as AuthenticatedAppChatIndexRouteImport } from './routes/_authenticated/_app/chat.index'
+import { Route as ApiPublicEventShareImageEventIdRouteImport } from './routes/api/public/event-share-image.$eventId'
 import { Route as AuthenticatedAppUUserIdRouteImport } from './routes/_authenticated/_app/u.$userId'
 import { Route as AuthenticatedAppSettingsTermsRouteImport } from './routes/_authenticated/_app/settings.terms'
 import { Route as AuthenticatedAppSettingsReportRouteImport } from './routes/_authenticated/_app/settings.report'
@@ -352,6 +353,12 @@ const AuthenticatedAppChatIndexRoute =
     path: '/chat/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const ApiPublicEventShareImageEventIdRoute =
+  ApiPublicEventShareImageEventIdRouteImport.update({
+    id: '/api/public/event-share-image/$eventId',
+    path: '/api/public/event-share-image/$eventId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAppUUserIdRoute = AuthenticatedAppUUserIdRouteImport.update({
   id: '/u/$userId',
   path: '/u/$userId',
@@ -543,6 +550,7 @@ export interface FileRoutesByFullPath {
   '/settings/report': typeof AuthenticatedAppSettingsReportRoute
   '/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
+  '/api/public/event-share-image/$eventId': typeof ApiPublicEventShareImageEventIdRoute
   '/chat/': typeof AuthenticatedAppChatIndexRoute
   '/circles/': typeof AuthenticatedAppCirclesIndexRoute
   '/events/': typeof AuthenticatedAppEventsIndexRoute
@@ -614,6 +622,7 @@ export interface FileRoutesByTo {
   '/settings/report': typeof AuthenticatedAppSettingsReportRoute
   '/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/u/$userId': typeof AuthenticatedAppUUserIdRoute
+  '/api/public/event-share-image/$eventId': typeof ApiPublicEventShareImageEventIdRoute
   '/chat': typeof AuthenticatedAppChatIndexRoute
   '/circles': typeof AuthenticatedAppCirclesIndexRoute
   '/events': typeof AuthenticatedAppEventsIndexRoute
@@ -690,6 +699,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/settings/report': typeof AuthenticatedAppSettingsReportRoute
   '/_authenticated/_app/settings/terms': typeof AuthenticatedAppSettingsTermsRoute
   '/_authenticated/_app/u/$userId': typeof AuthenticatedAppUUserIdRoute
+  '/api/public/event-share-image/$eventId': typeof ApiPublicEventShareImageEventIdRoute
   '/_authenticated/_app/chat/': typeof AuthenticatedAppChatIndexRoute
   '/_authenticated/_app/circles/': typeof AuthenticatedAppCirclesIndexRoute
   '/_authenticated/_app/events/': typeof AuthenticatedAppEventsIndexRoute
@@ -765,6 +775,7 @@ export interface FileRouteTypes {
     | '/settings/report'
     | '/settings/terms'
     | '/u/$userId'
+    | '/api/public/event-share-image/$eventId'
     | '/chat/'
     | '/circles/'
     | '/events/'
@@ -836,6 +847,7 @@ export interface FileRouteTypes {
     | '/settings/report'
     | '/settings/terms'
     | '/u/$userId'
+    | '/api/public/event-share-image/$eventId'
     | '/chat'
     | '/circles'
     | '/events'
@@ -911,6 +923,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/settings/report'
     | '/_authenticated/_app/settings/terms'
     | '/_authenticated/_app/u/$userId'
+    | '/api/public/event-share-image/$eventId'
     | '/_authenticated/_app/chat/'
     | '/_authenticated/_app/circles/'
     | '/_authenticated/_app/events/'
@@ -940,6 +953,7 @@ export interface RootRouteChildren {
   ApiPublicSendPushRoute: typeof ApiPublicSendPushRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
   OrganiserReviewEventIdRoute: typeof OrganiserReviewEventIdRoute
+  ApiPublicEventShareImageEventIdRoute: typeof ApiPublicEventShareImageEventIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1301,6 +1315,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppChatIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/api/public/event-share-image/$eventId': {
+      id: '/api/public/event-share-image/$eventId'
+      path: '/api/public/event-share-image/$eventId'
+      fullPath: '/api/public/event-share-image/$eventId'
+      preLoaderRoute: typeof ApiPublicEventShareImageEventIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/_app/u/$userId': {
       id: '/_authenticated/_app/u/$userId'
       path: '/u/$userId'
@@ -1631,6 +1652,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicSendPushRoute: ApiPublicSendPushRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
   OrganiserReviewEventIdRoute: OrganiserReviewEventIdRoute,
+  ApiPublicEventShareImageEventIdRoute: ApiPublicEventShareImageEventIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
