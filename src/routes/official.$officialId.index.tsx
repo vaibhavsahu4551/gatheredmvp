@@ -37,10 +37,16 @@ export const Route = createFileRoute("/official/$officialId/")({
   head: ({ params, loaderData }) => {
     const eventTitle = loaderData?.title?.trim();
     const title = eventTitle ? `${eventTitle} – Gathr` : "Official Event – Gathr";
-    const description = loaderData?.description?.trim()
-      || (eventTitle ? `Discover ${eventTitle} on Gathr and get your pass.` : "Discover official events and get your pass on Gathr.");
-    const image = loaderData?.coverUrl || GATHR_SHARE_IMAGE;
+    const rawDescription = loaderData?.description?.replace(/[*#_`]+/g, "").replace(/\s+/g, " ").trim();
+    const description = rawDescription
+      ? `${rawDescription.slice(0, 177)}${rawDescription.length > 177 ? "…" : ""}`
+      : eventTitle
+        ? `Discover ${eventTitle} on Gathr and get your pass.`
+        : "Discover official events and get your pass on Gathr.";
     const url = `https://gathrmeet.in/official/${params.officialId}`;
+    const image = loaderData?.hasCover
+      ? `https://gathrmeet.in/api/public/event-share-image/${params.officialId}`
+      : GATHR_SHARE_IMAGE;
     return {
       meta: [
         { title },

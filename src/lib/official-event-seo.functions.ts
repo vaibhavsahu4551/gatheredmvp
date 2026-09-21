@@ -25,6 +25,6 @@ export const getOfficialEventSeo = createServerFn({ method: "GET" })
     return {
       title: event.title,
       description: event.description,
-      coverUrl: event.cover_url && /^https:\/\//.test(event.cover_url) ? event.cover_url : null,
+      hasCover: Boolean(event.cover_url),
     };
   });
