@@ -14,6 +14,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { BottomNav, useShowBottomNav } from "@/components/BottomNav";
 
+const GATHR_SHARE_IMAGE = "https://gathrmeet.in/__l5e/assets-v1/9a99cb0a-7c14-4be1-8f90-90cbb85b6876/gathr-social-share.jpg";
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -71,8 +73,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Gathr – Discover, Create & Join Meetups & Events" },
       { name: "twitter:description", content: "Gathr is a meetup and event platform where you can discover events, create your own meetup, and join plans happening around you." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/950d8335-a2a5-4bc0-823e-e75487d32073/id-preview-9f737dfc--ce839c12-d248-4974-aa6d-41389271320c.lovable.app-1784294960190.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/950d8335-a2a5-4bc0-823e-e75487d32073/id-preview-9f737dfc--ce839c12-d248-4974-aa6d-41389271320c.lovable.app-1784294960190.png" },
+      { property: "og:image", content: GATHR_SHARE_IMAGE },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:type", content: "image/jpeg" },
+      { property: "og:image:alt", content: "Gathr — discover and join meetups and events" },
+      { name: "twitter:image", content: GATHR_SHARE_IMAGE },
+      { name: "twitter:image:alt", content: "Gathr — discover and join meetups and events" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
