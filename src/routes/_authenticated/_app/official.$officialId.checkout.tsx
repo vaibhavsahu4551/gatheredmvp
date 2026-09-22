@@ -17,6 +17,11 @@ import {
   type CouponValidationResult,
 } from "@/lib/official-passes";
 import { notifyOfficialOrder } from "@/lib/telegram-order.functions";
+type PlatformFeeSettings = {
+  enabled: boolean;
+  fee_type: "percentage" | "fixed";
+  fee_value: number;
+};
 function loadRazorpayScript(): Promise<boolean> {
   return new Promise((resolve) => {
     if (document.getElementById("razorpay-checkout-js")) {
@@ -103,19 +108,49 @@ function Checkout() {
   const [couponCode, setCouponCode] = useState("");
   const [coupon, setCoupon] = useState<CouponValidationResult | null>(null);
   const [couponBusy, setCouponBusy] = useState(false);
+  const [platformFeeSettings, setPlatformFeeSettings] = useState<PlatformFeeSettings>({
+  enabled: false,
+  fee_type: "percentage",
+  fee_value: 0,
+});
 
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
-        const [ev, passes, settings] = await Promise.all([
-          getOfficialEvent(officialId),
-          listPasses(officialId, { activeOnly: true }),
-          getAppSettingsCached(),
-        ]);
+       const [ev, passes, settings, feeSettings] = await Promise.all([
+  getOfficialEvent(officialId),
+  listPasses(officialId, { activeOnly: true }),
+  getAppSettingsCached(),
+  supabase
+    .from("platform_fee_settings")
+    .select("enabled, fee_type, fee_value")
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle(),
+]);
         if (!alive) return;
         setEvent(ev);
         setPass(passes.find((p) => p.id === passId) ?? passes[0] ?? null);
+        if (feeSettings.data) {
+
+  setPlatformFeeSettings({
+
+    enabled: Boolean(feeSettings.data.enabled),
+
+    fee_type:
+
+      feeSettings.data.fee_type === "fixed"
+
+        ? "fixed"
+
+        : "percentage",
+
+    fee_value: Number(feeSettings.data.fee_value ?? 0),
+
+  });
+
+}
        setUpi({
   id: ev?.upi_id?.trim() || (settings as any)?.upi_id || "",
   payee: ev?.upi_payee_name?.trim() || (settings as any)?.upi_payee_name || "Gathr",
@@ -144,9 +179,20 @@ function Checkout() {
     setPreview(URL.createObjectURL(f));
   }
 
-  const subtotal = pass ? Number(pass.price) * qty : 0;
+const subtotal = pass ? Number(pass.price) * qty : 0;
+
+const platformFee = platformFee.enabled
+  ? platformFee.fee_type === "percentage"
+    ? Number((subtotal * platformFee.fee_value / 100).toFixed(2))
+    : Number(platformFee.fee_value.toFixed(2))
+  : 0;
+
 const discountAmount = coupon?.discount_amount ?? 0;
-const amount = Math.max(0, subtotal - discountAmount);
+
+const amount = Math.max(
+  0,
+  Number((subtotal + platformFee - discountAmount).toFixed(2))
+);
   const maxQty = pass && pass.total_quantity > 0 ? Math.max(1, Math.min(10, passRemaining(pass))) : 10;
   async function applyCoupon() {
     const code = couponCode.trim();
