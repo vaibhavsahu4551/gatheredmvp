@@ -1353,6 +1353,7 @@ export type Database = {
           customer_email: string | null
           customer_name: string
           customer_phone: string
+          discount_amount: number
           event_id: string
           id: string
           order_code: string
@@ -1360,6 +1361,7 @@ export type Database = {
           pass_name: string
           payment_method: string
           payment_status: string
+          platform_fee: number
           quantity: number
           razorpay_order_id: string | null
           razorpay_payment_id: string | null
@@ -1367,6 +1369,7 @@ export type Database = {
           screenshot_path: string | null
           telegram_notified_at: string | null
           ticket_status: string
+          ticket_subtotal: number
           updated_at: string
           user_id: string
           utr: string | null
@@ -1380,6 +1383,7 @@ export type Database = {
           customer_email?: string | null
           customer_name: string
           customer_phone: string
+          discount_amount?: number
           event_id: string
           id?: string
           order_code?: string
@@ -1387,6 +1391,7 @@ export type Database = {
           pass_name: string
           payment_method?: string
           payment_status?: string
+          platform_fee?: number
           quantity: number
           razorpay_order_id?: string | null
           razorpay_payment_id?: string | null
@@ -1394,6 +1399,7 @@ export type Database = {
           screenshot_path?: string | null
           telegram_notified_at?: string | null
           ticket_status?: string
+          ticket_subtotal?: number
           updated_at?: string
           user_id: string
           utr?: string | null
@@ -1407,6 +1413,7 @@ export type Database = {
           customer_email?: string | null
           customer_name?: string
           customer_phone?: string
+          discount_amount?: number
           event_id?: string
           id?: string
           order_code?: string
@@ -1414,6 +1421,7 @@ export type Database = {
           pass_name?: string
           payment_method?: string
           payment_status?: string
+          platform_fee?: number
           quantity?: number
           razorpay_order_id?: string | null
           razorpay_payment_id?: string | null
@@ -1421,6 +1429,7 @@ export type Database = {
           screenshot_path?: string | null
           telegram_notified_at?: string | null
           ticket_status?: string
+          ticket_subtotal?: number
           updated_at?: string
           user_id?: string
           utr?: string | null
@@ -1443,6 +1452,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      platform_fee_settings: {
+        Row: {
+          enabled: boolean
+          fee_type: string
+          fee_value: number
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          enabled?: boolean
+          fee_type?: string
+          fee_value?: number
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          enabled?: boolean
+          fee_type?: string
+          fee_value?: number
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       points_transactions: {
         Row: {
@@ -2810,6 +2843,7 @@ export type Database = {
           customer_email: string | null
           customer_name: string
           customer_phone: string
+          discount_amount: number
           event_id: string
           id: string
           order_code: string
@@ -2817,6 +2851,7 @@ export type Database = {
           pass_name: string
           payment_method: string
           payment_status: string
+          platform_fee: number
           quantity: number
           razorpay_order_id: string | null
           razorpay_payment_id: string | null
@@ -2824,6 +2859,7 @@ export type Database = {
           screenshot_path: string | null
           telegram_notified_at: string | null
           ticket_status: string
+          ticket_subtotal: number
           updated_at: string
           user_id: string
           utr: string | null
@@ -2859,6 +2895,7 @@ export type Database = {
           customer_email: string | null
           customer_name: string
           customer_phone: string
+          discount_amount: number
           event_id: string
           id: string
           order_code: string
@@ -2866,6 +2903,7 @@ export type Database = {
           pass_name: string
           payment_method: string
           payment_status: string
+          platform_fee: number
           quantity: number
           razorpay_order_id: string | null
           razorpay_payment_id: string | null
@@ -2873,6 +2911,7 @@ export type Database = {
           screenshot_path: string | null
           telegram_notified_at: string | null
           ticket_status: string
+          ticket_subtotal: number
           updated_at: string
           user_id: string
           utr: string | null
@@ -3111,6 +3150,7 @@ export type Database = {
           customer_email: string | null
           customer_name: string
           customer_phone: string
+          discount_amount: number
           event_id: string
           id: string
           order_code: string
@@ -3118,6 +3158,7 @@ export type Database = {
           pass_name: string
           payment_method: string
           payment_status: string
+          platform_fee: number
           quantity: number
           razorpay_order_id: string | null
           razorpay_payment_id: string | null
@@ -3125,6 +3166,7 @@ export type Database = {
           screenshot_path: string | null
           telegram_notified_at: string | null
           ticket_status: string
+          ticket_subtotal: number
           updated_at: string
           user_id: string
           utr: string | null
@@ -3147,6 +3189,7 @@ export type Database = {
           customer_email: string | null
           customer_name: string
           customer_phone: string
+          discount_amount: number
           event_id: string
           id: string
           order_code: string
@@ -3154,6 +3197,7 @@ export type Database = {
           pass_name: string
           payment_method: string
           payment_status: string
+          platform_fee: number
           quantity: number
           razorpay_order_id: string | null
           razorpay_payment_id: string | null
@@ -3161,6 +3205,7 @@ export type Database = {
           screenshot_path: string | null
           telegram_notified_at: string | null
           ticket_status: string
+          ticket_subtotal: number
           updated_at: string
           user_id: string
           utr: string | null
