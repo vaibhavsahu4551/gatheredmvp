@@ -1,9 +1,9 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { unreadCount } from "@/lib/notifications";
-import { loadMe } from "@/lib/huddl";
+import { loadMe, profileIsComplete } from "@/lib/huddl";
 import { EVENT_TYPES, countByGender, getProfilesLite, listEvents, type EventRow, getParticipantsForEvents } from "@/lib/events";
 import { isNewHere } from "@/lib/badges";
 import { listFeed, getLikes, toggleLike, signedFeedUrl, getEventsLite } from "@/lib/feed";
@@ -43,7 +43,16 @@ export function HomeFeed() {
   const [unread, setUnread] = useState(0);
   const [banner, setBanner] = useState<HomeBanner | null>(null);
   const [premium, setPremium] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => { unreadCount().then(setUnread).catch(() => {}); }, []);
+  // Signed-in members without a name or photo finish setup first.
+  useEffect(() => {
+    loadMe()
+      .then((me) => {
+        if (me && !profileIsComplete(me.profile)) navigate({ to: "/onboarding" });
+      })
+      .catch(() => {});
+  }, [navigate]);
   useEffect(() => {
     getActiveBanner().then(setBanner).catch(() => {});
     getAppSettings().then((s) => setPremium(s.subscription_enabled)).catch(() => {});
