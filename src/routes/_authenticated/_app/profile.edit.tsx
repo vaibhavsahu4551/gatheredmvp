@@ -84,6 +84,10 @@ function EditProfile() {
       toast.error("Name is required");
       return;
     }
+    if (!photoPath) {
+      toast.error("A profile photo is required");
+      return;
+    }
     if (bio.length > 150) {
       toast.error("Bio must be 150 characters or less");
       return;

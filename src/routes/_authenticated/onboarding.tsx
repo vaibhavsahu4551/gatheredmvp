@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { claimPendingReferral } from "@/lib/rewards";
-import { INTERESTS, loadMe, invalidateMe, signedPhotoUrl } from "@/lib/huddl";
+import { INTERESTS, loadMe, invalidateMe, signedPhotoUrl, profileIsComplete } from "@/lib/huddl";
 import { compressImage } from "@/lib/image-compress";
 import { normalizeHandle, normalizeSpotify } from "@/lib/socials";
 import { PhotoCropModal } from "@/components/PhotoCropModal";
@@ -61,7 +61,7 @@ function Onboarding() {
           return;
         }
         setUserId(me.user.id);
-        if (me.profile?.onboarding_complete) {
+        if (profileIsComplete(me.profile)) {
           navigate({ to: "/home" });
           return;
         }
