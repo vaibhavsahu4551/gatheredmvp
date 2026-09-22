@@ -63,6 +63,18 @@ export function invalidateMe() {
   invalidate("me");
 }
 
+/**
+ * Every member must end up with a name and a profile photo. Accounts created
+ * before this rule, or abandoned halfway through setup, are sent back to
+ * finish onboarding.
+ */
+export function profileIsComplete(profile: ProfileRow | null | undefined): boolean {
+  if (!profile) return false;
+  const name = (profile.full_name ?? "").trim();
+  const photo = (profile.photos ?? []).find((p) => !!p && `${p}`.trim().length > 0);
+  return !!profile.onboarding_complete && name.length >= 2 && !!photo;
+}
+
 export function ageFromDob(dob: string): number {
   const d = new Date(dob);
   const now = new Date();

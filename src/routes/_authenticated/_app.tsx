@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { loadMe } from "@/lib/huddl";
+import { loadMe, profileIsComplete } from "@/lib/huddl";
 import { supabase } from "@/integrations/supabase/client";
 import { enablePush, pushAsked, pushDeclined } from "@/lib/push";
 import { useMaintenance } from "@/hooks/useMaintenance";
@@ -21,7 +21,7 @@ function AppShell() {
     loadMe()
       .then((me) => {
         if (!me) { navigate({ to: "/auth" }); return; }
-        if (!me.profile?.onboarding_complete) { navigate({ to: "/onboarding" }); return; }
+        if (!profileIsComplete(me.profile)) { navigate({ to: "/onboarding" }); return; }
         
         // Logging back in reactivates a temporarily deactivated account.
         (supabase as any)
