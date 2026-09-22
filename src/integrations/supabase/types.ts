@@ -2559,7 +2559,9 @@ export type Database = {
         Returns: {
           created_at: string
           full_name: string
+          has_photo: boolean
           id: string
+          onboarding_complete: boolean
           phone: string
           pride_opt_in: boolean
           suspended_until: string

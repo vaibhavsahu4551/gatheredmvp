@@ -86,8 +86,17 @@ function AdminUsers() {
               return (
                 <tr key={r.id} className="border-t border-border">
                   <td className="px-3 py-2">
-                    <div className="font-medium">{r.full_name ?? "—"}</div>
+                    <div className="font-medium">
+                      {r.full_name?.trim()
+                        ? r.full_name
+                        : <span className="text-muted-foreground italic">Profile incomplete</span>}
+                    </div>
                     <div className="text-[11px] text-muted-foreground">{r.phone ?? r.id.slice(0, 8)}</div>
+                    {(!r.onboarding_complete || !r.has_photo || !r.full_name?.trim()) && (
+                      <div className="mt-1 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                        {!r.has_photo && r.full_name?.trim() ? "No photo" : "Setup pending"}
+                      </div>
+                    )}
                   </td>
                   <td className="px-3 py-2 text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</td>
                   <td className="px-3 py-2 tabular-nums">{r.event_count}</td>
