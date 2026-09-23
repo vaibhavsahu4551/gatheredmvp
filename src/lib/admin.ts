@@ -275,3 +275,67 @@ export async function adminDeletePost(id: string) {
   const { error } = await supabase.from("posts").delete().eq("id", id);
   if (error) throw error;
 }
+
+// ---- Platform Fee Settings ----
+
+export type PlatformFeeSettings = {
+  id: string;
+  enabled: boolean;
+  fee_type: "percentage" | "fixed";
+  fee_value: number;
+  updated_at: string;
+};
+
+export async function getPlatformFeeSettings(): Promise<PlatformFeeSettings | null> {
+  const { data } = await supabase
+    .from("platform_fee_settings" as any)
+    .select("id, enabled, fee_type, fee_value, updated_at")
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!data) return null;
+  const row = data as any;
+  return {
+    id: row.id,
+    enabled: Boolean(row.enabled),
+    fee_type: row.fee_type === "fixed" ? "fixed" : "percentage",
+    fee_value: Number(row.fee_value ?? 0),
+    updated_at: row.updated_at,
+  };
+}
+
+export async function updatePlatformFeeSettings(input: {
+  enabled: boolean;
+  fee_type: "percentage" | "fixed";
+  fee_value: number;
+}): Promise<void> {
+  // Fetch the existing row id — do NOT create a new row each save.
+  const { data: existing } = await supabase
+    .from("platform_fee_settings" as any)
+    .select("id")
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const id = (existing as any)?.id as string | undefined;
+  const body = {
+    enabled: input.enabled,
+    fee_type: input.fee_type,
+    fee_value: input.fee_value,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (id) {
+    const { error } = await supabase
+      .from("platform_fee_settings" as any)
+      .update(body)
+      .eq("id", id);
+    if (error) throw error;
+  } else {
+    // First-time setup: insert the initial row.
+    const { error } = await supabase
+      .from("platform_fee_settings" as any)
+      .insert(body);
+    if (error) throw error;
+  }
+}
