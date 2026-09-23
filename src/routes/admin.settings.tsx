@@ -18,6 +18,10 @@ function AdminSettings() {
   const [waNumber, setWaNumber] = useState("");
   const [upiId, setUpiId] = useState("");
   const [upiName, setUpiName] = useState("");
+  const [feeEnabled, setFeeEnabled] = useState(false);
+  const [feeType, setFeeType] = useState<"percentage" | "fixed">("percentage");
+  const [feeValue, setFeeValue] = useState("");
+  const [feeBusy, setFeeBusy] = useState(false);
 
   async function refresh() {
     const s = await getAppSettings();
