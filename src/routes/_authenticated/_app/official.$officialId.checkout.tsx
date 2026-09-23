@@ -181,10 +181,10 @@ function Checkout() {
 
 const subtotal = pass ? Number(pass.price) * qty : 0;
 
-const platformFee = platformFee.enabled
-  ? platformFee.fee_type === "percentage"
-    ? Number((subtotal * platformFee.fee_value / 100).toFixed(2))
-    : Number(platformFee.fee_value.toFixed(2))
+const platformFee = platformFeeSettings.enabled
+  ? platformFeeSettings.fee_type === "percentage"
+    ? Number((subtotal * platformFeeSettings.fee_value / 100).toFixed(2))
+    : Number(platformFeeSettings.fee_value.toFixed(2))
   : 0;
 
 const discountAmount = coupon?.discount_amount ?? 0;
