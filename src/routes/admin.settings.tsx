@@ -71,6 +71,17 @@ function AdminSettings() {
     catch (e: any) { toast.error(e.message); }
   }
 
+  async function saveFee() {
+    const val = Number(feeValue);
+    if (isNaN(val) || val < 0) { toast.error("Enter a valid non-negative fee value"); return; }
+    setFeeBusy(true);
+    try {
+      await updatePlatformFeeSettings({ enabled: feeEnabled, fee_type: feeType, fee_value: val });
+      toast.success("Platform fee saved");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setFeeBusy(false); }
+  }
+
   return (
     <div className="space-y-8">
       <section>
