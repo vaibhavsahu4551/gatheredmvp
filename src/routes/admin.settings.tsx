@@ -32,6 +32,12 @@ function AdminSettings() {
     setUpiId(s.upi_id ?? "");
     setUpiName(s.upi_payee_name ?? "");
     setBanners(await listBanners());
+    const fee = await getPlatformFeeSettings();
+    if (fee) {
+      setFeeEnabled(fee.enabled);
+      setFeeType(fee.fee_type);
+      setFeeValue(String(fee.fee_value));
+    }
   }
   useEffect(() => { refresh(); }, []);
 
