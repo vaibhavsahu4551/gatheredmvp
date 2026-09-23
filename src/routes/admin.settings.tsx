@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getAppSettings, setDefaultBookingWhatsapp, setUpiSettings, setSubscriptionEnabled, setMaintenance, DEFAULT_MAINTENANCE_MESSAGE, listBanners, createBanner, updateBanner, deleteBanner, type HomeBanner } from "@/lib/admin";
+import { getAppSettings, setDefaultBookingWhatsapp, setUpiSettings, setSubscriptionEnabled, setMaintenance, DEFAULT_MAINTENANCE_MESSAGE, listBanners, createBanner, updateBanner, deleteBanner, type HomeBanner, getPlatformFeeSettings, updatePlatformFeeSettings } from "@/lib/admin";
 import { MaintenanceScreen } from "@/components/MaintenanceScreen";
 import { toast } from "sonner";
 
@@ -18,6 +18,10 @@ function AdminSettings() {
   const [waNumber, setWaNumber] = useState("");
   const [upiId, setUpiId] = useState("");
   const [upiName, setUpiName] = useState("");
+  const [feeEnabled, setFeeEnabled] = useState(false);
+  const [feeType, setFeeType] = useState<"percentage" | "fixed">("percentage");
+  const [feeValue, setFeeValue] = useState("");
+  const [feeBusy, setFeeBusy] = useState(false);
 
   async function refresh() {
     const s = await getAppSettings();
@@ -28,6 +32,12 @@ function AdminSettings() {
     setUpiId(s.upi_id ?? "");
     setUpiName(s.upi_payee_name ?? "");
     setBanners(await listBanners());
+    const fee = await getPlatformFeeSettings();
+    if (fee) {
+      setFeeEnabled(fee.enabled);
+      setFeeType(fee.fee_type);
+      setFeeValue(String(fee.fee_value));
+    }
   }
   useEffect(() => { refresh(); }, []);
 
@@ -59,6 +69,17 @@ function AdminSettings() {
   async function saveWhatsapp() {
     try { await setDefaultBookingWhatsapp(waNumber.trim() || null); toast.success("Default WhatsApp number saved"); }
     catch (e: any) { toast.error(e.message); }
+  }
+
+  async function saveFee() {
+    const val = Number(feeValue);
+    if (isNaN(val) || val < 0) { toast.error("Enter a valid non-negative fee value"); return; }
+    setFeeBusy(true);
+    try {
+      await updatePlatformFeeSettings({ enabled: feeEnabled, fee_type: feeType, fee_value: val });
+      toast.success("Platform fee saved");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setFeeBusy(false); }
   }
 
   return (
@@ -104,6 +125,40 @@ function AdminSettings() {
             className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm" />
           <button onClick={saveUpi} className="rounded-lg bg-foreground text-background px-3 py-2 text-sm">Save</button>
         </div>
+      </section>
+
+      <section className="rounded-xl border border-border p-4 space-y-3">
+        <div>
+          <div className="font-medium">Gathr Platform Fee</div>
+          <div className="text-xs text-muted-foreground">Charged on every official event ticket. Calculated on the ticket subtotal before any coupon discount.</div>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">Platform Fee</span>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" checked={feeEnabled} onChange={(e) => setFeeEnabled(e.target.checked)} className="sr-only peer" />
+            <div className="w-11 h-6 bg-muted rounded-full peer-checked:bg-foreground transition after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:h-5 after:w-5 after:bg-background after:rounded-full after:transition peer-checked:after:translate-x-5" />
+          </label>
+        </div>
+        <div className="flex gap-2">
+          <select value={feeType} onChange={(e) => setFeeType(e.target.value as "percentage" | "fixed")}
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm">
+            <option value="percentage">Percentage (%)</option>
+            <option value="fixed">Fixed Amount (₹)</option>
+          </select>
+          <input type="number" min="0" step={feeType === "percentage" ? "0.01" : "1"} value={feeValue}
+            onChange={(e) => setFeeValue(e.target.value)}
+            placeholder={feeType === "percentage" ? "e.g. 5" : "e.g. 25"}
+            className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm" />
+        </div>
+        <div className="text-xs text-muted-foreground">
+          Preview: {feeType === "percentage"
+            ? `${feeValue || 0}% platform fee`
+            : `₹${Number(feeValue) || 0} platform fee`}
+        </div>
+        <button onClick={saveFee} disabled={feeBusy}
+          className="rounded-lg bg-foreground text-background px-3 py-2 text-sm disabled:opacity-60">
+          {feeBusy ? "Saving…" : "Save Platform Fee"}
+        </button>
       </section>
 
       <section className="rounded-xl border border-border p-4 space-y-3">
