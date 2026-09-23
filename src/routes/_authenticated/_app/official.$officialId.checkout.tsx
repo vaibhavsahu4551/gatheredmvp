@@ -181,10 +181,10 @@ function Checkout() {
 
 const subtotal = pass ? Number(pass.price) * qty : 0;
 
-const platformFee = platformFee.enabled
-  ? platformFee.fee_type === "percentage"
-    ? Number((subtotal * platformFee.fee_value / 100).toFixed(2))
-    : Number(platformFee.fee_value.toFixed(2))
+const platformFee = platformFeeSettings.enabled
+  ? platformFeeSettings.fee_type === "percentage"
+    ? Number((subtotal * platformFeeSettings.fee_value / 100).toFixed(2))
+    : Number(platformFeeSettings.fee_value.toFixed(2))
   : 0;
 
 const discountAmount = coupon?.discount_amount ?? 0;
@@ -558,23 +558,34 @@ const amount = Math.max(
     )}
   </div>
 
-  {coupon && (
-    <div className="mt-3 rounded-xl bg-green-500/10 p-3 text-sm">
-      <div className="flex items-center justify-between">
-        <span>Subtotal</span>
-        <span>₹{subtotal.toLocaleString("en-IN")}</span>
-      </div>
+  {/* Price breakdown */}
+  <div className="mt-4 space-y-2 rounded-xl bg-muted p-3 text-sm">
+    <div className="flex items-center justify-between">
+      <span>Ticket subtotal</span>
+      <span>₹{subtotal.toLocaleString("en-IN")}</span>
+    </div>
 
-      <div className="mt-1 flex items-center justify-between text-green-600">
+    {platformFeeSettings.enabled && platformFee > 0 && (
+      <div className="flex items-center justify-between">
         <span>
-          Discount ({coupon.code})
+          Gathr Platform Fee
+          {platformFeeSettings.fee_type === "percentage" && ` (${platformFeeSettings.fee_value}%)`}
+        </span>
+        <span>₹{platformFee.toLocaleString("en-IN")}</span>
+      </div>
+    )}
+
+    {discountAmount > 0 && (
+      <div className="flex items-center justify-between text-green-600">
+        <span>
+          Discount{coupon?.code ? ` (${coupon.code})` : ""}
         </span>
         <span>
           −₹{discountAmount.toLocaleString("en-IN")}
         </span>
       </div>
-    </div>
-  )}
+    )}
+  </div>
 
   <div className="mt-3 flex items-center justify-between">
     <span className="text-sm font-semibold">
@@ -585,6 +596,7 @@ const amount = Math.max(
       ₹{amount.toLocaleString("en-IN")}
     </span>
   </div>
+
 </div>
         </section>
 
