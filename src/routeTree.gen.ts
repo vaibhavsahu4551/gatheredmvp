@@ -9,99 +9,88 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as HomeRouteImport } from './routes/home'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AdminLoginRouteImport } from './routes/admin-login'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as OfficialOfficialIdRouteImport } from './routes/official.$officialId'
-import { Route as CheckinTokenRouteImport } from './routes/checkin.$token'
-import { Route as AdminVerificationRouteImport } from './routes/admin.verification'
-import { Route as AdminUsersRouteImport } from './routes/admin.users'
-import { Route as AdminStoriesRouteImport } from './routes/admin.stories'
-import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
-import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
-import { Route as AdminRevenueRouteImport } from './routes/admin.revenue'
-import { Route as AdminReportsRouteImport } from './routes/admin.reports'
-import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
-import { Route as AdminPostsRouteImport } from './routes/admin.posts'
-import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
-import { Route as AdminOfficialRouteImport } from './routes/admin.official'
-import { Route as AdminMusicRouteImport } from './routes/admin.music'
-import { Route as AdminFlaggedRouteImport } from './routes/admin.flagged'
-import { Route as AdminEventsRouteImport } from './routes/admin.events'
-import { Route as AdminEngagementRouteImport } from './routes/admin.engagement'
-import { Route as AdminBadgesRouteImport } from './routes/admin.badges'
-import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AdminLoginRouteImport } from './routes/admin-login'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as HomeRouteImport } from './routes/home'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/_app'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminBadgesRouteImport } from './routes/admin.badges'
+import { Route as AdminEngagementRouteImport } from './routes/admin.engagement'
+import { Route as AdminEventsRouteImport } from './routes/admin.events'
+import { Route as AdminFlaggedRouteImport } from './routes/admin.flagged'
+import { Route as AdminMusicRouteImport } from './routes/admin.music'
+import { Route as AdminOfficialRouteImport } from './routes/admin.official'
+import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
+import { Route as AdminPostsRouteImport } from './routes/admin.posts'
+import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminRevenueRouteImport } from './routes/admin.revenue'
+import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminStoriesRouteImport } from './routes/admin.stories'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminVerificationRouteImport } from './routes/admin.verification'
+import { Route as CheckinTokenRouteImport } from './routes/checkin.$token'
+import { Route as OfficialOfficialIdRouteImport } from './routes/official.$officialId'
+import { Route as AuthenticatedAppAppHomeRouteImport } from './routes/_authenticated/_app/app-home'
+import { Route as AuthenticatedAppCreateRouteImport } from './routes/_authenticated/_app/create'
+import { Route as AuthenticatedAppDiscoverRouteImport } from './routes/_authenticated/_app/discover'
+import { Route as AuthenticatedAppIcebreakerRouteImport } from './routes/_authenticated/_app/icebreaker'
+import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/_app/notifications'
+import { Route as AuthenticatedAppPremiumRouteImport } from './routes/_authenticated/_app/premium'
+import { Route as AuthenticatedAppRequestsRouteImport } from './routes/_authenticated/_app/requests'
+import { Route as AuthenticatedAppSubscriptionRouteImport } from './routes/_authenticated/_app/subscription'
+import { Route as AuthenticatedAppVerifyRouteImport } from './routes/_authenticated/_app/verify'
+import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
+import { Route as ApiPublicSendPushRouteImport } from './routes/api/public/send-push'
+import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram-webhook'
 import { Route as OfficialOfficialIdIndexRouteImport } from './routes/official.$officialId.index'
 import { Route as OrganiserReviewEventIdRouteImport } from './routes/organiser.review.$eventId'
-import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram-webhook'
-import { Route as ApiPublicSendPushRouteImport } from './routes/api/public/send-push'
-import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
-import { Route as AuthenticatedAppVerifyRouteImport } from './routes/_authenticated/_app/verify'
-import { Route as AuthenticatedAppSubscriptionRouteImport } from './routes/_authenticated/_app/subscription'
-import { Route as AuthenticatedAppRequestsRouteImport } from './routes/_authenticated/_app/requests'
-import { Route as AuthenticatedAppPremiumRouteImport } from './routes/_authenticated/_app/premium'
-import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/_app/notifications'
-import { Route as AuthenticatedAppIcebreakerRouteImport } from './routes/_authenticated/_app/icebreaker'
-import { Route as AuthenticatedAppDiscoverRouteImport } from './routes/_authenticated/_app/discover'
-import { Route as AuthenticatedAppCreateRouteImport } from './routes/_authenticated/_app/create'
-import { Route as AuthenticatedAppAppHomeRouteImport } from './routes/_authenticated/_app/app-home'
-import { Route as AuthenticatedAppSettingsIndexRouteImport } from './routes/_authenticated/_app/settings.index'
-import { Route as AuthenticatedAppRewardsIndexRouteImport } from './routes/_authenticated/_app/rewards.index'
-import { Route as AuthenticatedAppProfileIndexRouteImport } from './routes/_authenticated/_app/profile.index'
-import { Route as AuthenticatedAppPrideIndexRouteImport } from './routes/_authenticated/_app/pride.index'
-import { Route as AuthenticatedAppPassesIndexRouteImport } from './routes/_authenticated/_app/passes.index'
-import { Route as AuthenticatedAppMessagesIndexRouteImport } from './routes/_authenticated/_app/messages.index'
-import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/_app/events.index'
-import { Route as AuthenticatedAppCirclesIndexRouteImport } from './routes/_authenticated/_app/circles.index'
 import { Route as AuthenticatedAppChatIndexRouteImport } from './routes/_authenticated/_app/chat.index'
-import { Route as ApiPublicEventShareImageEventIdRouteImport } from './routes/api/public/event-share-image.$eventId'
-import { Route as AuthenticatedAppUUserIdRouteImport } from './routes/_authenticated/_app/u.$userId'
-import { Route as AuthenticatedAppSettingsTermsRouteImport } from './routes/_authenticated/_app/settings.terms'
-import { Route as AuthenticatedAppSettingsReportRouteImport } from './routes/_authenticated/_app/settings.report'
-import { Route as AuthenticatedAppSettingsPrivacyRouteImport } from './routes/_authenticated/_app/settings.privacy'
-import { Route as AuthenticatedAppSettingsPhoneRouteImport } from './routes/_authenticated/_app/settings.phone'
-import { Route as AuthenticatedAppSettingsPasswordRouteImport } from './routes/_authenticated/_app/settings.password'
-import { Route as AuthenticatedAppSettingsHelpRouteImport } from './routes/_authenticated/_app/settings.help'
-import { Route as AuthenticatedAppSettingsBlockedRouteImport } from './routes/_authenticated/_app/settings.blocked'
-import { Route as AuthenticatedAppProfileEditRouteImport } from './routes/_authenticated/_app/profile.edit'
-import { Route as AuthenticatedAppPrideSetupRouteImport } from './routes/_authenticated/_app/pride.setup'
-import { Route as AuthenticatedAppPrideResourcesRouteImport } from './routes/_authenticated/_app/pride.resources'
-import { Route as AuthenticatedAppPrideNotificationsRouteImport } from './routes/_authenticated/_app/pride.notifications'
-import { Route as AuthenticatedAppPrideGuidelinesRouteImport } from './routes/_authenticated/_app/pride.guidelines'
-import { Route as AuthenticatedAppPostsPostIdRouteImport } from './routes/_authenticated/_app/posts.$postId'
-import { Route as AuthenticatedAppPassesOrderIdRouteImport } from './routes/_authenticated/_app/passes.$orderId'
-import { Route as AuthenticatedAppMessagesThreadIdRouteImport } from './routes/_authenticated/_app/messages.$threadId'
-import { Route as AuthenticatedAppCirclesCircleIdRouteImport } from './routes/_authenticated/_app/circles.$circleId'
 import { Route as AuthenticatedAppChatGroupIdRouteImport } from './routes/_authenticated/_app/chat.$groupId'
-import { Route as AuthenticatedAppEventsEventIdIndexRouteImport } from './routes/_authenticated/_app/events.$eventId.index'
-import { Route as AuthenticatedAppOfficialOfficialIdCheckoutRouteImport } from './routes/_authenticated/_app/official.$officialId.checkout'
-import { Route as AuthenticatedAppEventsEventIdEditRouteImport } from './routes/_authenticated/_app/events.$eventId.edit'
+import { Route as AuthenticatedAppCirclesIndexRouteImport } from './routes/_authenticated/_app/circles.index'
+import { Route as AuthenticatedAppCirclesCircleIdRouteImport } from './routes/_authenticated/_app/circles.$circleId'
+import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/_app/events.index'
+import { Route as AuthenticatedAppMessagesIndexRouteImport } from './routes/_authenticated/_app/messages.index'
+import { Route as AuthenticatedAppMessagesThreadIdRouteImport } from './routes/_authenticated/_app/messages.$threadId'
+import { Route as AuthenticatedAppPassesIndexRouteImport } from './routes/_authenticated/_app/passes.index'
+import { Route as AuthenticatedAppPassesOrderIdRouteImport } from './routes/_authenticated/_app/passes.$orderId'
+import { Route as AuthenticatedAppPostsPostIdRouteImport } from './routes/_authenticated/_app/posts.$postId'
+import { Route as AuthenticatedAppPrideIndexRouteImport } from './routes/_authenticated/_app/pride.index'
+import { Route as AuthenticatedAppPrideGuidelinesRouteImport } from './routes/_authenticated/_app/pride.guidelines'
+import { Route as AuthenticatedAppPrideNotificationsRouteImport } from './routes/_authenticated/_app/pride.notifications'
+import { Route as AuthenticatedAppPrideResourcesRouteImport } from './routes/_authenticated/_app/pride.resources'
+import { Route as AuthenticatedAppPrideSetupRouteImport } from './routes/_authenticated/_app/pride.setup'
+import { Route as AuthenticatedAppProfileIndexRouteImport } from './routes/_authenticated/_app/profile.index'
+import { Route as AuthenticatedAppProfileEditRouteImport } from './routes/_authenticated/_app/profile.edit'
+import { Route as AuthenticatedAppRewardsIndexRouteImport } from './routes/_authenticated/_app/rewards.index'
+import { Route as AuthenticatedAppSettingsIndexRouteImport } from './routes/_authenticated/_app/settings.index'
+import { Route as AuthenticatedAppSettingsBlockedRouteImport } from './routes/_authenticated/_app/settings.blocked'
+import { Route as AuthenticatedAppSettingsHelpRouteImport } from './routes/_authenticated/_app/settings.help'
+import { Route as AuthenticatedAppSettingsPasswordRouteImport } from './routes/_authenticated/_app/settings.password'
+import { Route as AuthenticatedAppSettingsPhoneRouteImport } from './routes/_authenticated/_app/settings.phone'
+import { Route as AuthenticatedAppSettingsPrivacyRouteImport } from './routes/_authenticated/_app/settings.privacy'
+import { Route as AuthenticatedAppSettingsReportRouteImport } from './routes/_authenticated/_app/settings.report'
+import { Route as AuthenticatedAppSettingsTermsRouteImport } from './routes/_authenticated/_app/settings.terms'
+import { Route as AuthenticatedAppUUserIdRouteImport } from './routes/_authenticated/_app/u.$userId'
+import { Route as ApiPublicEventShareImageEventIdRouteImport } from './routes/api/public/event-share-image.$eventId'
 import { Route as AuthenticatedAppCirclesJoinCodeRouteImport } from './routes/_authenticated/_app/circles.join.$code'
+import { Route as AuthenticatedAppEventsEventIdIndexRouteImport } from './routes/_authenticated/_app/events.$eventId.index'
+import { Route as AuthenticatedAppEventsEventIdEditRouteImport } from './routes/_authenticated/_app/events.$eventId.edit'
+import { Route as AuthenticatedAppOfficialOfficialIdCheckoutRouteImport } from './routes/_authenticated/_app/official.$officialId.checkout'
 
-const HomeRoute = HomeRouteImport.update({
-  id: '/home',
-  path: '/home',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin-login',
-  path: '/admin-login',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -109,103 +98,38 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin-login',
+  path: '/admin-login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const OfficialOfficialIdRoute = OfficialOfficialIdRouteImport.update({
-  id: '/official/$officialId',
-  path: '/official/$officialId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckinTokenRoute = CheckinTokenRouteImport.update({
-  id: '/checkin/$token',
-  path: '/checkin/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminVerificationRoute = AdminVerificationRouteImport.update({
-  id: '/verification',
-  path: '/verification',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminStoriesRoute = AdminStoriesRouteImport.update({
-  id: '/stories',
-  path: '/stories',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminSettingsRoute = AdminSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminRewardsRoute = AdminRewardsRouteImport.update({
-  id: '/rewards',
-  path: '/rewards',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminRevenueRoute = AdminRevenueRouteImport.update({
-  id: '/revenue',
-  path: '/revenue',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminReportsRoute = AdminReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminReferralsRoute = AdminReferralsRouteImport.update({
-  id: '/referrals',
-  path: '/referrals',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPostsRoute = AdminPostsRouteImport.update({
-  id: '/posts',
-  path: '/posts',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminOrdersRoute = AdminOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminOfficialRoute = AdminOfficialRouteImport.update({
-  id: '/official',
-  path: '/official',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminMusicRoute = AdminMusicRouteImport.update({
-  id: '/music',
-  path: '/music',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminFlaggedRoute = AdminFlaggedRouteImport.update({
-  id: '/flagged',
-  path: '/flagged',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminEventsRoute = AdminEventsRouteImport.update({
-  id: '/events',
-  path: '/events',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminEngagementRoute = AdminEngagementRouteImport.update({
-  id: '/engagement',
-  path: '/engagement',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminBadgesRoute = AdminBadgesRouteImport.update({
@@ -213,15 +137,158 @@ const AdminBadgesRoute = AdminBadgesRouteImport.update({
   path: '/badges',
   getParentRoute: () => AdminRoute,
 } as any)
-const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const AdminEngagementRoute = AdminEngagementRouteImport.update({
+  id: '/engagement',
+  path: '/engagement',
+  getParentRoute: () => AdminRoute,
 } as any)
-const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
-  id: '/_app',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const AdminEventsRoute = AdminEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AdminRoute,
 } as any)
+const AdminFlaggedRoute = AdminFlaggedRouteImport.update({
+  id: '/flagged',
+  path: '/flagged',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMusicRoute = AdminMusicRouteImport.update({
+  id: '/music',
+  path: '/music',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOfficialRoute = AdminOfficialRouteImport.update({
+  id: '/official',
+  path: '/official',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPostsRoute = AdminPostsRouteImport.update({
+  id: '/posts',
+  path: '/posts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReferralsRoute = AdminReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRevenueRoute = AdminRevenueRouteImport.update({
+  id: '/revenue',
+  path: '/revenue',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRewardsRoute = AdminRewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminStoriesRoute = AdminStoriesRouteImport.update({
+  id: '/stories',
+  path: '/stories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminVerificationRoute = AdminVerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
+  getParentRoute: () => AdminRoute,
+} as any)
+const CheckinTokenRoute = CheckinTokenRouteImport.update({
+  id: '/checkin/$token',
+  path: '/checkin/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfficialOfficialIdRoute = OfficialOfficialIdRouteImport.update({
+  id: '/official/$officialId',
+  path: '/official/$officialId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAppAppHomeRoute = AuthenticatedAppAppHomeRouteImport.update({
+  id: '/app-home',
+  path: '/app-home',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppCreateRoute = AuthenticatedAppCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppDiscoverRoute =
+  AuthenticatedAppDiscoverRouteImport.update({
+    id: '/discover',
+    path: '/discover',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppIcebreakerRoute =
+  AuthenticatedAppIcebreakerRouteImport.update({
+    id: '/icebreaker',
+    path: '/icebreaker',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppNotificationsRoute =
+  AuthenticatedAppNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppPremiumRoute = AuthenticatedAppPremiumRouteImport.update({
+  id: '/premium',
+  path: '/premium',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppRequestsRoute =
+  AuthenticatedAppRequestsRouteImport.update({
+    id: '/requests',
+    path: '/requests',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppSubscriptionRoute =
+  AuthenticatedAppSubscriptionRouteImport.update({
+    id: '/subscription',
+    path: '/subscription',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppVerifyRoute = AuthenticatedAppVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const ApiPublicRazorpayWebhookRoute =
+  ApiPublicRazorpayWebhookRouteImport.update({
+    id: '/api/public/razorpay-webhook',
+    path: '/api/public/razorpay-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicSendPushRoute = ApiPublicSendPushRouteImport.update({
+  id: '/api/public/send-push',
+  path: '/api/public/send-push',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTelegramWebhookRoute =
+  ApiPublicTelegramWebhookRouteImport.update({
+    id: '/api/public/telegram-webhook',
+    path: '/api/public/telegram-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const OfficialOfficialIdIndexRoute = OfficialOfficialIdIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -232,232 +299,10 @@ const OrganiserReviewEventIdRoute = OrganiserReviewEventIdRouteImport.update({
   path: '/organiser/review/$eventId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicTelegramWebhookRoute =
-  ApiPublicTelegramWebhookRouteImport.update({
-    id: '/api/public/telegram-webhook',
-    path: '/api/public/telegram-webhook',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicSendPushRoute = ApiPublicSendPushRouteImport.update({
-  id: '/api/public/send-push',
-  path: '/api/public/send-push',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicRazorpayWebhookRoute =
-  ApiPublicRazorpayWebhookRouteImport.update({
-    id: '/api/public/razorpay-webhook',
-    path: '/api/public/razorpay-webhook',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AuthenticatedAppVerifyRoute = AuthenticatedAppVerifyRouteImport.update({
-  id: '/verify',
-  path: '/verify',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppSubscriptionRoute =
-  AuthenticatedAppSubscriptionRouteImport.update({
-    id: '/subscription',
-    path: '/subscription',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppRequestsRoute =
-  AuthenticatedAppRequestsRouteImport.update({
-    id: '/requests',
-    path: '/requests',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppPremiumRoute = AuthenticatedAppPremiumRouteImport.update({
-  id: '/premium',
-  path: '/premium',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppNotificationsRoute =
-  AuthenticatedAppNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppIcebreakerRoute =
-  AuthenticatedAppIcebreakerRouteImport.update({
-    id: '/icebreaker',
-    path: '/icebreaker',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppDiscoverRoute =
-  AuthenticatedAppDiscoverRouteImport.update({
-    id: '/discover',
-    path: '/discover',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppCreateRoute = AuthenticatedAppCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppAppHomeRoute = AuthenticatedAppAppHomeRouteImport.update({
-  id: '/app-home',
-  path: '/app-home',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppSettingsIndexRoute =
-  AuthenticatedAppSettingsIndexRouteImport.update({
-    id: '/settings/',
-    path: '/settings/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppRewardsIndexRoute =
-  AuthenticatedAppRewardsIndexRouteImport.update({
-    id: '/rewards/',
-    path: '/rewards/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppProfileIndexRoute =
-  AuthenticatedAppProfileIndexRouteImport.update({
-    id: '/profile/',
-    path: '/profile/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppPrideIndexRoute =
-  AuthenticatedAppPrideIndexRouteImport.update({
-    id: '/pride/',
-    path: '/pride/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppPassesIndexRoute =
-  AuthenticatedAppPassesIndexRouteImport.update({
-    id: '/passes/',
-    path: '/passes/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppMessagesIndexRoute =
-  AuthenticatedAppMessagesIndexRouteImport.update({
-    id: '/messages/',
-    path: '/messages/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppEventsIndexRoute =
-  AuthenticatedAppEventsIndexRouteImport.update({
-    id: '/events/',
-    path: '/events/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppCirclesIndexRoute =
-  AuthenticatedAppCirclesIndexRouteImport.update({
-    id: '/circles/',
-    path: '/circles/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
 const AuthenticatedAppChatIndexRoute =
   AuthenticatedAppChatIndexRouteImport.update({
     id: '/chat/',
     path: '/chat/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const ApiPublicEventShareImageEventIdRoute =
-  ApiPublicEventShareImageEventIdRouteImport.update({
-    id: '/api/public/event-share-image/$eventId',
-    path: '/api/public/event-share-image/$eventId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AuthenticatedAppUUserIdRoute = AuthenticatedAppUUserIdRouteImport.update({
-  id: '/u/$userId',
-  path: '/u/$userId',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppSettingsTermsRoute =
-  AuthenticatedAppSettingsTermsRouteImport.update({
-    id: '/settings/terms',
-    path: '/settings/terms',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppSettingsReportRoute =
-  AuthenticatedAppSettingsReportRouteImport.update({
-    id: '/settings/report',
-    path: '/settings/report',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppSettingsPrivacyRoute =
-  AuthenticatedAppSettingsPrivacyRouteImport.update({
-    id: '/settings/privacy',
-    path: '/settings/privacy',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppSettingsPhoneRoute =
-  AuthenticatedAppSettingsPhoneRouteImport.update({
-    id: '/settings/phone',
-    path: '/settings/phone',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppSettingsPasswordRoute =
-  AuthenticatedAppSettingsPasswordRouteImport.update({
-    id: '/settings/password',
-    path: '/settings/password',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppSettingsHelpRoute =
-  AuthenticatedAppSettingsHelpRouteImport.update({
-    id: '/settings/help',
-    path: '/settings/help',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppSettingsBlockedRoute =
-  AuthenticatedAppSettingsBlockedRouteImport.update({
-    id: '/settings/blocked',
-    path: '/settings/blocked',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppProfileEditRoute =
-  AuthenticatedAppProfileEditRouteImport.update({
-    id: '/profile/edit',
-    path: '/profile/edit',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppPrideSetupRoute =
-  AuthenticatedAppPrideSetupRouteImport.update({
-    id: '/pride/setup',
-    path: '/pride/setup',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppPrideResourcesRoute =
-  AuthenticatedAppPrideResourcesRouteImport.update({
-    id: '/pride/resources',
-    path: '/pride/resources',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppPrideNotificationsRoute =
-  AuthenticatedAppPrideNotificationsRouteImport.update({
-    id: '/pride/notifications',
-    path: '/pride/notifications',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppPrideGuidelinesRoute =
-  AuthenticatedAppPrideGuidelinesRouteImport.update({
-    id: '/pride/guidelines',
-    path: '/pride/guidelines',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppPostsPostIdRoute =
-  AuthenticatedAppPostsPostIdRouteImport.update({
-    id: '/posts/$postId',
-    path: '/posts/$postId',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppPassesOrderIdRoute =
-  AuthenticatedAppPassesOrderIdRouteImport.update({
-    id: '/passes/$orderId',
-    path: '/passes/$orderId',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppMessagesThreadIdRoute =
-  AuthenticatedAppMessagesThreadIdRouteImport.update({
-    id: '/messages/$threadId',
-    path: '/messages/$threadId',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppCirclesCircleIdRoute =
-  AuthenticatedAppCirclesCircleIdRouteImport.update({
-    id: '/circles/$circleId',
-    path: '/circles/$circleId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppChatGroupIdRoute =
@@ -466,16 +311,171 @@ const AuthenticatedAppChatGroupIdRoute =
     path: '/chat/$groupId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppCirclesIndexRoute =
+  AuthenticatedAppCirclesIndexRouteImport.update({
+    id: '/circles/',
+    path: '/circles/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppCirclesCircleIdRoute =
+  AuthenticatedAppCirclesCircleIdRouteImport.update({
+    id: '/circles/$circleId',
+    path: '/circles/$circleId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppEventsIndexRoute =
+  AuthenticatedAppEventsIndexRouteImport.update({
+    id: '/events/',
+    path: '/events/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppMessagesIndexRoute =
+  AuthenticatedAppMessagesIndexRouteImport.update({
+    id: '/messages/',
+    path: '/messages/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppMessagesThreadIdRoute =
+  AuthenticatedAppMessagesThreadIdRouteImport.update({
+    id: '/messages/$threadId',
+    path: '/messages/$threadId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppPassesIndexRoute =
+  AuthenticatedAppPassesIndexRouteImport.update({
+    id: '/passes/',
+    path: '/passes/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppPassesOrderIdRoute =
+  AuthenticatedAppPassesOrderIdRouteImport.update({
+    id: '/passes/$orderId',
+    path: '/passes/$orderId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppPostsPostIdRoute =
+  AuthenticatedAppPostsPostIdRouteImport.update({
+    id: '/posts/$postId',
+    path: '/posts/$postId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppPrideIndexRoute =
+  AuthenticatedAppPrideIndexRouteImport.update({
+    id: '/pride/',
+    path: '/pride/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppPrideGuidelinesRoute =
+  AuthenticatedAppPrideGuidelinesRouteImport.update({
+    id: '/pride/guidelines',
+    path: '/pride/guidelines',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppPrideNotificationsRoute =
+  AuthenticatedAppPrideNotificationsRouteImport.update({
+    id: '/pride/notifications',
+    path: '/pride/notifications',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppPrideResourcesRoute =
+  AuthenticatedAppPrideResourcesRouteImport.update({
+    id: '/pride/resources',
+    path: '/pride/resources',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppPrideSetupRoute =
+  AuthenticatedAppPrideSetupRouteImport.update({
+    id: '/pride/setup',
+    path: '/pride/setup',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppProfileIndexRoute =
+  AuthenticatedAppProfileIndexRouteImport.update({
+    id: '/profile/',
+    path: '/profile/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppProfileEditRoute =
+  AuthenticatedAppProfileEditRouteImport.update({
+    id: '/profile/edit',
+    path: '/profile/edit',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppRewardsIndexRoute =
+  AuthenticatedAppRewardsIndexRouteImport.update({
+    id: '/rewards/',
+    path: '/rewards/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppSettingsIndexRoute =
+  AuthenticatedAppSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppSettingsBlockedRoute =
+  AuthenticatedAppSettingsBlockedRouteImport.update({
+    id: '/settings/blocked',
+    path: '/settings/blocked',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppSettingsHelpRoute =
+  AuthenticatedAppSettingsHelpRouteImport.update({
+    id: '/settings/help',
+    path: '/settings/help',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppSettingsPasswordRoute =
+  AuthenticatedAppSettingsPasswordRouteImport.update({
+    id: '/settings/password',
+    path: '/settings/password',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppSettingsPhoneRoute =
+  AuthenticatedAppSettingsPhoneRouteImport.update({
+    id: '/settings/phone',
+    path: '/settings/phone',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppSettingsPrivacyRoute =
+  AuthenticatedAppSettingsPrivacyRouteImport.update({
+    id: '/settings/privacy',
+    path: '/settings/privacy',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppSettingsReportRoute =
+  AuthenticatedAppSettingsReportRouteImport.update({
+    id: '/settings/report',
+    path: '/settings/report',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppSettingsTermsRoute =
+  AuthenticatedAppSettingsTermsRouteImport.update({
+    id: '/settings/terms',
+    path: '/settings/terms',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppUUserIdRoute = AuthenticatedAppUUserIdRouteImport.update({
+  id: '/u/$userId',
+  path: '/u/$userId',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const ApiPublicEventShareImageEventIdRoute =
+  ApiPublicEventShareImageEventIdRouteImport.update({
+    id: '/api/public/event-share-image/$eventId',
+    path: '/api/public/event-share-image/$eventId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedAppCirclesJoinCodeRoute =
+  AuthenticatedAppCirclesJoinCodeRouteImport.update({
+    id: '/circles/join/$code',
+    path: '/circles/join/$code',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppEventsEventIdIndexRoute =
   AuthenticatedAppEventsEventIdIndexRouteImport.update({
     id: '/events/$eventId/',
     path: '/events/$eventId/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppOfficialOfficialIdCheckoutRoute =
-  AuthenticatedAppOfficialOfficialIdCheckoutRouteImport.update({
-    id: '/official/$officialId/checkout',
-    path: '/official/$officialId/checkout',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppEventsEventIdEditRoute =
@@ -484,10 +484,10 @@ const AuthenticatedAppEventsEventIdEditRoute =
     path: '/events/$eventId/edit',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedAppCirclesJoinCodeRoute =
-  AuthenticatedAppCirclesJoinCodeRouteImport.update({
-    id: '/circles/join/$code',
-    path: '/circles/join/$code',
+const AuthenticatedAppOfficialOfficialIdCheckoutRoute =
+  AuthenticatedAppOfficialOfficialIdCheckoutRouteImport.update({
+    id: '/official/$officialId/checkout',
+    path: '/official/$officialId/checkout',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 
@@ -958,39 +958,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/home': {
-      id: '/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof HomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin-login': {
-      id: '/admin-login'
-      path: '/admin-login'
-      fullPath: '/admin-login'
-      preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -1000,137 +972,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin-login': {
+      id: '/admin-login'
+      path: '/admin-login'
+      fullPath: '/admin-login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/_app': {
+      id: '/_authenticated/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedAppRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/admin/': {
       id: '/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/official/$officialId': {
-      id: '/official/$officialId'
-      path: '/official/$officialId'
-      fullPath: '/official/$officialId'
-      preLoaderRoute: typeof OfficialOfficialIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkin/$token': {
-      id: '/checkin/$token'
-      path: '/checkin/$token'
-      fullPath: '/checkin/$token'
-      preLoaderRoute: typeof CheckinTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/verification': {
-      id: '/admin/verification'
-      path: '/verification'
-      fullPath: '/admin/verification'
-      preLoaderRoute: typeof AdminVerificationRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/stories': {
-      id: '/admin/stories'
-      path: '/stories'
-      fullPath: '/admin/stories'
-      preLoaderRoute: typeof AdminStoriesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/settings': {
-      id: '/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AdminSettingsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/rewards': {
-      id: '/admin/rewards'
-      path: '/rewards'
-      fullPath: '/admin/rewards'
-      preLoaderRoute: typeof AdminRewardsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/revenue': {
-      id: '/admin/revenue'
-      path: '/revenue'
-      fullPath: '/admin/revenue'
-      preLoaderRoute: typeof AdminRevenueRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/reports': {
-      id: '/admin/reports'
-      path: '/reports'
-      fullPath: '/admin/reports'
-      preLoaderRoute: typeof AdminReportsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/referrals': {
-      id: '/admin/referrals'
-      path: '/referrals'
-      fullPath: '/admin/referrals'
-      preLoaderRoute: typeof AdminReferralsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/posts': {
-      id: '/admin/posts'
-      path: '/posts'
-      fullPath: '/admin/posts'
-      preLoaderRoute: typeof AdminPostsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/orders': {
-      id: '/admin/orders'
-      path: '/orders'
-      fullPath: '/admin/orders'
-      preLoaderRoute: typeof AdminOrdersRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/official': {
-      id: '/admin/official'
-      path: '/official'
-      fullPath: '/admin/official'
-      preLoaderRoute: typeof AdminOfficialRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/music': {
-      id: '/admin/music'
-      path: '/music'
-      fullPath: '/admin/music'
-      preLoaderRoute: typeof AdminMusicRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/flagged': {
-      id: '/admin/flagged'
-      path: '/flagged'
-      fullPath: '/admin/flagged'
-      preLoaderRoute: typeof AdminFlaggedRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/events': {
-      id: '/admin/events'
-      path: '/events'
-      fullPath: '/admin/events'
-      preLoaderRoute: typeof AdminEventsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/engagement': {
-      id: '/admin/engagement'
-      path: '/engagement'
-      fullPath: '/admin/engagement'
-      preLoaderRoute: typeof AdminEngagementRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/badges': {
@@ -1140,19 +1035,208 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBadgesRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/_authenticated/onboarding': {
-      id: '/_authenticated/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/admin/engagement': {
+      id: '/admin/engagement'
+      path: '/engagement'
+      fullPath: '/admin/engagement'
+      preLoaderRoute: typeof AdminEngagementRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/_authenticated/_app': {
-      id: '/_authenticated/_app'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedAppRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/admin/events': {
+      id: '/admin/events'
+      path: '/events'
+      fullPath: '/admin/events'
+      preLoaderRoute: typeof AdminEventsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/flagged': {
+      id: '/admin/flagged'
+      path: '/flagged'
+      fullPath: '/admin/flagged'
+      preLoaderRoute: typeof AdminFlaggedRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/music': {
+      id: '/admin/music'
+      path: '/music'
+      fullPath: '/admin/music'
+      preLoaderRoute: typeof AdminMusicRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/official': {
+      id: '/admin/official'
+      path: '/official'
+      fullPath: '/admin/official'
+      preLoaderRoute: typeof AdminOfficialRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/orders': {
+      id: '/admin/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/posts': {
+      id: '/admin/posts'
+      path: '/posts'
+      fullPath: '/admin/posts'
+      preLoaderRoute: typeof AdminPostsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/referrals': {
+      id: '/admin/referrals'
+      path: '/referrals'
+      fullPath: '/admin/referrals'
+      preLoaderRoute: typeof AdminReferralsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/revenue': {
+      id: '/admin/revenue'
+      path: '/revenue'
+      fullPath: '/admin/revenue'
+      preLoaderRoute: typeof AdminRevenueRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/rewards': {
+      id: '/admin/rewards'
+      path: '/rewards'
+      fullPath: '/admin/rewards'
+      preLoaderRoute: typeof AdminRewardsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/stories': {
+      id: '/admin/stories'
+      path: '/stories'
+      fullPath: '/admin/stories'
+      preLoaderRoute: typeof AdminStoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/verification': {
+      id: '/admin/verification'
+      path: '/verification'
+      fullPath: '/admin/verification'
+      preLoaderRoute: typeof AdminVerificationRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/checkin/$token': {
+      id: '/checkin/$token'
+      path: '/checkin/$token'
+      fullPath: '/checkin/$token'
+      preLoaderRoute: typeof CheckinTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/official/$officialId': {
+      id: '/official/$officialId'
+      path: '/official/$officialId'
+      fullPath: '/official/$officialId'
+      preLoaderRoute: typeof OfficialOfficialIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/_app/app-home': {
+      id: '/_authenticated/_app/app-home'
+      path: '/app-home'
+      fullPath: '/app-home'
+      preLoaderRoute: typeof AuthenticatedAppAppHomeRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/create': {
+      id: '/_authenticated/_app/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof AuthenticatedAppCreateRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/discover': {
+      id: '/_authenticated/_app/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof AuthenticatedAppDiscoverRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/icebreaker': {
+      id: '/_authenticated/_app/icebreaker'
+      path: '/icebreaker'
+      fullPath: '/icebreaker'
+      preLoaderRoute: typeof AuthenticatedAppIcebreakerRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/notifications': {
+      id: '/_authenticated/_app/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedAppNotificationsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/premium': {
+      id: '/_authenticated/_app/premium'
+      path: '/premium'
+      fullPath: '/premium'
+      preLoaderRoute: typeof AuthenticatedAppPremiumRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/requests': {
+      id: '/_authenticated/_app/requests'
+      path: '/requests'
+      fullPath: '/requests'
+      preLoaderRoute: typeof AuthenticatedAppRequestsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/subscription': {
+      id: '/_authenticated/_app/subscription'
+      path: '/subscription'
+      fullPath: '/subscription'
+      preLoaderRoute: typeof AuthenticatedAppSubscriptionRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/verify': {
+      id: '/_authenticated/_app/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof AuthenticatedAppVerifyRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/api/public/razorpay-webhook': {
+      id: '/api/public/razorpay-webhook'
+      path: '/api/public/razorpay-webhook'
+      fullPath: '/api/public/razorpay-webhook'
+      preLoaderRoute: typeof ApiPublicRazorpayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/send-push': {
+      id: '/api/public/send-push'
+      path: '/api/public/send-push'
+      fullPath: '/api/public/send-push'
+      preLoaderRoute: typeof ApiPublicSendPushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/telegram-webhook': {
+      id: '/api/public/telegram-webhook'
+      path: '/api/public/telegram-webhook'
+      fullPath: '/api/public/telegram-webhook'
+      preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/official/$officialId/': {
       id: '/official/$officialId/'
@@ -1168,277 +1252,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrganiserReviewEventIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/telegram-webhook': {
-      id: '/api/public/telegram-webhook'
-      path: '/api/public/telegram-webhook'
-      fullPath: '/api/public/telegram-webhook'
-      preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/send-push': {
-      id: '/api/public/send-push'
-      path: '/api/public/send-push'
-      fullPath: '/api/public/send-push'
-      preLoaderRoute: typeof ApiPublicSendPushRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/razorpay-webhook': {
-      id: '/api/public/razorpay-webhook'
-      path: '/api/public/razorpay-webhook'
-      fullPath: '/api/public/razorpay-webhook'
-      preLoaderRoute: typeof ApiPublicRazorpayWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/_app/verify': {
-      id: '/_authenticated/_app/verify'
-      path: '/verify'
-      fullPath: '/verify'
-      preLoaderRoute: typeof AuthenticatedAppVerifyRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/subscription': {
-      id: '/_authenticated/_app/subscription'
-      path: '/subscription'
-      fullPath: '/subscription'
-      preLoaderRoute: typeof AuthenticatedAppSubscriptionRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/requests': {
-      id: '/_authenticated/_app/requests'
-      path: '/requests'
-      fullPath: '/requests'
-      preLoaderRoute: typeof AuthenticatedAppRequestsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/premium': {
-      id: '/_authenticated/_app/premium'
-      path: '/premium'
-      fullPath: '/premium'
-      preLoaderRoute: typeof AuthenticatedAppPremiumRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/notifications': {
-      id: '/_authenticated/_app/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof AuthenticatedAppNotificationsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/icebreaker': {
-      id: '/_authenticated/_app/icebreaker'
-      path: '/icebreaker'
-      fullPath: '/icebreaker'
-      preLoaderRoute: typeof AuthenticatedAppIcebreakerRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/discover': {
-      id: '/_authenticated/_app/discover'
-      path: '/discover'
-      fullPath: '/discover'
-      preLoaderRoute: typeof AuthenticatedAppDiscoverRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/create': {
-      id: '/_authenticated/_app/create'
-      path: '/create'
-      fullPath: '/create'
-      preLoaderRoute: typeof AuthenticatedAppCreateRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/app-home': {
-      id: '/_authenticated/_app/app-home'
-      path: '/app-home'
-      fullPath: '/app-home'
-      preLoaderRoute: typeof AuthenticatedAppAppHomeRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/settings/': {
-      id: '/_authenticated/_app/settings/'
-      path: '/settings'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof AuthenticatedAppSettingsIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/rewards/': {
-      id: '/_authenticated/_app/rewards/'
-      path: '/rewards'
-      fullPath: '/rewards/'
-      preLoaderRoute: typeof AuthenticatedAppRewardsIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/profile/': {
-      id: '/_authenticated/_app/profile/'
-      path: '/profile'
-      fullPath: '/profile/'
-      preLoaderRoute: typeof AuthenticatedAppProfileIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/pride/': {
-      id: '/_authenticated/_app/pride/'
-      path: '/pride'
-      fullPath: '/pride/'
-      preLoaderRoute: typeof AuthenticatedAppPrideIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/passes/': {
-      id: '/_authenticated/_app/passes/'
-      path: '/passes'
-      fullPath: '/passes/'
-      preLoaderRoute: typeof AuthenticatedAppPassesIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/messages/': {
-      id: '/_authenticated/_app/messages/'
-      path: '/messages'
-      fullPath: '/messages/'
-      preLoaderRoute: typeof AuthenticatedAppMessagesIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/events/': {
-      id: '/_authenticated/_app/events/'
-      path: '/events'
-      fullPath: '/events/'
-      preLoaderRoute: typeof AuthenticatedAppEventsIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/circles/': {
-      id: '/_authenticated/_app/circles/'
-      path: '/circles'
-      fullPath: '/circles/'
-      preLoaderRoute: typeof AuthenticatedAppCirclesIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
     '/_authenticated/_app/chat/': {
       id: '/_authenticated/_app/chat/'
       path: '/chat'
       fullPath: '/chat/'
       preLoaderRoute: typeof AuthenticatedAppChatIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/api/public/event-share-image/$eventId': {
-      id: '/api/public/event-share-image/$eventId'
-      path: '/api/public/event-share-image/$eventId'
-      fullPath: '/api/public/event-share-image/$eventId'
-      preLoaderRoute: typeof ApiPublicEventShareImageEventIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/_app/u/$userId': {
-      id: '/_authenticated/_app/u/$userId'
-      path: '/u/$userId'
-      fullPath: '/u/$userId'
-      preLoaderRoute: typeof AuthenticatedAppUUserIdRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/settings/terms': {
-      id: '/_authenticated/_app/settings/terms'
-      path: '/settings/terms'
-      fullPath: '/settings/terms'
-      preLoaderRoute: typeof AuthenticatedAppSettingsTermsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/settings/report': {
-      id: '/_authenticated/_app/settings/report'
-      path: '/settings/report'
-      fullPath: '/settings/report'
-      preLoaderRoute: typeof AuthenticatedAppSettingsReportRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/settings/privacy': {
-      id: '/_authenticated/_app/settings/privacy'
-      path: '/settings/privacy'
-      fullPath: '/settings/privacy'
-      preLoaderRoute: typeof AuthenticatedAppSettingsPrivacyRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/settings/phone': {
-      id: '/_authenticated/_app/settings/phone'
-      path: '/settings/phone'
-      fullPath: '/settings/phone'
-      preLoaderRoute: typeof AuthenticatedAppSettingsPhoneRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/settings/password': {
-      id: '/_authenticated/_app/settings/password'
-      path: '/settings/password'
-      fullPath: '/settings/password'
-      preLoaderRoute: typeof AuthenticatedAppSettingsPasswordRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/settings/help': {
-      id: '/_authenticated/_app/settings/help'
-      path: '/settings/help'
-      fullPath: '/settings/help'
-      preLoaderRoute: typeof AuthenticatedAppSettingsHelpRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/settings/blocked': {
-      id: '/_authenticated/_app/settings/blocked'
-      path: '/settings/blocked'
-      fullPath: '/settings/blocked'
-      preLoaderRoute: typeof AuthenticatedAppSettingsBlockedRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/profile/edit': {
-      id: '/_authenticated/_app/profile/edit'
-      path: '/profile/edit'
-      fullPath: '/profile/edit'
-      preLoaderRoute: typeof AuthenticatedAppProfileEditRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/pride/setup': {
-      id: '/_authenticated/_app/pride/setup'
-      path: '/pride/setup'
-      fullPath: '/pride/setup'
-      preLoaderRoute: typeof AuthenticatedAppPrideSetupRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/pride/resources': {
-      id: '/_authenticated/_app/pride/resources'
-      path: '/pride/resources'
-      fullPath: '/pride/resources'
-      preLoaderRoute: typeof AuthenticatedAppPrideResourcesRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/pride/notifications': {
-      id: '/_authenticated/_app/pride/notifications'
-      path: '/pride/notifications'
-      fullPath: '/pride/notifications'
-      preLoaderRoute: typeof AuthenticatedAppPrideNotificationsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/pride/guidelines': {
-      id: '/_authenticated/_app/pride/guidelines'
-      path: '/pride/guidelines'
-      fullPath: '/pride/guidelines'
-      preLoaderRoute: typeof AuthenticatedAppPrideGuidelinesRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/posts/$postId': {
-      id: '/_authenticated/_app/posts/$postId'
-      path: '/posts/$postId'
-      fullPath: '/posts/$postId'
-      preLoaderRoute: typeof AuthenticatedAppPostsPostIdRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/passes/$orderId': {
-      id: '/_authenticated/_app/passes/$orderId'
-      path: '/passes/$orderId'
-      fullPath: '/passes/$orderId'
-      preLoaderRoute: typeof AuthenticatedAppPassesOrderIdRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/messages/$threadId': {
-      id: '/_authenticated/_app/messages/$threadId'
-      path: '/messages/$threadId'
-      fullPath: '/messages/$threadId'
-      preLoaderRoute: typeof AuthenticatedAppMessagesThreadIdRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/circles/$circleId': {
-      id: '/_authenticated/_app/circles/$circleId'
-      path: '/circles/$circleId'
-      fullPath: '/circles/$circleId'
-      preLoaderRoute: typeof AuthenticatedAppCirclesCircleIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/chat/$groupId': {
@@ -1448,18 +1266,200 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppChatGroupIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/circles/': {
+      id: '/_authenticated/_app/circles/'
+      path: '/circles'
+      fullPath: '/circles/'
+      preLoaderRoute: typeof AuthenticatedAppCirclesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/circles/$circleId': {
+      id: '/_authenticated/_app/circles/$circleId'
+      path: '/circles/$circleId'
+      fullPath: '/circles/$circleId'
+      preLoaderRoute: typeof AuthenticatedAppCirclesCircleIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/events/': {
+      id: '/_authenticated/_app/events/'
+      path: '/events'
+      fullPath: '/events/'
+      preLoaderRoute: typeof AuthenticatedAppEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/messages/': {
+      id: '/_authenticated/_app/messages/'
+      path: '/messages'
+      fullPath: '/messages/'
+      preLoaderRoute: typeof AuthenticatedAppMessagesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/messages/$threadId': {
+      id: '/_authenticated/_app/messages/$threadId'
+      path: '/messages/$threadId'
+      fullPath: '/messages/$threadId'
+      preLoaderRoute: typeof AuthenticatedAppMessagesThreadIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/passes/': {
+      id: '/_authenticated/_app/passes/'
+      path: '/passes'
+      fullPath: '/passes/'
+      preLoaderRoute: typeof AuthenticatedAppPassesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/passes/$orderId': {
+      id: '/_authenticated/_app/passes/$orderId'
+      path: '/passes/$orderId'
+      fullPath: '/passes/$orderId'
+      preLoaderRoute: typeof AuthenticatedAppPassesOrderIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/posts/$postId': {
+      id: '/_authenticated/_app/posts/$postId'
+      path: '/posts/$postId'
+      fullPath: '/posts/$postId'
+      preLoaderRoute: typeof AuthenticatedAppPostsPostIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/pride/': {
+      id: '/_authenticated/_app/pride/'
+      path: '/pride'
+      fullPath: '/pride/'
+      preLoaderRoute: typeof AuthenticatedAppPrideIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/pride/guidelines': {
+      id: '/_authenticated/_app/pride/guidelines'
+      path: '/pride/guidelines'
+      fullPath: '/pride/guidelines'
+      preLoaderRoute: typeof AuthenticatedAppPrideGuidelinesRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/pride/notifications': {
+      id: '/_authenticated/_app/pride/notifications'
+      path: '/pride/notifications'
+      fullPath: '/pride/notifications'
+      preLoaderRoute: typeof AuthenticatedAppPrideNotificationsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/pride/resources': {
+      id: '/_authenticated/_app/pride/resources'
+      path: '/pride/resources'
+      fullPath: '/pride/resources'
+      preLoaderRoute: typeof AuthenticatedAppPrideResourcesRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/pride/setup': {
+      id: '/_authenticated/_app/pride/setup'
+      path: '/pride/setup'
+      fullPath: '/pride/setup'
+      preLoaderRoute: typeof AuthenticatedAppPrideSetupRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/profile/': {
+      id: '/_authenticated/_app/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof AuthenticatedAppProfileIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/profile/edit': {
+      id: '/_authenticated/_app/profile/edit'
+      path: '/profile/edit'
+      fullPath: '/profile/edit'
+      preLoaderRoute: typeof AuthenticatedAppProfileEditRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/rewards/': {
+      id: '/_authenticated/_app/rewards/'
+      path: '/rewards'
+      fullPath: '/rewards/'
+      preLoaderRoute: typeof AuthenticatedAppRewardsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/settings/': {
+      id: '/_authenticated/_app/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AuthenticatedAppSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/settings/blocked': {
+      id: '/_authenticated/_app/settings/blocked'
+      path: '/settings/blocked'
+      fullPath: '/settings/blocked'
+      preLoaderRoute: typeof AuthenticatedAppSettingsBlockedRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/settings/help': {
+      id: '/_authenticated/_app/settings/help'
+      path: '/settings/help'
+      fullPath: '/settings/help'
+      preLoaderRoute: typeof AuthenticatedAppSettingsHelpRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/settings/password': {
+      id: '/_authenticated/_app/settings/password'
+      path: '/settings/password'
+      fullPath: '/settings/password'
+      preLoaderRoute: typeof AuthenticatedAppSettingsPasswordRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/settings/phone': {
+      id: '/_authenticated/_app/settings/phone'
+      path: '/settings/phone'
+      fullPath: '/settings/phone'
+      preLoaderRoute: typeof AuthenticatedAppSettingsPhoneRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/settings/privacy': {
+      id: '/_authenticated/_app/settings/privacy'
+      path: '/settings/privacy'
+      fullPath: '/settings/privacy'
+      preLoaderRoute: typeof AuthenticatedAppSettingsPrivacyRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/settings/report': {
+      id: '/_authenticated/_app/settings/report'
+      path: '/settings/report'
+      fullPath: '/settings/report'
+      preLoaderRoute: typeof AuthenticatedAppSettingsReportRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/settings/terms': {
+      id: '/_authenticated/_app/settings/terms'
+      path: '/settings/terms'
+      fullPath: '/settings/terms'
+      preLoaderRoute: typeof AuthenticatedAppSettingsTermsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/u/$userId': {
+      id: '/_authenticated/_app/u/$userId'
+      path: '/u/$userId'
+      fullPath: '/u/$userId'
+      preLoaderRoute: typeof AuthenticatedAppUUserIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/api/public/event-share-image/$eventId': {
+      id: '/api/public/event-share-image/$eventId'
+      path: '/api/public/event-share-image/$eventId'
+      fullPath: '/api/public/event-share-image/$eventId'
+      preLoaderRoute: typeof ApiPublicEventShareImageEventIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/_app/circles/join/$code': {
+      id: '/_authenticated/_app/circles/join/$code'
+      path: '/circles/join/$code'
+      fullPath: '/circles/join/$code'
+      preLoaderRoute: typeof AuthenticatedAppCirclesJoinCodeRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/events/$eventId/': {
       id: '/_authenticated/_app/events/$eventId/'
       path: '/events/$eventId'
       fullPath: '/events/$eventId/'
       preLoaderRoute: typeof AuthenticatedAppEventsEventIdIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/official/$officialId/checkout': {
-      id: '/_authenticated/_app/official/$officialId/checkout'
-      path: '/official/$officialId/checkout'
-      fullPath: '/official/$officialId/checkout'
-      preLoaderRoute: typeof AuthenticatedAppOfficialOfficialIdCheckoutRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/events/$eventId/edit': {
@@ -1469,11 +1469,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppEventsEventIdEditRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/_app/circles/join/$code': {
-      id: '/_authenticated/_app/circles/join/$code'
-      path: '/circles/join/$code'
-      fullPath: '/circles/join/$code'
-      preLoaderRoute: typeof AuthenticatedAppCirclesJoinCodeRouteImport
+    '/_authenticated/_app/official/$officialId/checkout': {
+      id: '/_authenticated/_app/official/$officialId/checkout'
+      path: '/official/$officialId/checkout'
+      fullPath: '/official/$officialId/checkout'
+      preLoaderRoute: typeof AuthenticatedAppOfficialOfficialIdCheckoutRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
   }
